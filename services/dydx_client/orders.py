@@ -7,11 +7,11 @@ This class have   functions create_order() and cancel_orders() that are used to 
 
 
 class DydxOrder:
-    CLIENT = None
+
 
     def __init__(self):
-        self.CLIENT = DydxPClient()
-        self.CLIENT = self.CLIENT.get_dydx_instance
+        self.client = DydxPClient()
+        self.client = self.client.get_dydx_instance
 
     """ function is responsible for creating Order on dydx.
         @param order_params are order parameters that pass to dydx API.
@@ -19,21 +19,8 @@ class DydxOrder:
     """
 
     def create_order(self, order_params):
-        placed_order = self.CLIENT.private.create_order(
-            position_id=order_params[
-                "position_id"
-            ],  # required for creating the order signature
-            market=order_params["market"],
-            side=order_params["side"],
-            order_type=order_params["order_type"],
-            post_only=order_params["post_only"],
-            size=str(order_params["size"]),
-            price=str(order_params["price"]),
-            limit_fee=str(order_params["limit_fee"]),
-            expiration_epoch_seconds=order_params["expiration_epoch_seconds"],
-            time_in_force=order_params["time_in_force"],
-        )
-        return placed_order
+        placed_order_details = self.client.private.create_order(**order_params)
+        return placed_order_details
 
     """ function is responsible for deleting the order on dydx.
         @param orderId orderId to be deleted.
@@ -41,7 +28,7 @@ class DydxOrder:
     """
 
     def cancel_order(self, id):
-        deleted_order = self.CLIENT.private.cancel_order(order_id=id)
+        deleted_order = self.client.private.cancel_order(order_id=id)
         return deleted_order
 
     """ function get_market_orders is responsible for getting all the market order according to the order_params.
@@ -50,7 +37,7 @@ class DydxOrder:
     """
 
     def get_market_orders(self, order_params):
-        all_orders = self.CLIENT.private.get_orders(
+        all_orders = self.client.private.get_orders(
             market=order_params["market"],
             status=order_params["status"],
             side=order_params["side"],
