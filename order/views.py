@@ -1,11 +1,7 @@
-from django.shortcuts import render
-
-# Create your views here.
 from dydx3 import DydxApiError
 from rest_framework import status
 from rest_framework.response import Response
 from rest_framework.viewsets import GenericViewSet
-
 from order.serializers import OrderRequestSerializer, CancelOrderRequestSerializer
 from services import DydxAdmin, DydxOrder
 from utilities.enums import ErrorCodes
@@ -36,34 +32,9 @@ class Order(GenericViewSet):
         except DydxApiError or ValueError as e:
             e = vars(e)
             error = e["msg"]["errors"][0]["msg"]
-            error_codes = ErrorCodes(error)
+            error_codes = ErrorCodes
             if error_codes.signature_error.value == error:
-                # get the user position_id
-                position_id = ADMIN.get_position_id()
-                order_data["position_id"] = position_id
-                try:
-                    response = DYDX_ORDER.create_order(order_data)
-                    response = vars(response)
-                    response = response["data"]["order"]
-                    return Response(response, status.HTTP_201_CREATED)
-                except DydxApiError as e:
-                    e = vars(e)
-                    error = e["msg"]["errors"][0]["msg"]
-                    return Response(str(error), status.HTTP_400_BAD_REQUEST)
-            elif error_codes.time_expiration_error.value == error:
-                return Response(str(error), status.HTTP_400_BAD_REQUEST)
-            elif error_codes.timeInForce_error.value == error:
-                return Response(str(error), status.HTTP_400_BAD_REQUEST)
-            elif error_codes.invalid_order_type.value == error:
-                return Response(str(error), status.HTTP_400_BAD_REQUEST)
-            elif error_codes.invalid_side_error.value == error:
-                return Response(str(error), status.HTTP_400_BAD_REQUEST)
-            elif (
-                error_codes.order_size_error.value == error
-                or error_codes.price_size_error == error
-            ):
-                return Response(str(error), status.HTTP_400_BAD_REQUEST)
-            print(vars(error))
+                return Response(str("Invalid position id"), status.HTTP_400_BAD_REQUEST)
             return Response(str(error), status.HTTP_400_BAD_REQUEST)
         except Exception as e:
             return Response(str(e), status.HTTP_400_BAD_REQUEST)
@@ -88,3 +59,10 @@ class Order(GenericViewSet):
             e = vars(e)
             error = e["msg"]["errors"][0]["msg"]
             return Response(str(error), status.HTTP_400_BAD_REQUEST)
+
+    def get_position_id(self, requset):
+        try:
+            position_id = ADMIN.get_position_id()
+            return Response("position_id:" + str(position_id), status.HTTP_200_OK)
+        except Exception as e:
+            return Response(str(e), status.HTTP_500_INTERNAL_SERVER_ERROR)
