@@ -7,8 +7,7 @@ from rest_framework.response import Response
 from rest_framework.viewsets import GenericViewSet
 
 from order.serializers import OrderRequestSerializer, CancelOrderRequestSerializer
-from services import DydxOrder
-from services.dydx_client import DydxAdmin
+from services import DydxAdmin, DydxOrder
 from utilities.enums import ErrorCodes
 
 ADMIN = DydxAdmin()
