@@ -24,20 +24,23 @@ class Order(GenericViewSet):
         serializer = self.serializer_class(data=request.data)
         serializer.is_valid(raise_exception=True)
         order_data = serializer.data
+
+        result = {"message": None, "error": None}
         try:
-            response = DYDX_ORDER.create_order(order_data)
-            response = vars(response)
-            response = response["data"]["order"]
-            return Response(response, status.HTTP_201_CREATED)
+            dydx_order_details = DYDX_ORDER.create_order(order_data)
+            dydx_order_details = vars(dydx_order_details)
+            result["message"] = dydx_order_details["data"]["order"]
+            return Response(result, status.HTTP_201_CREATED)
         except DydxApiError or ValueError as e:
             e = vars(e)
-            error = e["msg"]["errors"][0]["msg"]
+            result["error"] = e["msg"]["errors"][0]["msg"]
             error_codes = ErrorCodes
-            if error_codes.signature_error.value == error:
-                return Response(str("Invalid position id"), status.HTTP_400_BAD_REQUEST)
-            return Response(str(error), status.HTTP_400_BAD_REQUEST)
+            if error_codes.signature_error.value == result["error"]:
+                return Response(result, status.HTTP_400_BAD_REQUEST)
+            return Response(result, status.HTTP_400_BAD_REQUEST)
         except Exception as e:
-            return Response(str(e), status.HTTP_400_BAD_REQUEST)
+            result["error"] = str(e)
+            return Response(result, status.HTTP_400_BAD_REQUEST)
 
     """
         method cancel  is used to cancel an given order.
@@ -50,19 +53,24 @@ class Order(GenericViewSet):
         self.serializer_class = CancelOrderRequestSerializer(data=request.data)
         self.serializer_class.is_valid(raise_exception=True)
         order_id = self.serializer_class.data["order_id"]
+
+        result = {"message": None, "error": None}
         try:
-            response = DYDX_ORDER.cancel_order(order_id)
-            response = vars(response)
-            response = response["data"]["cancelOrder"]
-            return Response(response, status.HTTP_200_OK)
+            cancelled_order_details = DYDX_ORDER.cancel_order(order_id)
+            cancelled_order_details = vars(cancelled_order_details)
+            result["message"] = cancelled_order_details["data"]["cancelOrder"]
+            return Response(result, status.HTTP_200_OK)
         except Exception as e:
             e = vars(e)
-            error = e["msg"]["errors"][0]["msg"]
-            return Response(str(error), status.HTTP_400_BAD_REQUEST)
+            result["error"] = e["msg"]["errors"][0]["msg"]
+            return Response(result, status.HTTP_500_INTERNAL_SERVER_ERROR)
 
-    def get_position_id(self, requset):
+    def get_position_id(self, request):
+        result = {"message": None, "error": None}
         try:
             position_id = ADMIN.get_position_id()
-            return Response("position_id:" + str(position_id), status.HTTP_200_OK)
+            result["message"] = {"position_id": position_id}
+            return Response(result, status.HTTP_200_OK)
         except Exception as e:
-            return Response(str(e), status.HTTP_500_INTERNAL_SERVER_ERROR)
+            result["error"] = str(e)
+            return Response(result, status.HTTP_500_INTERNAL_SERVER_ERROR)

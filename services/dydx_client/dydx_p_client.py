@@ -6,12 +6,15 @@ from web3 import Web3
 This class DydxPClient is responsible for initializing the DydxClient instance.
 It has a function __create_dydx_Instance() that is responsible for initializing the dydx instance and returning it.
 """
-CLIENT = None
+
 
 # TODO : make is singleton class
-class DydxPClient:
+class DydxPClient(object):
+    def __init__(self):
+        self.client = None
+
     def create_dydx_Instance(self):
-        CLIENT = Client(
+        self.client = Client(
             host=config("HOST"),
             network_id=config("NETWORK_ID"),
             eth_private_key=config("PRIVATE_KEY"),
@@ -23,11 +26,11 @@ class DydxPClient:
                 "passphrase": config("PASSPHRASE"),
             },
         )
-        return CLIENT
+        return self.client
 
     @property
     def get_dydx_instance(self):
-        if CLIENT != None:
-            return CLIENT
+        if self.client is not None:
+            return self.client
 
         return self.create_dydx_Instance()
