@@ -25,12 +25,11 @@ class Order(GenericViewSet):
         dydx_order = DydxOrder()
         order_manager = OrderManager()
         result = {"message": None, "error": None}
-
         try:
             dydx_order_details = dydx_order.create_order(order_data)
             dydx_order_details = vars(dydx_order_details)
             result["message"] = dydx_order_details["data"]["order"]
-            order_manager.store_order_data(result["message"])
+            order_manager.store_data_firebase(result["message"], "dydx_order")
             return Response(result, status.HTTP_201_CREATED)
         except DydxApiError or ValueError as e:
             e = vars(e)
@@ -62,12 +61,20 @@ class Order(GenericViewSet):
             cancelled_order_details = dydx_order.cancel_order(order_id)
             cancelled_order_details = vars(cancelled_order_details)
             result["message"] = cancelled_order_details["data"]["cancelOrder"]
-            order_manager.update_order_data(order_id)
+            order_manager.update_on_firebase(order_id, "dydx_order", "CANCEL")
             return Response(result, status.HTTP_200_OK)
         except Exception as e:
             e = vars(e)
             result["error"] = e["msg"]["errors"][0]["msg"]
             return Response(result, status.HTTP_500_INTERNAL_SERVER_ERROR)
+
+    """ method dydx_order is responsible for getting all the openPositions on dydx .
+        :return openPositions on dydx.
+    """
+
+    def dydx_order(self, request):
+        result = {"message": None, "error": None}
+        admin = DydxAdmin()
 
     """ method dydx_order is responsible for getting all the openPositions on dydx .
         :return openPositions on dydx.
@@ -103,6 +110,8 @@ class Order(GenericViewSet):
 
         try:
             orders = order_manager.fetch_orders(order_id=validated_data.get("order_id"))
+            if orders is None:
+                raise RuntimeError("Order id not found")
             result["message"] = orders
             return Response(result, status.HTTP_200_OK)
 
