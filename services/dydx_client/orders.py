@@ -1,5 +1,3 @@
-from dydx3.constants import ASSET_USDC, ACCOUNT_ACTION_WITHDRAWAL
-
 from services.dydx_client.dydx_p_client import DydxPClient
 
 """
@@ -9,11 +7,11 @@ This class have   functions create_order() and cancel_orders() that are used to 
 
 
 class DydxOrder:
-    CLIENT = None
+
 
     def __init__(self):
-        self.CLIENT = DydxPClient()
-        self.CLIENT = self.CLIENT.get_dydx_instance
+        self.client = DydxPClient()
+        self.client = self.client.get_dydx_instance
 
     """ function is responsible for creating Order on dydx.
         @param order_params are order parameters that pass to dydx API.
@@ -21,7 +19,7 @@ class DydxOrder:
     """
 
     def create_order(self, order_params):
-        placed_order_details = self.CLIENT.private.create_order(**order_params)
+        placed_order_details = self.client.private.create_order(**order_params)
         return placed_order_details
 
     """ function is responsible for deleting the order on dydx.
@@ -30,7 +28,7 @@ class DydxOrder:
     """
 
     def cancel_order(self, id):
-        deleted_order = self.CLIENT.private.cancel_order(order_id=id)
+        deleted_order = self.client.private.cancel_order(order_id=id)
         return deleted_order
 
     """ function get_market_orders is responsible for getting all the market order according to the order_params.
@@ -39,7 +37,7 @@ class DydxOrder:
     """
 
     def get_market_orders(self, order_params):
-        all_orders = self.CLIENT.private.get_orders(
+        all_orders = self.client.private.get_orders(
             market=order_params["market"],
             status=order_params["status"],
             side=order_params["side"],

@@ -30,7 +30,9 @@ class DydxAdmin(object):
     # function get_register_user is responsible register dydx_user on dydx.
     def register_user(self):
         signature = self.client.private.get_registration()
-        return signature
+        if(not signature is None):
+           return vars(signature)
+        return "user not get register"
 
     """function create_api is responsible for create api with dydx_user account on dydx
        @return created api.
@@ -55,6 +57,8 @@ class DydxAdmin(object):
         account_info = self.client.private.get_account(
             ethereum_address=config("ETH_ADDRESS"),
         )
+
+
         return account_info
 
     # return dydx_user dydx position_id.
@@ -63,6 +67,4 @@ class DydxAdmin(object):
         user = vars(user)
         position_id = user["data"]["account"]["positionId"]
         return position_id
-
-
 

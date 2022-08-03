@@ -27,7 +27,6 @@ class Order(GenericViewSet):
         result = {"message": None, "error": None}
         order_manager = OrderManager()
         result = {"message": None, "error": None}
-
         try:
             dydx_order_details = dydx_order.create_order(order_data)
             dydx_order_details = vars(dydx_order_details)
@@ -36,15 +35,11 @@ class Order(GenericViewSet):
             return Response(result, status.HTTP_201_CREATED)
         except DydxApiError or ValueError as e:
             e = vars(e)
-
             result["error"] = e["msg"]["errors"][0]["msg"]
-            error_codes = ErrorCodes
-            if error_codes.signature_error.value == result["error"]:
-                return Response(result, status.HTTP_400_BAD_REQUEST)
             return Response(result, status.HTTP_400_BAD_REQUEST)
         except Exception as e:
             result["error"] = str(e)
-            return Response(result, status.HTTP_400_BAD_REQUEST)
+            return Response(result, status.HTTP_500_INTERNAL_SERVER_ERROR)
 
     """
         method cancel  is used to cancel an given order on dydx .
@@ -68,6 +63,7 @@ class Order(GenericViewSet):
             return Response(result, status.HTTP_200_OK)
         except Exception as e:
             e = vars(e)
+            print("this is error", e)
             result["error"] = e["msg"]["errors"][0]["msg"]
             return Response(result, status.HTTP_500_INTERNAL_SERVER_ERROR)
 

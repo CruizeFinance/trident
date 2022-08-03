@@ -1,7 +1,7 @@
 from decouple import config
 from dydx3 import Client
 from web3 import Web3
-
+from dydx3 import constants
 """
 This class DydxPClient is responsible for initializing the DydxClient instance.
 It has a function __create_dydx_Instance() that is responsible for initializing the dydx instance and returning it.
@@ -15,8 +15,8 @@ class DydxPClient(object):
 
     def create_dydx_Instance(self):
         self.client = Client(
-            host=config("HOST"),
-            network_id=config("NETWORK_ID"),
+            host=constants.API_HOST_ROPSTEN,
+            network_id=constants.NETWORK_ID_ROPSTEN,
             eth_private_key=config("PRIVATE_KEY"),
             stark_private_key=config("STARK_PRIVATE_KEY"),
             web3=Web3(Web3.HTTPProvider(config("WEB_PROVIDER"))),
