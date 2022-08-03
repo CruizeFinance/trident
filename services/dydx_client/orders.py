@@ -1,3 +1,5 @@
+from dydx3.constants import ASSET_USDC, ACCOUNT_ACTION_WITHDRAWAL
+
 from services.dydx_client.dydx_p_client import DydxPClient
 
 """
@@ -19,7 +21,7 @@ class DydxOrder:
     """
 
     def create_order(self, order_params):
-        placed_order = self.CLIENT.private.create_order(
+        placed_order_details = self.CLIENT.private.create_order(
             position_id=order_params[
                 "position_id"
             ],  # required for creating the order signature
@@ -33,7 +35,7 @@ class DydxOrder:
             expiration_epoch_seconds=order_params["expiration_epoch_seconds"],
             time_in_force=order_params["time_in_force"],
         )
-        return placed_order
+        return placed_order_details
 
     """ function is responsible for deleting the order on dydx.
         @param orderId orderId to be deleted.

@@ -2,7 +2,6 @@ from decouple import config
 from dydx3 import Client
 from web3 import Web3
 
-
 """
 This class DydxPClient is responsible for initializing the DydxClient instance.
 It has a function __create_dydx_Instance() that is responsible for initializing the dydx instance and returning it.
@@ -10,11 +9,12 @@ It has a function __create_dydx_Instance() that is responsible for initializing 
 
 
 # TODO : make is singleton class
-class DydxPClient:
-    CLIENT = None
+class DydxPClient(object):
+    def __init__(self):
+        self.client = None
 
-    def _create_dydx_Instance(self):
-        self.CLIENT = Client(
+    def create_dydx_Instance(self):
+        self.client = Client(
             host=config("HOST"),
             network_id=config("NETWORK_ID"),
             eth_private_key=config("PRIVATE_KEY"),
@@ -26,11 +26,11 @@ class DydxPClient:
                 "passphrase": config("PASSPHRASE"),
             },
         )
-        return self.CLIENT
+        return self.client
 
     @property
     def get_dydx_instance(self):
-        if self.CLIENT != None:
-            return self.CLIENT
+        if self.client is not None:
+            return self.client
 
-        return self._create_dydx_Instance()
+        return self.create_dydx_Instance()

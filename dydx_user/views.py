@@ -1,0 +1,23 @@
+from django.shortcuts import render
+
+# Create your views here.
+from rest_framework import status
+from rest_framework.response import Response
+from rest_framework.viewsets import GenericViewSet
+
+from services import DydxAdmin, DydxOrder
+
+ADMIN = DydxAdmin()
+DYDX_ORDER = DydxOrder()
+
+
+class User(GenericViewSet):
+    def get_position_id(self, request):
+        result = {"message": None, "error": None}
+        try:
+            position_id = ADMIN.get_position_id()
+            result["message"] = {"position_id": position_id}
+            return Response(result, status.HTTP_200_OK)
+        except Exception as e:
+            result["error"] = str(e)
+            return Response(result, status.HTTP_500_INTERNAL_SERVER_ERROR)
