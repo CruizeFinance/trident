@@ -2,6 +2,8 @@ from dydx3 import DydxApiError
 from rest_framework import status
 from rest_framework.response import Response
 from rest_framework.viewsets import GenericViewSet
+
+from components import OrderManager
 from order.serializers import OrderRequestSerializer, CancelOrderRequestSerializer
 from services import DydxAdmin, DydxOrder
 from utilities.enums import ErrorCodes
@@ -26,6 +28,8 @@ class Order(GenericViewSet):
         order_data = serializer.data
 
         result = {"message": None, "error": None}
+        order_manager = OrderManager()
+        print('OM: data: ', order_manager.getdata())
         try:
             dydx_order_details = DYDX_ORDER.create_order(order_data)
             dydx_order_details = vars(dydx_order_details)

@@ -1,1 +1,1 @@
-from .firebase_client import  FirebaseClient
+from .firebase_client import FirebaseClient
