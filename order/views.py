@@ -25,6 +25,8 @@ class Order(GenericViewSet):
         dydx_order = DydxOrder()
         order_manager = OrderManager()
         result = {"message": None, "error": None}
+        order_manager = OrderManager()
+        print('OM: data: ', order_manager.getdata())
         try:
             dydx_order_details = dydx_order.create_order(order_data)
             dydx_order_details = vars(dydx_order_details)

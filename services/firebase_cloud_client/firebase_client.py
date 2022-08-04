@@ -25,5 +25,4 @@ class FirebaseClient(object):
         if self.client is not None:
             return self.client
 
-        return self.create_firebase_client_Instance()
-
+        return self.create_firebase_client_instance()
