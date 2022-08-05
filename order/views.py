@@ -26,7 +26,8 @@ class Order(GenericViewSet):
         order_manager = OrderManager()
         result = {"message": None, "error": None}
         order_manager = OrderManager()
-        print('OM: data: ', order_manager.getdata())
+        result = {"message": None, "error": None}
+
         try:
             dydx_order_details = dydx_order.create_order(order_data)
             dydx_order_details = vars(dydx_order_details)
@@ -67,6 +68,7 @@ class Order(GenericViewSet):
             return Response(result, status.HTTP_200_OK)
         except Exception as e:
             e = vars(e)
+            print("this is error", e)
             result["error"] = e["msg"]["errors"][0]["msg"]
             return Response(result, status.HTTP_500_INTERNAL_SERVER_ERROR)
 
