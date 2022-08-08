@@ -68,7 +68,6 @@ class Order(GenericViewSet):
             return Response(result, status.HTTP_200_OK)
         except Exception as e:
             e = vars(e)
-            print("this is error", e)
             result["error"] = e["msg"]["errors"][0]["msg"]
             return Response(result, status.HTTP_500_INTERNAL_SERVER_ERROR)
 
