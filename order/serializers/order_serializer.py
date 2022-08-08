@@ -10,11 +10,11 @@ class OrderRequestSerializer(serializers.Serializer):
     side = serializers.CharField(max_length=4, required=True)
     order_type = serializers.CharField(max_length=6, required=True)
     post_only = serializers.BooleanField(required=True)
-    size = serializers.IntegerField(required=True, min_value=0)
-    price = serializers.FloatField(required=True, min_value=0)
+    size = serializers.CharField(required=True)
+    price = serializers.CharField(required=True)
     limit_fee = serializers.FloatField(required=True, min_value=0)
     expiration_epoch_seconds = serializers.IntegerField(required=True)
-    time_in_force = serializers.CharField(required=True)
+    time_in_force = serializers.CharField(required=False)
 
     def validate(self, data):
         if (

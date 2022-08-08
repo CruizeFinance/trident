@@ -9,8 +9,7 @@ from services import DydxAdmin
 
 
 class User(GenericViewSet):
-
-    def get_position_id(self, request):
+    def position_id(self, request):
         result = {"message": None, "error": None}
         admin = DydxAdmin()
         try:

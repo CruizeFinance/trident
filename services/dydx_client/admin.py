@@ -50,7 +50,7 @@ class DydxAdmin(object):
         api_keys = self.client.private.get_api_keys()
         return api_keys
 
-    # return dydx_user .
+    # return dydx_user.
     def get_account(self):
         account_info = self.client.private.get_account(
             ethereum_address=config("ETH_ADDRESS"),
