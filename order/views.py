@@ -113,8 +113,11 @@ class Order(GenericViewSet):
 
         try:
             orders = order_manager.fetch_orders(order_id=validated_data.get("order_id"))
+<<<<<<< HEAD
             if orders is None:
                 raise RuntimeError("Order id not found")
+=======
+>>>>>>> 311ffb2 (get api for fetching firestore orders)
             result["message"] = orders
             return Response(result, status.HTTP_200_OK)
 
