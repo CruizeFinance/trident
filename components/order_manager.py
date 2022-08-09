@@ -18,3 +18,15 @@ class OrderManager(object):
         self.firebase_client.collection("dydx_orders").document(order_id).update(
             {"status": "CANCEL"}
         )
+
+    def fetch_orders(self, order_id=None):
+        db_ref = self.firebase_client.collection("dydx_orders")
+        if order_id:
+            order = db_ref.document(str(order_id)).get()
+            return vars(order).get("_data")
+
+        order_objects = db_ref.get()
+        orders = []
+        for order in order_objects:
+            orders.append(vars(order)["_data"])
+        return orders

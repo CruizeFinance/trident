@@ -4,6 +4,7 @@ from rest_framework.response import Response
 from rest_framework.viewsets import GenericViewSet
 from components import OrderManager
 from order.serializers import OrderRequestSerializer, CancelOrderRequestSerializer
+from order.serializers.order_serializer import FirestoreOrdersRequestSerializer
 from services import DydxOrder, DydxAdmin
 from utilities.enums import ErrorCodes
 
@@ -89,4 +90,22 @@ class Order(GenericViewSet):
         except Exception as e:
             e = vars(e)
             result["error"] = e["msg"]["errors"][0]["msg"]
+            return Response(result, status.HTTP_500_INTERNAL_SERVER_ERROR)
+
+    def orders(self, request):
+        result = {"message": None, "error": None}
+        request_data = request.query_params.dict()
+        self.serializer_class = FirestoreOrdersRequestSerializer(data=request_data)
+        self.serializer_class.is_valid(raise_exception=True)
+        validated_data = self.serializer_class.data
+
+        order_manager = OrderManager()
+
+        try:
+            orders = order_manager.fetch_orders(order_id=validated_data.get("order_id"))
+            result["message"] = orders
             return Response(result, status.HTTP_200_OK)
+
+        except Exception as e:
+            result["error"] = str(e)
+            return Response(result, status.HTTP_500_INTERNAL_SERVER_ERROR)

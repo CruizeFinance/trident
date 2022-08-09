@@ -63,3 +63,8 @@ class DydxAdmin(object):
         user = vars(user)
         position_id = user["data"]["account"]["positionId"]
         return position_id
+
+
+if __name__ == "__main__":
+    a = DydxAdmin()
+    print(vars(a.register_user()))
