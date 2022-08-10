@@ -3,18 +3,11 @@ from rest_framework import status
 from rest_framework.response import Response
 from rest_framework.viewsets import GenericViewSet
 
-<<<<<<< HEAD
 from components import OrderManager
 from dydx_withdrawal import (
     SlowWithdrawalSerializer,
     FastWithdrawalSerializer,
     TransferSerializer,
-=======
-from dydx_withdrawal import (
-    slowWithdrawalSerializer,
-    fastWithdrawalSerializer,
-    transferSerializer,
->>>>>>> 393c1c8 (wrote withdrawal api for dydx and test it on mainnet)
 )
 
 from services import DydxWithdrawal

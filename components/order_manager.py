@@ -22,6 +22,8 @@ class OrderManager(object):
 
         if order_id:
             order = db_ref.document(str(order_id)).get()
+            if order == None:
+                return None
             return vars(order).get("_data")
 
         order_objects = db_ref.get()
