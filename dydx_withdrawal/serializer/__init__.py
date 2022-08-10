@@ -1,5 +1,5 @@
 from .withdrawal_serializer import (
-    slowWithdrawalSerializer,
-    transferSerializer,
-    fastWithdrawalSerializer,
+    SlowWithdrawalSerializer,
+    TransferSerializer,
+    FastWithdrawalSerializer,
 )

@@ -4,9 +4,9 @@ from rest_framework.response import Response
 from rest_framework.viewsets import GenericViewSet
 
 from dydx_withdrawal import (
-    slowWithdrawalSerializer,
-    fastWithdrawalSerializer,
-    transferSerializer,
+    SlowWithdrawalSerializer,
+    FastWithdrawalSerializer,
+    TransferSerializer,
 )
 
 from services import DydxWithdrawal
@@ -20,7 +20,7 @@ class Withdrawal(GenericViewSet):
 
     def slow_withdrawal(self, request):
         result = {"message": None, "error": None}
-        self.serializer_class = slowWithdrawalSerializer
+        self.serializer_class = SlowWithdrawalSerializer
         serializer = self.serializer_class(data=request.data)
         serializer.is_valid(raise_exception=True)
         withdrawal_data = serializer.data
@@ -43,7 +43,7 @@ class Withdrawal(GenericViewSet):
     # NOTICE - NOT TESTED YET.
     def fast_withdrawal(self, request):
         result = {"message": None, "error": None}
-        self.serializer_class = fastWithdrawalSerializer
+        self.serializer_class = FastWithdrawalSerializer
         serializer = self.serializer_class(data=request.data)
         serializer.is_valid(raise_exception=True)
         withdrawal_data = serializer.data
@@ -67,7 +67,7 @@ class Withdrawal(GenericViewSet):
 
     def transfer_info(self, request):
         result = {"message": None, "error": None}
-        self.serializer_class = transferSerializer
+        self.serializer_class = TransferSerializer
         serializer = self.serializer_class(data=request.data)
         serializer.is_valid(raise_exception=True)
         data = serializer.data

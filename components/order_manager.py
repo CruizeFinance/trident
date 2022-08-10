@@ -21,8 +21,11 @@ class OrderManager(object):
 
     def fetch_orders(self, order_id=None):
         db_ref = self.firebase_client.collection("dydx_orders")
+
         if order_id:
             order = db_ref.document(str(order_id)).get()
+            if order == None:
+                return None
             return vars(order).get("_data")
 
         order_objects = db_ref.get()

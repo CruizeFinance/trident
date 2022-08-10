@@ -103,6 +103,8 @@ class Order(GenericViewSet):
 
         try:
             orders = order_manager.fetch_orders(order_id=validated_data.get("order_id"))
+            if orders == None:
+                raise RuntimeError("Order Id not found")
             result["message"] = orders
             return Response(result, status.HTTP_200_OK)
 

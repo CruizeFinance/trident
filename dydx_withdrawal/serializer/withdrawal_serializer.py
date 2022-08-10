@@ -1,7 +1,7 @@
 from rest_framework import serializers
 
 
-class slowWithdrawalSerializer(serializers.Serializer):
+class SlowWithdrawalSerializer(serializers.Serializer):
     position_id = serializers.IntegerField(required=True)
     amount = serializers.CharField(required=True)
     asset = serializers.CharField(required=True)
@@ -9,12 +9,12 @@ class slowWithdrawalSerializer(serializers.Serializer):
     to_address = serializers.CharField(required=True)
 
 
-class transferSerializer(serializers.Serializer):
+class TransferSerializer(serializers.Serializer):
     limit = serializers.CharField(required=True)
     transfer_type = serializers.CharField(required=True)
 
 
-class fastWithdrawalSerializer(serializers.Serializer):
+class FastWithdrawalSerializer(serializers.Serializer):
     position_id = serializers.IntegerField(required=True)
     credit_asset = serializers.CharField(required=True)
     credit_amount = serializers.CharField(required=True)
