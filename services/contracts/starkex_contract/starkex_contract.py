@@ -9,13 +9,13 @@ class StarkExContract():
         dydxabi = requests.get(
            url='https://raw.githubusercontent.com/dydxprotocol/dydx-v3-python/master/dydx3/abi/starkware-perpetuals.json').json()
         self.w3 = Web3(Web3.HTTPProvider(config("WEB_PROVIDER")))
-        self.contract = self.w3.eth.contract(address=config("STARKEX_ADDRESS"), abi=dydxabi)
+        self.contract = self.w3.eth.contract(address=config("STARK_EX_ADDRESS"), abi=dydxabi)
 
     """function withdraw will withdraw funds form dydx contract"""
 
     def withdraw(self):
         transaction = self.contract.functions.withdraw(
-            starkKey=int(config('STRAK_PUBLIC_KEY'), 16),
+            starkKey=int(config('STARK_PUBLIC_KEY'), 16),
             assetType=config("ASSET_TYPE")
         ).buildTransaction()
         transaction.update(
