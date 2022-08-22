@@ -32,7 +32,7 @@ class Order(GenericViewSet):
             dydx_order_details = dydx_order.create_order(order_data)
             dydx_order_details = vars(dydx_order_details)
             result["message"] = dydx_order_details["data"]["order"]
-            order_manager.store_data_firebase(result["message"], "dydx_order")
+            order_manager.store_data_firebase(result["message"], "dydx_orders")
             return Response(result, status.HTTP_201_CREATED)
         except DydxApiError or ValueError as e:
             e = vars(e)
@@ -64,7 +64,7 @@ class Order(GenericViewSet):
             cancelled_order_details = dydx_order.cancel_order(order_id)
             cancelled_order_details = vars(cancelled_order_details)
             result["message"] = cancelled_order_details["data"]["cancelOrder"]
-            order_manager.update_on_firebase(order_id, "dydx_order", "CANCEL")
+            order_manager.update_on_firebase(order_id, "dydx_orders", "CANCEL")
             return Response(result, status.HTTP_200_OK)
         except Exception as e:
             e = vars(e)
