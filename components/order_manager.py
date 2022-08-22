@@ -22,7 +22,10 @@ class OrderManager(object):
 
         if order_id:
             order = db_ref.document(str(order_id)).get()
-            return vars(order).get("_data")
+            data = vars(order).get("_data")
+            if data is None:
+                return "No order id found."
+            return data
 
         order_objects = db_ref.get()
         orders = []

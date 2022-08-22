@@ -65,6 +65,4 @@ class DydxAdmin(object):
         return position_id
 
 
-if __name__ == "__main__":
-    a = DydxAdmin()
-    print(vars(a.register_user()))
+

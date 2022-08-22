@@ -35,4 +35,10 @@ class DydxWithdrawal:
 
     def transfer(self, params):
         transfers = self.client.private.get_transfers(**params)
+<<<<<<< HEAD
         return vars(transfers)
+=======
+        if not transfers is None:
+            return vars(transfers)
+        return "NO TRANSFER FOUND."
+>>>>>>> d7b4f13 (commented changes)
