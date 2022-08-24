@@ -1,13 +1,17 @@
 from django.shortcuts import render
 
 # Create your views here.
+
 from dydx3 import DydxApiError
+
 from rest_framework import status
 from rest_framework.response import Response
 from rest_framework.viewsets import GenericViewSet
 
 from services import DydxAdmin
+
 from utilities.enums import ErrorCodes
+
 
 
 class User(GenericViewSet):
@@ -18,6 +22,7 @@ class User(GenericViewSet):
             position_id = admin.get_position_id()
             result["message"] = {"position_id": position_id}
             return Response(result, status.HTTP_200_OK)
+
         except DydxApiError or ValueError as e:
             e = vars(e)
 
@@ -40,3 +45,4 @@ class User(GenericViewSet):
         except Exception as e:
             result["error"] = str(e)
             return Response(result, status.HTTP_500_INTERNAL_SERVER_ERROR)
+

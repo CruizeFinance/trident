@@ -2,7 +2,6 @@ from components import OrderManager
 from services import DydxWithdrawal
 from settings_config.celery import app
 
-
 @app.task(name="check_withdrawal", default_retry_delay=4 * 60)
 def check_withdrawal():
     dydx_withdrawal = DydxWithdrawal()

@@ -34,6 +34,7 @@ class DydxAdmin(object):
            return vars(signature)
         return "user not get register"
 
+
     """function create_api is responsible for create api with dydx_user account on dydx
        @return created api.
     """
@@ -67,4 +68,5 @@ class DydxAdmin(object):
         user = vars(user)
         position_id = user["data"]["account"]["positionId"]
         return position_id
+
 

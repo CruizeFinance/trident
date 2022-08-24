@@ -13,6 +13,8 @@ from dydx_withdrawal import (
 from services import DydxWithdrawal
 
 
+
+
 class Withdrawal(GenericViewSet):
     """function slow withdrawal is responsible for withdrawing user's asset's.
     :returns Withdrawal information.
@@ -35,10 +37,12 @@ class Withdrawal(GenericViewSet):
         except DydxApiError or ValueError as e:
             e = vars(e)
             result["error"] = e["msg"]["errors"][0]["msg"]
+
             return Response(result, status.HTTP_400_BAD_REQUEST)
         except Exception as e:
             result["error"] = str(e)
             return Response(result, status.HTTP_500_INTERNAL_SERVER_ERROR)
+
 
 
     def fast_withdrawal(self, request):
@@ -50,7 +54,9 @@ class Withdrawal(GenericViewSet):
         try:
             withdrawal_ref = DydxWithdrawal()
             withdrawal_data = withdrawal_ref.fast_withdrawal(withdrawal_data)
+
             result["message"] = withdrawal_data.get('withdrawal')
+
             return Response(result, status.HTTP_200_OK)
         except DydxApiError or ValueError as e:
             e = vars(e)
@@ -61,6 +67,7 @@ class Withdrawal(GenericViewSet):
             result["error"] = str(e)
             return Response(result, status.HTTP_500_INTERNAL_SERVER_ERROR)
 
+
     """ :return user transfer history."""
 
     def transfer_info(self, request):
@@ -70,6 +77,7 @@ class Withdrawal(GenericViewSet):
         serializer.is_valid(raise_exception=True)
         data = serializer.data
         try:
+
             transfer_ref = DydxWithdrawal()
             transfer_data = transfer_ref.transfer(data)
             result["message"] = transfer_data["data"]["transfers"]
@@ -81,3 +89,4 @@ class Withdrawal(GenericViewSet):
         except Exception as e:
             result["error"] = str(e)
             return Response(result, status.HTTP_500_INTERNAL_SERVER_ERROR)
+

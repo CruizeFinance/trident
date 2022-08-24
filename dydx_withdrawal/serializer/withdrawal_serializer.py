@@ -17,6 +17,8 @@ class TransferSerializer(serializers.Serializer):
 
 class FastWithdrawalSerializer(serializers.Serializer):
     position_id = serializers.IntegerField(required=True)
+
     withdrawalamount = serializers.CharField(required=True)
     to_address = serializers.CharField(required=True)
+
 
