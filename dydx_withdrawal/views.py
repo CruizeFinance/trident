@@ -11,7 +11,6 @@ from dydx_withdrawal import (
 )
 
 from services import DydxWithdrawal
-from utilities.enums import ErrorCodes
 
 
 class Withdrawal(GenericViewSet):
@@ -31,20 +30,16 @@ class Withdrawal(GenericViewSet):
             withdrawal_data = withdarwal_ref.slow_withdrawal(data)
             result["message"] = withdrawal_data["data"]["withdrawal"]
             result["message"]["address"] = data["user_address"]
-            db_ref.store_data_firebase(result["message"], "withdrawal")
+            db_ref.store_data(result["message"], "withdrawal")
             return Response(result, status.HTTP_200_OK)
         except DydxApiError or ValueError as e:
             e = vars(e)
             result["error"] = e["msg"]["errors"][0]["msg"]
-            error_codes = ErrorCodes
-            if error_codes.signature_error.value == result["error"]:
-                return Response(result, status.HTTP_400_BAD_REQUEST)
             return Response(result, status.HTTP_400_BAD_REQUEST)
         except Exception as e:
             result["error"] = str(e)
-            return Response(result, status.HTTP_400_BAD_REQUEST)
+            return Response(result, status.HTTP_500_INTERNAL_SERVER_ERROR)
 
-    # NOTICE - NOT TESTED YET.
     def fast_withdrawal(self, request):
         result = {"message": None, "error": None}
         self.serializer_class = FastWithdrawalSerializer
@@ -54,18 +49,16 @@ class Withdrawal(GenericViewSet):
         try:
             withdrawal_ref = DydxWithdrawal()
             withdrawal_data = withdrawal_ref.fast_withdrawal(withdrawal_data)
-            result["message"] = withdrawal_data["data"]["withdrawal"]
+
+            result["message"] = withdrawal_data.get("withdrawal")
             return Response(result, status.HTTP_200_OK)
         except DydxApiError or ValueError as e:
             e = vars(e)
             result["error"] = e["msg"]["errors"][0]["msg"]
-            error_codes = ErrorCodes
-            if error_codes.signature_error.value == result["error"]:
-                return Response(result, status.HTTP_400_BAD_REQUEST)
             return Response(result, status.HTTP_400_BAD_REQUEST)
         except Exception as e:
             result["error"] = str(e)
-            return Response(result, status.HTTP_400_BAD_REQUEST)
+            return Response(result, status.HTTP_500_INTERNAL_SERVER_ERROR)
 
     """ :return user transfer history."""
 
@@ -78,16 +71,13 @@ class Withdrawal(GenericViewSet):
         try:
 
             transfer_ref = DydxWithdrawal()
-            transfer_data = transfer_ref.transfer(data)
+            transfer_data = transfer_ref.all_transfer_details(data)
             result["message"] = transfer_data["data"]["transfers"]
             return Response(result, status.HTTP_200_OK)
         except DydxApiError or ValueError as e:
             e = vars(e)
             result["error"] = e["msg"]["errors"][0]["msg"]
-            error_codes = ErrorCodes
-            if error_codes.signature_error.value == result["error"]:
-                return Response(result, status.HTTP_400_BAD_REQUEST)
             return Response(result, status.HTTP_400_BAD_REQUEST)
         except Exception as e:
             result["error"] = str(e)
-            return Response(result, status.HTTP_400_BAD_REQUEST)
+            return Response(result, status.HTTP_500_INTERNAL_SERVER_ERROR)
