@@ -20,7 +20,6 @@ class DydxPClient(object):
         self.client = Client(
             host=constants.API_HOST_ROPSTEN,
             network_id=constants.NETWORK_ID_ROPSTEN,
-            eth_private_key=config("PRIVATE_KEY"),
             stark_private_key=config("STARK_PRIVATE_KEY"),
             web3=Web3(Web3.HTTPProvider(config("WEB_PROVIDER"))),
             api_key_credentials={
@@ -37,3 +36,8 @@ class DydxPClient(object):
         if self.client is not None:
             return self.client
         return self.create_dydx_Instance()
+
+
+if __name__ == "__main__":
+    d = DydxPClient()
+    print(vars(d.get_dydx_instance))
