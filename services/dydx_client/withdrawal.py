@@ -1,3 +1,7 @@
+import time
+
+from dydx3 import constants, epoch_seconds_to_iso
+
 from services.dydx_client.dydx_p_client import DydxPClient
 
 """
@@ -27,11 +31,37 @@ class DydxWithdrawal:
         return vars(withdrawal)
 
     def fast_withdrawal(self, withdrawal_params):
-        fast_withdrawal = self.client.private.create_fast_withdrawal(
-            **withdrawal_params
+        withdrawal_amount = withdrawal_params["withdrawal_amount"]
+        fast_withdrawal_result = self.fast_withdrawal_details(withdrawal_amount)
+        lp_position_id_result = list(
+            fast_withdrawal_result.data["liquidityProviders"].keys()
+        )[0]
+        quote = fast_withdrawal_result.data["liquidityProviders"][
+            lp_position_id_result
+        ]["quote"]
+        if quote is None:
+            raise Exception("Could not get a quote")
+        debit_amount = quote["debitAmount"]
+        create_fast_withdrawal_result = self.client.private.create_fast_withdrawal(
+            position_id=withdrawal_params["position_id"],
+            credit_asset=constants.ASSET_USDC,
+            credit_amount=withdrawal_amount,
+            debit_amount=debit_amount,
+            to_address=withdrawal_params["to_address"],
+            lp_position_id=lp_position_id_result,
+            lp_stark_public_key=list(
+                fast_withdrawal_result.data["liquidityProviders"].values()
+            )[0]["starkKey"],
+            expiration=epoch_seconds_to_iso(time.time() + 604801),
         )
-        return vars(fast_withdrawal)
+        return create_fast_withdrawal_result.data
 
-    def transfer(self, params):
+    def all_transfer_details(self, params):
         transfers = self.client.private.get_transfers(**params)
         return vars(transfers)
+
+    def fast_withdrawal_details(self, withdrawal_amount):
+        get_fast_withdrawal_result = self.client.public.get_fast_withdrawal(
+            creditAsset=constants.ASSET_USDC, creditAmount=withdrawal_amount
+        )
+        return get_fast_withdrawal_result

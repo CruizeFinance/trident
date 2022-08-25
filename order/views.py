@@ -2,11 +2,13 @@ from dydx3 import DydxApiError
 from rest_framework import status
 from rest_framework.response import Response
 from rest_framework.viewsets import GenericViewSet
+
 from components import OrderManager
+
 from order.serializers import OrderRequestSerializer, CancelOrderRequestSerializer
+
 from order.serializers.order_serializer import FirestoreOrdersRequestSerializer
 from services import DydxOrder, DydxAdmin
-from utilities.enums import ErrorCodes
 
 
 class Order(GenericViewSet):
@@ -25,23 +27,20 @@ class Order(GenericViewSet):
         dydx_order = DydxOrder()
         order_manager = OrderManager()
         result = {"message": None, "error": None}
+
         try:
             dydx_order_details = dydx_order.create_order(order_data)
             dydx_order_details = vars(dydx_order_details)
             result["message"] = dydx_order_details["data"]["order"]
-            order_manager.store_data_firebase(result["message"], "dydx_order")
+            order_manager.store_data(result["message"], "dydx_orders")
             return Response(result, status.HTTP_201_CREATED)
         except DydxApiError or ValueError as e:
             e = vars(e)
-
             result["error"] = e["msg"]["errors"][0]["msg"]
-            error_codes = ErrorCodes
-            if error_codes.signature_error.value == result["error"]:
-                return Response(result, status.HTTP_400_BAD_REQUEST)
             return Response(result, status.HTTP_400_BAD_REQUEST)
         except Exception as e:
             result["error"] = str(e)
-            return Response(result, status.HTTP_400_BAD_REQUEST)
+            return Response(result, status.HTTP_500_INTERNAL_SERVER_ERROR)
 
     """
         method cancel  is used to cancel an given order on dydx .
@@ -61,20 +60,13 @@ class Order(GenericViewSet):
             cancelled_order_details = dydx_order.cancel_order(order_id)
             cancelled_order_details = vars(cancelled_order_details)
             result["message"] = cancelled_order_details["data"]["cancelOrder"]
-            order_manager.update_on_firebase(order_id, "dydx_order", "CANCEL")
+            order_manager.update_data(order_id, "dydx_orders", "CANCEL")
             return Response(result, status.HTTP_200_OK)
         except Exception as e:
             e = vars(e)
+            print("this is error", e)
             result["error"] = e["msg"]["errors"][0]["msg"]
             return Response(result, status.HTTP_500_INTERNAL_SERVER_ERROR)
-
-    """ method dydx_order is responsible for getting all the openPositions on dydx .
-        :return openPositions on dydx.
-    """
-
-    def dydx_order(self, request):
-        result = {"message": None, "error": None}
-        admin = DydxAdmin()
 
     """ method dydx_order is responsible for getting all the openPositions on dydx .
         :return openPositions on dydx.
@@ -88,10 +80,9 @@ class Order(GenericViewSet):
             orders = admin.get_account()
             orders = vars(orders)
             orders_data = orders["data"]["account"]["openPositions"]
+            if not orders_data:
+                raise Exception("No open position found on dydx")
             result["message"] = orders_data
-            if not orders_data == {}:
-                return Response(result, status.HTTP_200_OK)
-            result["message"] = "No openPositions on dydx"
             return Response(result, status.HTTP_200_OK)
 
         except Exception as e:
@@ -111,7 +102,7 @@ class Order(GenericViewSet):
         try:
             orders = order_manager.fetch_orders(order_id=validated_data.get("order_id"))
             if orders is None:
-                raise RuntimeError("Order id not found")
+                raise Exception("Order id not found")
             result["message"] = orders
             return Response(result, status.HTTP_200_OK)
 

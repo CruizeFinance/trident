@@ -1,16 +1,17 @@
+import json
+
 from web3 import Web3
 from decouple import config
-import requests
 
 
 class StarkExContract:
     def __init__(self):
-        dydxabi = requests.get(
-            url="https://raw.githubusercontent.com/dydxprotocol/dydx-v3-python/master/dydx3/abi/starkware-perpetuals.json"
-        ).json()
+        dydxabi = open("dydx_starkware_perpetuals.json")
+        dydxabi_data = json.load(dydxabi)
+
         self.w3 = Web3(Web3.HTTPProvider(config("WEB_PROVIDER")))
         self.contract = self.w3.eth.contract(
-            address=config("STARKEX_ADDRESS"), abi=dydxabi
+            address=config("STARK_EX_CONTRACT"), abi=dydxabi_data
         )
 
     """function withdraw will withdraw funds form dydx contract"""
