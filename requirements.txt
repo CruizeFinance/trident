@@ -5,7 +5,7 @@ asgiref==3.5.2
 async-timeout==4.0.2
 atomicwrites==1.4.1
 attrs==21.4.0
-backports.zoneinfo==0.2.1
+backports.zoneinfo==0.2.1;python_version<"3.9"
 base58==2.1.1
 billiard==3.6.4.0
 bitarray==2.6.0
