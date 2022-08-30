@@ -20,5 +20,6 @@ urlpatterns = [
     path("admin/", admin.site.urls),
     path("order/", include("order.urls")),
     path("dydx_user/", include("dydx_user.urls")),
-    path("dydx_withdrawal/", include("dydx_withdrawal.urls")),
+    path("dydx_operations/", include("dydx_operations.urls")),
+    path("cruize_operations/", include("cruize_operations.urls")),
 ]

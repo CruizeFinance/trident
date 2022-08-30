@@ -1,5 +1,3 @@
-from dydx3.constants import ASSET_USDC, ACCOUNT_ACTION_WITHDRAWAL
-
 from services.dydx_client.dydx_p_client import DydxPClient
 
 """
