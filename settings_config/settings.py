@@ -15,7 +15,7 @@ import sentry_sdk
 from sentry_sdk.integrations.django import DjangoIntegration
 
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
-from services.celery.celery import check_withdrawal
+# from services.celery.celery import check_withdrawal
 
 BASE_DIR = Path(__file__).resolve().parent.parent
 
@@ -126,18 +126,18 @@ USE_TZ = True
 STATIC_URL = "/static/"
 # CELERY SETTINGS
 
-CELERY_BROKER_URL = "redis://127.0.0.1:6379"
-CELERY_ACCEPT_CONTENT = ["application/json"]
-CELERY_RESULT_SERIALIZER = "json"
-CELERY_TASK_SERIALIZER = "json"
-CELERY_TIMEZONE = "Asia/Kolkata"
-CELERY_RESULT_BACK_END = "redis://127.0.0.1:6379"
-CELERY_BEAT_SCHEDULE = {
-    "withdrawal_check": {
-        "task": check_withdrawal.delay(),
-        "schedule": timedelta(seconds=1),
-    }
-}
+# CELERY_BROKER_URL = "redis://127.0.0.1:6379"
+# CELERY_ACCEPT_CONTENT = ["application/json"]
+# CELERY_RESULT_SERIALIZER = "json"
+# CELERY_TASK_SERIALIZER = "json"
+# CELERY_TIMEZONE = "Asia/Kolkata"
+# CELERY_RESULT_BACK_END = "redis://127.0.0.1:6379"
+# CELERY_BEAT_SCHEDULE = {
+#     "withdrawal_check": {
+#         "task": check_withdrawal.delay(),
+#         "schedule": timedelta(seconds=1),
+#     }
+# }
 
 # SENTRY SETTINGS
 
