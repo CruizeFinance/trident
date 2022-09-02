@@ -7,6 +7,7 @@ class OrderTests(TestCase):
     def test_get_position_id(self):
         response = self.client.get("/dydx_user/position_id")
         self.assertEqual(response.status_code, 200)
+
     def test_create_order(self):
         response = self.client.post(
             "/order/create",
