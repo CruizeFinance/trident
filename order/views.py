@@ -2,12 +2,12 @@ from dydx3 import DydxApiError
 from rest_framework import status
 from rest_framework.response import Response
 from rest_framework.viewsets import GenericViewSet
-
 from components import OrderManager
-
-from order.serializers import OrderRequestSerializer, CancelOrderRequestSerializer
-
-from order.serializers.order_serializer import FirestoreOrdersRequestSerializer
+from order.serializers import (
+    OrderRequestSerializer,
+    CancelOrderRequestSerializer,
+    FirestoreOrdersRequestSerializer,
+)
 from services import DydxOrder, DydxAdmin
 
 
