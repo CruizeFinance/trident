@@ -65,3 +65,11 @@ class DydxAdmin(object):
         user = vars(user)
         position_id = user["data"]["account"]["positionId"]
         return position_id
+
+    def deposit_fund(self):
+        return self.client.private.request_testnet_tokens()
+
+
+if __name__ == "__main__":
+    a = DydxAdmin()
+    print(vars(a.deposit_fund()))

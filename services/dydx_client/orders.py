@@ -1,5 +1,3 @@
-from dydx3.constants import ASSET_USDC, ACCOUNT_ACTION_WITHDRAWAL
-
 from services.dydx_client.dydx_p_client import DydxPClient
 
 """
@@ -20,6 +18,7 @@ class DydxOrder:
 
     def create_order(self, order_params):
         placed_order_details = self.client.private.create_order(**order_params)
+        # save to firebase .
         return placed_order_details
 
     """ function is responsible for deleting the order on dydx.
