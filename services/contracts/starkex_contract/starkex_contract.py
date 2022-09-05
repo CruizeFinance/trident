@@ -3,17 +3,15 @@ import json
 from web3 import Web3
 from decouple import config
 
+from services import LoadContracts
+
 
 class StarkExContract:
     def __init__(self):
-        dydxabi = open("dydx_starkware_perpetuals.json")
-        dydxabi_data = json.load(dydxabi)
-
-        self.w3 = Web3(Web3.HTTPProvider(config("WEB_PROVIDER")))
-        self.contract = self.w3.eth.contract(
-            address=config("STARK_EX_CONTRACT"), abi=dydxabi_data
-        )
-
+        self.load_contract = LoadContracts()
+        contract_abi = open("dydx_starkware_perpetuals.json")
+        self.contract = self.load_contract.load_contracts(config("STARK_EX_CONTRACT"),contract_abi)
+        self.w3 = self.load_contract.web3_provider()
     """function withdraw will withdraw funds form dydx contract"""
 
     def withdraw(self):
