@@ -9,7 +9,7 @@ from services import LoadContracts
 class StarkExContract:
     def __init__(self):
         self.load_contract = LoadContracts()
-        contract_abi = open("dydx_starkware_perpetuals.json")
+        contract_abi = open("../contract_abis/dydx_starkware_perpetuals.json")
         self.contract = self.load_contract.load_contracts(
             config("STARK_EX_CONTRACT"), contract_abi
         )

@@ -22,7 +22,7 @@ app.conf.update(
 app.config_from_object(settings, namespace="CELERY")
 app.autodiscover_tasks(lambda: settings.INSTALLED_APPS)
 app.conf.beat_schedule = {
-    "borrow_from_aave": {"task": "borrow_from_aave", "schedule": 10.0},
-    "check_withdrawal": {"task": "check_withdrawal", "schedule": 10.0},
-    "deposit_to_gnosis": {"task": "deposit_to_gnosis", "schedule": 10.0},
+    "borrow_from_aave": {"task": "borrow_from_aave", "schedule": 1.0},
+    "check_withdrawal": {"task": "check_withdrawal", "schedule": 1.0},
+    "deposit_to_gnosis": {"task": "deposit_to_gnosis", "schedule": 20.0},
 }

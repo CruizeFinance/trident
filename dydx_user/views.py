@@ -1,11 +1,7 @@
-from django.shortcuts import render
-
-# Create your views here.
 from dydx3 import DydxApiError
 from rest_framework import status
 from rest_framework.response import Response
 from rest_framework.viewsets import GenericViewSet
-
 from services import DydxAdmin
 
 
