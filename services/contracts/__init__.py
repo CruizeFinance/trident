@@ -1,2 +1,1 @@
-
-from .load_contract import  LoadContracts
+from .load_contract import LoadContracts

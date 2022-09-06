@@ -10,8 +10,11 @@ class StarkExContract:
     def __init__(self):
         self.load_contract = LoadContracts()
         contract_abi = open("dydx_starkware_perpetuals.json")
-        self.contract = self.load_contract.load_contracts(config("STARK_EX_CONTRACT"),contract_abi)
+        self.contract = self.load_contract.load_contracts(
+            config("STARK_EX_CONTRACT"), contract_abi
+        )
         self.w3 = self.load_contract.web3_provider()
+
     """function withdraw will withdraw funds form dydx contract"""
 
     def withdraw(self):

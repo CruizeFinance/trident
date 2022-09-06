@@ -126,14 +126,14 @@ USE_TZ = True
 STATIC_URL = "/static/"
 # CELERY SETTINGS
 # BEAT_SCHEDULE = {
-    # "withdrawal_check": {
-    #     "task": check_withdrawal.delay(),
-    #     "schedule": timedelta(seconds=1),
-    # },
-    # "borrow_from_aave": {
-    #     "task": borrow_usdc_from_aave.apply_async(countdown=10),
-    #     "schedule": timedelta(seconds=5)
-    # },
+# "withdrawal_check": {
+#     "task": check_withdrawal.delay(),
+#     "schedule": timedelta(seconds=1),
+# },
+# "borrow_from_aave": {
+#     "task": borrow_usdc_from_aave.apply_async(countdown=10),
+#     "schedule": timedelta(seconds=5)
+# },
 # }
 
 # SENTRY SETTINGS
