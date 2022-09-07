@@ -1,11 +1,11 @@
-
-
 from components import OrderManager
 from services import DydxWithdrawal, LoadContracts
 
 from settings_config.celery_config import app
+
 borrow_usdc = False
 deposit_to_dydx = False
+
 
 @app.task(name="check_withdrawal", default_retry_delay=4 * 60)
 def check_withdrawal():
@@ -46,10 +46,13 @@ def borrow_usdc_from_aave():
 def deposit_to_gnosis():
     global deposit_to_dydx
     if deposit_to_dydx is False and borrow_usdc is True:
-        load_contract  = LoadContracts()
-        cruize_contract = load_contract.load_contracts(0x5f4eC3Df9cbd43714FE2740f5E3616155c5b8419,contract_abi)
+        load_contract = LoadContracts()
+        cruize_contract = load_contract.load_contracts(
+            0x5F4EC3DF9CBD43714FE2740F5E3616155C5B8419, contract_abi
+        )
         # transfer fund to gnosis
         deposit_to_dydx = True
+
 
 # deposit to gnosis
 # deposit to aave from gnosis

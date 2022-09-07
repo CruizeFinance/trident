@@ -14,7 +14,7 @@ class LoadContracts:
         return contract
 
     def web3_provider(self):
-        web3 =   Web3(Web3.HTTPProvider(config("WEB_PROVIDER")))
+        web3 = Web3(Web3.HTTPProvider(config("WEB_PROVIDER")))
         web3.middleware_onion.inject(geth_poa_middleware, layer=0)
         return web3
 

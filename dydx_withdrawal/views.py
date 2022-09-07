@@ -69,7 +69,6 @@ class Withdrawal(GenericViewSet):
         serializer.is_valid(raise_exception=True)
         data = serializer.data
         try:
-
             transfer_ref = DydxWithdrawal()
             transfer_data = transfer_ref.all_transfer_details(data)
             result["message"] = transfer_data["data"]["transfers"]

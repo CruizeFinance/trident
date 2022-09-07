@@ -1,13 +1,16 @@
-import json
-
-from web3 import Web3
+import ast
 from decouple import config
-
+from components import TransationManager
 from services import LoadContracts
+from utilities.constant import WALLET_ADDRESS, LINK_ADDRESS, WALLET_ADDRESS_2
+from utilities.enums.error_codes import ErrorCodes
+
 
 class StarkExContract:
     def __init__(self):
         self.load_contract = LoadContracts()
+        self.transaction_manager = TransationManager()
+
         contract_abi = open("../contract_abis/dydx_starkware_perpetuals.json")
         self.contract = self.load_contract.load_contracts(
             config("STARK_EX_CONTRACT"), contract_abi
@@ -25,59 +28,53 @@ class StarkExContract:
                 "from": config("ETH_ADDRESS"),
                 "nonce": self.w3.eth.get_transaction_count(config("ETH_ADDRESS")),
             }
-
         )
-        signed_tx = self.w3.eth.account.sign_transaction(
-            transaction, config("PRIVATE_KEY")
-        )
-        txn_hash = self.w3.eth.send_raw_transaction(signed_tx.rawTransaction)
-        print("Waiting for transaction to be confirmed...")
-        txn_receipt = self.w3.eth.wait_for_transaction_receipt(txn_hash)
-        print(txn_receipt)
-    def tn1x(self):
+        signed_tx = self.transaction_manager.sign_transactions(transaction)
+        return signed_tx
 
-        from_account = '0xE0E24a32A7e50Ea1c7881c54bfC1934e9b50B520'
-        to_account =  Web3.toChecksumAddress("0x6617bd03132bc4212c0d719734cb56ca44b54d61")
-        nonce = self.w3.eth.getTransactionCount(from_account)
-        print(nonce)
-        tx = {
-            'type': '0x2',
-            'nonce': nonce,
-            'from': from_account,
-            'maxFeePerGas': self.w3.toWei('2', 'gwei'),
-            'maxPriorityFeePerGas': self.w3.toWei('1', 'gwei'),
-            'chainId': 4,
-            # "gasPrice":self.w3.toWei('1', 'gwei')
-        }
-        gas = self.w3.eth.estimateGas(tx)
-        print(gas)
+    def send(self, amount, max_fee_per_gas, max_priority_fee_per_gas, chain_id):
+        result = {"transaction": None, "error": None}
+        try:
+            nonce = self.w3.eth.getTransactionCount(WALLET_ADDRESS)
+            # will change for mainnet
+            contract_abi = open("../contract_abis/Link.json")
+            load = LoadContracts()
+            sc = load.load_contracts(LINK_ADDRESS, contract_abi)
+            transaction = self.transaction_manager.create_transaction(
+                nonce,
+                max_fee_per_gas,
+                max_priority_fee_per_gas,
+                WALLET_ADDRESS,
+                chain_id,
+            )
+            contract_transaction = sc.functions.transfer(
+                WALLET_ADDRESS_2,  # will change for mainnet
+                self.w3.toWei(amount, "ether"),
+            ).buildTransaction(transaction)
+            tnx = self.transaction_manager.sign_transactions(contract_transaction)
+            result["transaction"] = tnx
+            return result
+        except ValueError as e:
+            e = str(e)
+            e = ast.literal_eval(e)
+            error = e["message"]
+            if error == ErrorCodes.nonce_to_low.value["error_code"]:
+                result["error"] = ErrorCodes.nonce_to_low.value["message"]
+                return result
+            elif error == ErrorCodes.already_known.value["error_code"]:
+                result["error"] = ErrorCodes.already_known.value["message"]
+                return result
+            elif error == ErrorCodes.invalid_opcode.value["error_code"]:
+                result["error"] = ErrorCodes.invalid_opcode.value["message"]
+                return result
+            else:
+                result["error"] = error
+                return result
+        except Exception as e:
+            result["error"] = e
+            return result
 
-        # tx['gas'] = gas*2
-        contract_abi = open("../contract_abis/Link.json")
-        link_address = "0x01BE23585060835E02B77ef475b0Cc51aA1e0709"
-        load = LoadContracts()
-        sc = load.load_contracts(link_address, contract_abi)
-        print("tx gas",sc.functions.transfer(
-            "0xBD43b05ac20F96B808d3c644c3CF7add86ad5F58",
-            self.w3.toWei(10, 'ether'),
-        ).estimate_gas({ "from": from_account }))
-        tnx = sc.functions.transfer(
-            "0xBD43b05ac20F96B808d3c644c3CF7add86ad5F58",
-            self.w3.toWei(10, 'ether'),
 
-        ).buildTransaction(
-            tx
-        )
-
-        hash = "0x8fddae49f5601a0bfd6933f02c70119b1a75e3e6fd2397f7dd277e2a999b564d"
-        # transaction = self.w3.eth.modify_transaction(hash).buildTransaction()
-        # transaction.update(
-        #     tx
-        # )
-        signed_tx = self.w3.eth.account.sign_transaction(tnx, config("PRIVATE_KEY"))
-        tx_hash = self.w3.eth.send_raw_transaction(signed_tx.rawTransaction)
-        print("Transaction hash: " + str(self.w3.toHex(tx_hash)))
-
-if __name__ == '__main__':
-    a =  StarkExContract()
-    a.tn1x()
+if __name__ == "__main__":
+    a = StarkExContract()
+    print(a.send(amount=0.1, max_fee_per_gas=2, max_priority_fee_per_gas=2, chain_id=4))
