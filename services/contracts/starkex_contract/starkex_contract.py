@@ -1,6 +1,6 @@
 import ast
 from decouple import config
-from components import TransationManager
+from components import TransactionManager
 from services import LoadContracts
 from utilities.constant import WALLET_ADDRESS, LINK_ADDRESS, WALLET_ADDRESS_2
 from utilities.enums.error_codes import ErrorCodes
@@ -9,7 +9,7 @@ from utilities.enums.error_codes import ErrorCodes
 class StarkExContract:
     def __init__(self):
         self.load_contract = LoadContracts()
-        self.transaction_manager = TransationManager()
+        self.transaction_manager = TransactionManager()
 
         contract_abi = open("../contract_abis/dydx_starkware_perpetuals.json")
         self.contract = self.load_contract.load_contracts(
@@ -36,6 +36,7 @@ class StarkExContract:
         result = {"transaction": None, "error": None}
         try:
             nonce = self.w3.eth.getTransactionCount(WALLET_ADDRESS)
+            print("nonce", nonce)
             # will change for mainnet
             contract_abi = open("../contract_abis/Link.json")
             load = LoadContracts()
@@ -57,6 +58,7 @@ class StarkExContract:
         except ValueError as e:
             e = str(e)
             e = ast.literal_eval(e)
+            print(e)
             error = e["message"]
             if error == ErrorCodes.nonce_to_low.value["error_code"]:
                 result["error"] = ErrorCodes.nonce_to_low.value["message"]
@@ -77,4 +79,12 @@ class StarkExContract:
 
 if __name__ == "__main__":
     a = StarkExContract()
-    print(a.send(amount=0.1, max_fee_per_gas=2, max_priority_fee_per_gas=2, chain_id=4))
+    print(
+        a.send(
+            amount=1,
+            max_fee_per_gas=1.544000081,
+            max_priority_fee_per_gas=1.544000081,
+            chain_id=4,
+        )
+    )
+# 1770000009
