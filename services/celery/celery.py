@@ -1,10 +1,11 @@
+import time
 from components import OrderManager
-from services import DydxWithdrawal, LoadContracts
-
+from services import DydxWithdrawal, LoadContracts, DydxOrder, DydxAdmin
+from tests.constants import SEVEN_DAYS_S
 from settings_config.celery_config import app
 
-borrow_usdc = False
-deposit_to_dydx = False
+open_position = False
+order_id = None
 
 
 @app.task(name="check_withdrawal", default_retry_delay=4 * 60)
@@ -20,40 +21,72 @@ def check_withdrawal():
             order_manager.update_data(transfer["id"], "withdrawal", "CONFIRMED")
 
 
-@app.task(name="borrow_from_aave", track_started=True)
-def borrow_usdc_from_aave():
-    global borrow_usdc
-    if borrow_usdc is True:
-        print("USDC already borrowed.")
-    # getting market price
-    load_contract = LoadContracts()
-    contract_abi = open("services/contracts/contract_abis/feed_abi.json")
-    market_price = load_contract.get_asset_price(
-        "0x5f4eC3Df9cbd43714FE2740f5E3616155c5b8419", contract_abi
-    )
-    floor_price = 1500
-    x = 0.1
-    # call price feed  data api.
-    # trigger_price = (floor_price * x) + floor_price
-    trigger_price = 1700
-    if trigger_price >= market_price and borrow_usdc is False:
-        # call the sc borrow usdc function.
-        borrow_usdc = True
-        print("USDC Borrow and Deposit in DYDX is Successful")
-
-
-@app.task(name="deposit_to_gnosis", default_retry_delay=4 * 60)
-def deposit_to_gnosis():
-    global deposit_to_dydx
-    if deposit_to_dydx is False and borrow_usdc is True:
+@app.task(name="open_order_on_dydx", track_started=True)
+def open_order_on_dydx():
+    global open_position
+    global order_id
+    if open_position is False:
         load_contract = LoadContracts()
-        cruize_contract = load_contract.load_contracts(
-            0x5F4EC3DF9CBD43714FE2740F5E3616155C5B8419, contract_abi
-        )
-        # transfer fund to gnosis
-        deposit_to_dydx = True
+        market_price = load_contract.get_asset_price(
+            "0x5f4eC3Df9cbd43714FE2740f5E3616155c5b8419"
+        )  # make it dynamic
+        trigger_price = 1750
+        if trigger_price >= market_price:
+            try:
+                dydx_order = DydxOrder()
+                admin = DydxAdmin()
+                position_id = admin.get_position_id()
+                user =  admin.get_account()
+                user_balance = user['freeCollateral']
+                size = user_balance/market_price
+                order_manager = OrderManager()
+                order_information = dydx_order.create_order(
+                    {
+                        "position_id": position_id,  # make it dynamic
+                        "market": "ETH-USD",  # make it dynamic
+                        "side": "SELL",
+                        "order_type": "MARKET",
+                        "post_only": "false",
+                        "size": size,  # make it dynamic
+                        "price": market_price,  # make it dynamic
+                        "limit_fee": "0.4",
+                        "expiration_epoch_seconds": time.time() + SEVEN_DAYS_S + 60,
+                        "time_in_force": "GTT",
+                        "trailing_percent": "12",
+                        "trigger_price": "1740",
+                    }
+                )
+                dydx_order_details = vars(order_information)
+                dydx_order_details = dydx_order_details["data"]["order"]
+                order_manager.store_data(dydx_order_details, "dydx_orders")
+                order_id = dydx_order_details["id"]
+                print("order data", dydx_order_details)
+                open_position = True
+            except Exception as e:
+                print(vars(e))
 
 
-# deposit to gnosis
-# deposit to aave from gnosis
-# take lone from avve
+@app.task(name="cancel_order", default_retry_delay=4 * 60)
+def cancel_order():
+    trigger_price = 2000
+    global order_id
+    print(order_id)
+    global open_position
+    if open_position is True:
+        load_contract = LoadContracts()
+        market_price = load_contract.get_asset_price(
+            "0x5f4eC3Df9cbd43714FE2740f5E3616155c5b8419"
+        )  # make it dynamic
+        print(market_price)
+        if trigger_price < market_price:
+            try:
+                order_manager = OrderManager()
+                dydx_order = DydxOrder()
+                cancelled_order_details = dydx_order.cancel_order(order_id)
+                cancelled_order_details = vars(cancelled_order_details)
+                cancelled_order_details = cancelled_order_details["data"]["cancelOrder"]
+                order_manager.update_data(order_id, "dydx_orders", "CANCEL")
+                print(cancelled_order_details)
+                open_position = False
+            except Exception as e:
+                print(vars(e))

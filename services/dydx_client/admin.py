@@ -63,5 +63,11 @@ class DydxAdmin(object):
     def get_position_id(self):
         user = self.get_account()
         user = vars(user)
+        print(user)
         position_id = user["data"]["account"]["positionId"]
         return position_id
+
+
+if __name__ == "__main__":
+    a = DydxAdmin()
+    print(vars(a.get_account()))
