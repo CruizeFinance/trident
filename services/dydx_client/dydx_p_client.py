@@ -18,8 +18,8 @@ class DydxPClient(object):
 
     def create_dydx_Instance(self):
         self.client = Client(
-            host=constants.API_HOST_ROPSTEN,
-            network_id=constants.NETWORK_ID_ROPSTEN,
+            host=config("HOST"),
+            network_id=config("NETWORK_ID"),
             stark_private_key=config("STARK_PRIVATE_KEY"),
             web3=Web3(Web3.HTTPProvider(config("WEB_PROVIDER"))),
             api_key_credentials={

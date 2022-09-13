@@ -15,8 +15,8 @@ class OrderRequestSerializer(serializers.Serializer):
     limit_fee = serializers.FloatField(required=True, min_value=0)
     expiration_epoch_seconds = serializers.IntegerField(required=True)
     time_in_force = serializers.CharField(required=True)
-    trailing_percent = serializers.CharField(required=True)
-    trigger_price = serializers.CharField(required=True)
+    # trailing_percent = serializers.CharField(required=True)
+    # trigger_price = serializers.CharField(required=True)
 
     def validate(self, data):
         if (
