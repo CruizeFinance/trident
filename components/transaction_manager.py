@@ -32,17 +32,15 @@ class TransactionManager:
         }
         return transaction
 
-    def set_transaction_price(self, max_wait_seconds, sample_size, probability):
-        price_strategy = self.get_price_strategy(
-            max_wait_seconds, sample_size, probability
-        )
+    def set_transaction_gas_price(self, max_wait_seconds, sample_size, probability):
+        price_strategy = self.get_gas_price_strategy(max_wait_seconds, sample_size, probability)
         self.w3.eth.set_gas_price_strategy(price_strategy)
         wei_price = self.w3.eth.generate_gas_price()
         price = self.w3.fromWei(wei_price, "gwei")
         return price
 
     @staticmethod
-    def get_price_strategy(max_wait_seconds, sample_size, probability, weighted=True):
+    def get_gas_price_strategy(max_wait_seconds, sample_size, probability, weighted=True):
         price_strategy = (
             gas_strategies.time_based.construct_time_based_gas_price_strategy(
                 max_wait_seconds, sample_size, probability, weighted
@@ -53,4 +51,4 @@ class TransactionManager:
 
 if __name__ == "__main__":
     a = TransactionManager()
-    print(a.set_transaction_price(60, 2, 100))
+    print(a.set_transaction_gas_price(60, 2, 100))

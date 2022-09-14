@@ -4,6 +4,8 @@ from decouple import config
 from web3 import Web3
 from web3.middleware import geth_poa_middleware
 
+from services import DydxAdmin
+
 
 class LoadContracts:
     def load_contracts(self, contract_address, contract_abi):
@@ -28,3 +30,22 @@ class LoadContracts:
         market_price = market_price[1]
         market_price = market_price / 1e8
         return market_price
+
+    def get_position_size(self):
+        position_prams = {"position_id": None, "size": None, "market_price": None}
+        market_price = self.get_asset_price(
+            "0x5f4eC3Df9cbd43714FE2740f5E3616155c5b8419"
+        )  # make it dynamic
+        admin = DydxAdmin()
+        user = admin.get_account()
+        user = vars(user)
+        user_balance = user["data"]["account"]["equity"]
+        position_id = user["data"]["account"]["position_id"]
+        print(user_balance)
+        size = float(user_balance) / market_price
+        print("ve", size)
+        size *= 5
+        position_prams["size"] = str(round(size, 3))
+        position_prams["position_id"] = position_id
+        position_prams["market_price"] = market_price
+        return position_prams
