@@ -10,11 +10,8 @@ from services import DydxAdmin
 class LoadContracts:
     def load_contracts(self, contract_address, contract_abi):
         contract_data = json.load(contract_abi)
-        w3 = Web3(
-            Web3.HTTPProvider(
-                "https://mainnet.infura.io/v3/4e55b6d7c94d4c58a931971dc807d055"
-            )
-        )
+        w3 = self.web3_provider()
+
         contract = w3.eth.contract(address=contract_address, abi=contract_data)
         return contract
 
@@ -31,7 +28,7 @@ class LoadContracts:
         market_price = market_price / 1e8
         return market_price
 
-    def get_position_size(self):
+    def get_order_data(self):
         position_prams = {"position_id": None, "size": None, "market_price": None}
         market_price = self.get_asset_price(
             "0x5f4eC3Df9cbd43714FE2740f5E3616155c5b8419"

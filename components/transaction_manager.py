@@ -4,6 +4,14 @@ from services import LoadContracts
 from web3 import middleware, gas_strategies
 from web3.gas_strategies import time_based
 
+from utilities.constant import (
+    SAMPLE_SIZE,
+    MAX_WAIT_SECONDS,
+    PROBABILITY,
+    WALLET_ADDRESS,
+    RINKEBY_CHAIN_ID,
+)
+
 
 class TransactionManager:
     def __init__(self):
@@ -32,7 +40,7 @@ class TransactionManager:
         }
         return transaction
 
-    def set_transaction_gas_price(self, max_wait_seconds, sample_size, probability):
+    def transaction_gas_price(self, max_wait_seconds, sample_size, probability):
         price_strategy = self.get_gas_price_strategy(max_wait_seconds, sample_size, probability)
         self.w3.eth.set_gas_price_strategy(price_strategy)
         wei_price = self.w3.eth.generate_gas_price()
@@ -48,7 +56,15 @@ class TransactionManager:
         )
         return price_strategy
 
+    def build_transaction(self):
+        gas_price = self.transaction_gas_price(MAX_WAIT_SECONDS, SAMPLE_SIZE, PROBABILITY)
+        nonce = self.w3.eth.getTransactionCount(WALLET_ADDRESS)
+        transaction = self.create_transaction(
+            nonce, gas_price, gas_price, WALLET_ADDRESS, RINKEBY_CHAIN_ID
+        )
+        return transaction
+
 
 if __name__ == "__main__":
     a = TransactionManager()
-    print(a.set_transaction_gas_price(60, 2, 100))
+    print(a.transaction_gas_price(60, 2, 100))

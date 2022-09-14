@@ -24,7 +24,7 @@ def open_order_on_dydx():
     if open_position is False:
         # TODO: set formula for trigger_price
         load_contract = LoadContracts()
-        order_data = load_contract.get_position_size()
+        order_data = load_contract.get_order_data()
         trigger_price = 1750
         if trigger_price >= order_data["market_price"]:
             try:
@@ -64,7 +64,7 @@ def close_order_on_dydx():
 
     if open_position is True:
         load_contract = LoadContracts()
-        order_data = load_contract.get_position_size()
+        order_data = load_contract.get_order_data()
         # TODO: set formula for trigger_price
         trigger_price = 1600
         if trigger_price < order_data["market_price"]:

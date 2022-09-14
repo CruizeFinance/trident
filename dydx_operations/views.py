@@ -4,18 +4,20 @@ from rest_framework.response import Response
 from rest_framework.viewsets import GenericViewSet
 
 from components import OrderManager
-from dydx_withdrawal import (
+from dydx_operations import (
     SlowWithdrawalSerializer,
     FastWithdrawalSerializer,
     TransferSerializer,
+    DepositSerializer,
 )
 
 from services import DydxWithdrawal
+from services.contracts.starkex_contracts.starkex_contract import StarkExContract
 
 
-class Withdrawal(GenericViewSet):
+class DydxOprations(GenericViewSet):
     """function slow withdrawal is responsible for withdrawing user's asset's.
-    :returns Withdrawal information.
+    :returns DydxOprations information.
     """
 
     def slow_withdrawal(self, request):
@@ -60,9 +62,21 @@ class Withdrawal(GenericViewSet):
             result["error"] = str(e)
             return Response(result, status.HTTP_500_INTERNAL_SERVER_ERROR)
 
+    def deposit(self, request):
+        self.serializer_class = DepositSerializer
+        serializer = self.serializer_class(data=request.data)
+        serializer.is_valid(raise_exception=True)
+        data = serializer.data
+        try:
+            deposit_ref = StarkExContract()
+            deposit_data = deposit_ref.deposit(data)
+            return Response(deposit_data, status.HTTP_200_OK)
+        except Exception as e:
+            return Response(e, status.HTTP_500_INTERNAL_SERVER_ERROR)
+
     """ :return user transfer history."""
 
-    def transfer_info(self, request):
+    def transfer_information(self, request):
         result = {"message": None, "error": None}
         self.serializer_class = TransferSerializer
         serializer = self.serializer_class(data=request.data)

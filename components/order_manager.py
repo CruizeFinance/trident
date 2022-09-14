@@ -1,9 +1,8 @@
-from settings_config import firebase_client
-
 """Class OrderManager is responsible for storing dydx_orders data in firebase cloud storage.
 
    It has two method store_on_firebase() that is responsible for storing data in DB.
    Method update_on_firebase() is used to update data in DB. """
+from settings_config import firebase_client
 
 
 class OrderManager(object):
