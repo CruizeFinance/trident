@@ -4,7 +4,7 @@ from services import DydxWithdrawal, LoadContracts, DydxOrder, DydxAdmin
 from tests.constants import SEVEN_DAYS_S
 from settings_config.celery_config import app
 
-open_position = True
+open_position = False
 
 
 @app.task(name="check_withdrawal", default_retry_delay=4 * 60)
@@ -25,35 +25,34 @@ def open_order_on_dydx():
     global open_position
     global order_id
     if open_position is False:
-        # TODO: set formula for trigger_price
+        # TODO: write a formula to calculate  the trigger_price
         load_contract = LoadContracts()
         order_params = load_contract.order_params()
         trigger_price = 1750
         if trigger_price >= order_params["market_price"]:
-            try:
-                dydx_order = DydxOrder()
-                order_manager = OrderManager()
-                order_information = dydx_order.create_order(
-                    {
-                        "position_id": order_params["position_id"],
-                        "market": "ETH-USD",
-                        "side": "SELL",
-                        "order_type": "MARKET",
-                        "post_only": "false",
-                        "size": order_params["size"],
-                        "price": str(int(order_params["market_price"] - 100)),
-                        "limit_fee": "0.4",
-                        "expiration_epoch_seconds": time.time() + SEVEN_DAYS_S + 60,
-                        "time_in_force": "IOC",
-                    }
-                )
-                dydx_order_details = vars(order_information)
-                dydx_order_details = dydx_order_details["data"]["order"]
-                order_manager.store_data(dydx_order_details, "dydx_orders")
-                order_id = dydx_order_details["id"]
-                open_position = True
-            except Exception as e:
-                print("this is error", vars(e))
+
+            dydx_order = DydxOrder()
+            order_manager = OrderManager()
+            order_information = dydx_order.create_order(
+                {
+                    "position_id": order_params["position_id"],
+                    "market": "ETH-USD",
+                    "side": "SELL",
+                    "order_type": "MARKET",
+                    "post_only": "false",
+                    "size": order_params["size"],
+                    "price": str(int(order_params["market_price"] - 100)),
+                    "limit_fee": "0.4",
+                    "expiration_epoch_seconds": time.time() + SEVEN_DAYS_S + 60,
+                    "time_in_force": "IOC",
+                }
+            )
+            dydx_order_details = vars(order_information)
+            dydx_order_details = dydx_order_details["data"]["order"]
+            order_manager.store_data(dydx_order_details, "dydx_orders")
+            order_id = dydx_order_details["id"]
+            open_position = True
+
     else:
         print("SELL order is already placed")
 
@@ -67,33 +66,32 @@ def close_order_on_dydx():
 
         load_contract = LoadContracts()
         order_params = load_contract.order_params()
-        # TODO: set formula for trigger_price
+        # TODO: write a formula to calculate  the trigger_price
         trigger_price = 1600
         if trigger_price < order_params["market_price"]:
-            try:
-                dydx_order = DydxOrder()
-                order_manager = OrderManager()
-                order_information = dydx_order.create_order(
-                    {
-                        "position_id": order_params["position_id"],
-                        "market": "ETH-USD",
-                        "side": "BUY",
-                        "order_type": "MARKET",
-                        "post_only": "false",
-                        "size": order_params["size"],
-                        "price": str(int(order_params["market_price"] + 10)),
-                        "limit_fee": "0.4",
-                        "expiration_epoch_seconds": time.time() + SEVEN_DAYS_S + 60,
-                        "time_in_force": "IOC",
-                    }
-                )
-                open_position = False
-                dydx_order_details = vars(order_information)
-                dydx_order_details = dydx_order_details["data"]["order"]
-                order_manager.store_data(dydx_order_details, "dydx_orders")
-                order_id = dydx_order_details["id"]
 
-            except Exception as e:
-                print(vars(e))
+            dydx_order = DydxOrder()
+            order_manager = OrderManager()
+
+            order_information = dydx_order.create_order(
+                {
+                    "position_id": order_params["position_id"],
+                    "market": "ETH-USD",
+                    "side": "BUY",
+                    "order_type": "MARKET",
+                    "post_only": "false",
+                    "size": order_params["size"],
+                    "price": str(int(order_params["market_price"] + 10)),
+                    "limit_fee": "0.4",
+                    "expiration_epoch_seconds": time.time() + SEVEN_DAYS_S + 60,
+                    "time_in_force": "IOC",
+                }
+            )
+            open_position = False
+            dydx_order_details = vars(order_information)
+            dydx_order_details = dydx_order_details["data"]["order"]
+            order_manager.store_data(dydx_order_details, "dydx_orders")
+            order_id = dydx_order_details["id"]
+
     else:
         print("BUY order is already placed")

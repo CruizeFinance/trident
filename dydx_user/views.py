@@ -34,3 +34,15 @@ class User(GenericViewSet):
         except Exception as e:
             result["error"] = str(e)
             return Response(result, status.HTTP_500_INTERNAL_SERVER_ERROR)
+
+    def deposit_test_fund(self, request):
+        result = {"message": None, "error": None}
+        admin = DydxAdmin()
+        try:
+            fund_detiels = admin.deposit_fund()
+            result["message"] = fund_detiels["data"]["transfer"]
+            return Response(result, status.HTTP_200_OK)
+        except Exception as e:
+            e = vars(e)
+            result["error"] = e["msg"]["errors"][0]["msg"]
+            return Response(result, status.HTTP_500_INTERNAL_SERVER_ERROR)
