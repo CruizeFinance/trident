@@ -28,8 +28,8 @@ class LoadContracts:
         market_price = market_price / 1e8
         return market_price
 
-    def get_order_data(self):
-        position_prams = {"position_id": None, "size": None, "market_price": None}
+    def order_params(self):
+        order_prams = {"position_id": None, "size": None, "market_price": None}
         market_price = self.get_asset_price(
             "0x5f4eC3Df9cbd43714FE2740f5E3616155c5b8419"
         )  # make it dynamic
@@ -37,12 +37,10 @@ class LoadContracts:
         user = admin.get_account()
         user = vars(user)
         user_balance = user["data"]["account"]["equity"]
-        position_id = user["data"]["account"]["position_id"]
-        print(user_balance)
+        position_id = user["data"]["account"]["positionId"]
         size = float(user_balance) / market_price
-        print("ve", size)
         size *= 5
-        position_prams["size"] = str(round(size, 3))
-        position_prams["position_id"] = position_id
-        position_prams["market_price"] = market_price
-        return position_prams
+        order_prams["size"] = str(round(size, 3))
+        order_prams["position_id"] = position_id
+        order_prams["market_price"] = market_price
+        return order_prams

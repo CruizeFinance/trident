@@ -24,5 +24,5 @@ app.autodiscover_tasks(lambda: settings.INSTALLED_APPS)
 app.conf.beat_schedule = {
     # "open_order_on_dydx": {"task": "open_order_on_dydx", "schedule": 30},
     # "check_withdrawal": {"task": "check_withdrawal", "schedule": 1.0},
-    "cancel_order": {"task": "close_order_on_dydx", "schedule": 20},
+    "close_order_on_dydx": {"task": "close_order_on_dydx", "schedule": 20},
 }

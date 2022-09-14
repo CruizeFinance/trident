@@ -41,14 +41,18 @@ class TransactionManager:
         return transaction
 
     def transaction_gas_price(self, max_wait_seconds, sample_size, probability):
-        price_strategy = self.get_gas_price_strategy(max_wait_seconds, sample_size, probability)
+        price_strategy = self.get_gas_price_strategy(
+            max_wait_seconds, sample_size, probability
+        )
         self.w3.eth.set_gas_price_strategy(price_strategy)
         wei_price = self.w3.eth.generate_gas_price()
         price = self.w3.fromWei(wei_price, "gwei")
         return price
 
     @staticmethod
-    def get_gas_price_strategy(max_wait_seconds, sample_size, probability, weighted=True):
+    def get_gas_price_strategy(
+        max_wait_seconds, sample_size, probability, weighted=True
+    ):
         price_strategy = (
             gas_strategies.time_based.construct_time_based_gas_price_strategy(
                 max_wait_seconds, sample_size, probability, weighted
@@ -57,7 +61,9 @@ class TransactionManager:
         return price_strategy
 
     def build_transaction(self):
-        gas_price = self.transaction_gas_price(MAX_WAIT_SECONDS, SAMPLE_SIZE, PROBABILITY)
+        gas_price = self.transaction_gas_price(
+            MAX_WAIT_SECONDS, SAMPLE_SIZE, PROBABILITY
+        )
         nonce = self.w3.eth.getTransactionCount(WALLET_ADDRESS)
         transaction = self.create_transaction(
             nonce, gas_price, gas_price, WALLET_ADDRESS, RINKEBY_CHAIN_ID

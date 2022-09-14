@@ -6,8 +6,6 @@ from services.contracts.cruize.cruize_contract import Cruize
 
 
 class CruizeOperations(GenericViewSet):
-   
-
     def repay_to_aave(self, request):
         self.serializer_class = AmountSerializers
         serializer = self.serializer_class(data=request.data)
