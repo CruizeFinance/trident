@@ -6,7 +6,7 @@ from settings_config import contract_exceptions
 from utilities.constant import (
     WALLET_ADDRESS,
     MAX_WAIT_SECONDS,
-    SAMPLE_SIZE,
+    BLOCK_SAMPLE_SIZE,
     PROBABILITY,
     RINKEBY_CHAIN_ID,
     SIGNATURE,

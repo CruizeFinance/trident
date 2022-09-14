@@ -8,7 +8,7 @@ from utilities.constant import (
     WALLET_ADDRESS,
     RINKEBY_CHAIN_ID,
     PROBABILITY,
-    SAMPLE_SIZE,
+    BLOCK_SAMPLE_SIZE,
     MAX_WAIT_SECONDS,
 )
 from utilities.enums import ErrorCodes
@@ -18,7 +18,6 @@ class Cruize:
     def __init__(self):
         self.load_contract = LoadContracts()
         self.transaction_manager = TransactionManager()
-        # will change once our contract is deployed .
         contract_abi = open("services/contracts/contract_abis/Starkware.json")
         self.contract = self.load_contract.load_contracts(
             config("STARK_EX_CONTRACT"), contract_abi

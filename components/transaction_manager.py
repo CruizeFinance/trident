@@ -5,7 +5,7 @@ from web3 import middleware, gas_strategies
 from web3.gas_strategies import time_based
 
 from utilities.constant import (
-    SAMPLE_SIZE,
+    BLOCK_SAMPLE_SIZE,
     MAX_WAIT_SECONDS,
     PROBABILITY,
     WALLET_ADDRESS,
