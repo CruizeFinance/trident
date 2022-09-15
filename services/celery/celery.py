@@ -67,7 +67,7 @@ def close_order_on_dydx():
         load_contract = LoadContracts()
         order_params = load_contract.order_params()
         # TODO: write a formula to calculate  the trigger_price
-        trigger_price = 1600
+        trigger_price = 1500
         if trigger_price < order_params["market_price"]:
 
             dydx_order = DydxOrder()

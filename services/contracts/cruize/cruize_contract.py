@@ -29,9 +29,7 @@ class Cruize:
         result = {"transaction_hash": None, "error": None}
         amount = amount["amount"]
 
-        # need to pre calculate the price
-        # average apis call time 20s
-
+        # need to pre-calculate the  gas price
         try:
 
             transaction = self.transaction_manager.build_transaction()
@@ -54,8 +52,8 @@ class Cruize:
     def repay_to_aave(self, amount):
         amount = amount["amount"]
         result = {"transaction_hash": None, "error": None}
-        # need to pre calculate the price
-        # average apis call time 20s
+        # need to pre-calculate the  gas price
+
         try:
             transaction = self.transaction_manager.build_transaction()
 

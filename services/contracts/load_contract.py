@@ -4,11 +4,8 @@ from decouple import config
 from web3 import Web3
 from web3.middleware import geth_poa_middleware
 
-<<<<<<< HEAD
 from services import DydxAdmin
 
-=======
->>>>>>> ffd00aa0d5f93d480e6f0ef2786ab2937aeee7e1
 
 class LoadContracts:
     def load_contracts(self, contract_address, contract_abi):
