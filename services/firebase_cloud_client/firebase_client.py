@@ -7,6 +7,8 @@ import os
  It have to method create_firebase_client_instance() that initializing firebase_admin client and get_firebase_instance
  that return firebase_admin client.
 """
+
+
 # TODO: make this class singleton
 class FirebaseClient(object):
     def __init__(self):

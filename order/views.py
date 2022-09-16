@@ -2,12 +2,12 @@ from dydx3 import DydxApiError
 from rest_framework import status
 from rest_framework.response import Response
 from rest_framework.viewsets import GenericViewSet
-
 from components import OrderManager
-
-from order.serializers import OrderRequestSerializer, CancelOrderRequestSerializer
-
-from order.serializers.order_serializer import FirestoreOrdersRequestSerializer
+from order.serializers import (
+    OrderRequestSerializer,
+    CancelOrderRequestSerializer,
+    FirestoreOrdersRequestSerializer,
+)
 from services import DydxOrder, DydxAdmin
 
 
@@ -24,15 +24,15 @@ class Order(GenericViewSet):
         serializer = self.serializer_class(data=request.data)
         serializer.is_valid(raise_exception=True)
         order_data = serializer.data
-        dydx_order = DydxOrder()
-        order_manager = OrderManager()
+        dydx_order_obj = DydxOrder()
+        order_manager_obj = OrderManager()
         result = {"message": None, "error": None}
 
         try:
-            dydx_order_details = dydx_order.create_order(order_data)
+            dydx_order_details = dydx_order_obj.create_order(order_data)
             dydx_order_details = vars(dydx_order_details)
             result["message"] = dydx_order_details["data"]["order"]
-            order_manager.store_data(result["message"], "dydx_orders")
+            order_manager_obj.store_data(result["message"], "dydx_orders")
             return Response(result, status.HTTP_201_CREATED)
         except DydxApiError or ValueError as e:
             e = vars(e)
@@ -52,15 +52,15 @@ class Order(GenericViewSet):
     def cancel(self, request):
         self.serializer_class = CancelOrderRequestSerializer(data=request.data)
         self.serializer_class.is_valid(raise_exception=True)
-        dydx_order = DydxOrder()
-        order_manager = OrderManager()
+        dydx_order_obj = DydxOrder()
+        order_manager_obj = OrderManager()
         order_id = self.serializer_class.data["order_id"]
         result = {"message": None, "error": None}
         try:
-            cancelled_order_details = dydx_order.cancel_order(order_id)
+            cancelled_order_details = dydx_order_obj.cancel_order(order_id)
             cancelled_order_details = vars(cancelled_order_details)
             result["message"] = cancelled_order_details["data"]["cancelOrder"]
-            order_manager.update_data(order_id, "dydx_orders", "CANCEL")
+            order_manager_obj.update_data(order_id, "dydx_orders", "CANCEL")
             return Response(result, status.HTTP_200_OK)
         except Exception as e:
             e = vars(e)
@@ -74,10 +74,10 @@ class Order(GenericViewSet):
 
     def dydx_order(self, request):
         result = {"message": None, "error": None}
-        admin = DydxAdmin()
+        dydx_admin_obj = DydxAdmin()
 
         try:
-            orders = admin.get_account()
+            orders = dydx_admin_obj.get_account()
             orders = vars(orders)
             orders_data = orders["data"]["account"]["openPositions"]
             if not orders_data:
@@ -97,10 +97,12 @@ class Order(GenericViewSet):
         self.serializer_class.is_valid(raise_exception=True)
         validated_data = self.serializer_class.data
 
-        order_manager = OrderManager()
+        order_manager_obj = OrderManager()
 
         try:
-            orders = order_manager.fetch_orders(order_id=validated_data.get("order_id"))
+            orders = order_manager_obj.fetch_orders(
+                order_id=validated_data.get("order_id")
+            )
             if orders is None:
                 raise Exception("Order id not found")
             result["message"] = orders

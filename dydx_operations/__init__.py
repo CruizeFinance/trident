@@ -1,5 +1,6 @@
-from .serializer.withdrawal_serializer import (
+from .serializer.dydx_oprations_serializer import (
     SlowWithdrawalSerializer,
     FastWithdrawalSerializer,
     TransferSerializer,
+    DepositSerializer,
 )

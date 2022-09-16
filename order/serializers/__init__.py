@@ -1,1 +1,5 @@
-from .order_serializer import OrderRequestSerializer, CancelOrderRequestSerializer
+from .order_serializer import (
+    OrderRequestSerializer,
+    CancelOrderRequestSerializer,
+    FirestoreOrdersRequestSerializer,
+)
