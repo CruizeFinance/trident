@@ -62,6 +62,10 @@ class Order(GenericViewSet):
             result["message"] = cancelled_order_details["data"]["cancelOrder"]
             order_manager_obj.update_data(order_id, "dydx_orders", "CANCEL")
             return Response(result, status.HTTP_200_OK)
+        except DydxApiError or ValueError as e:
+            e = vars(e)
+            result["error"] = e["msg"]["errors"][0]["msg"]
+            return Response(result, status.HTTP_400_BAD_REQUEST)
         except Exception as e:
             e = vars(e)
             print("this is error", e)
@@ -84,7 +88,10 @@ class Order(GenericViewSet):
                 raise Exception("No open position found on dydx")
             result["message"] = orders_data
             return Response(result, status.HTTP_200_OK)
-
+        except DydxApiError or ValueError as e:
+            e = vars(e)
+            result["error"] = e["msg"]["errors"][0]["msg"]
+            return Response(result, status.HTTP_400_BAD_REQUEST)
         except Exception as e:
             e = vars(e)
             result["error"] = e["msg"]["errors"][0]["msg"]
@@ -107,7 +114,10 @@ class Order(GenericViewSet):
                 raise Exception("Order id not found")
             result["message"] = orders
             return Response(result, status.HTTP_200_OK)
-
+        except DydxApiError or ValueError as e:
+            e = vars(e)
+            result["error"] = e["msg"]["errors"][0]["msg"]
+            return Response(result, status.HTTP_400_BAD_REQUEST)
         except Exception as e:
             result["error"] = str(e)
             return Response(result, status.HTTP_500_INTERNAL_SERVER_ERROR)

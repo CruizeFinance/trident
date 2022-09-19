@@ -21,14 +21,19 @@ def check_withdrawal():
 
 
 @app.task(name="open_order_on_dydx", track_started=True)
-def open_order_on_dydx():
+def open_order_on_dydx(trigger_price_test=None):
     global open_position
     global order_id
     if open_position is False:
         # TODO: write a formula to calculate  the trigger_price
         order_manager_obj = OrderManager()
         order_params = order_manager_obj.order_params()
-        trigger_price = 17
+        if trigger_price_test is None:
+            # we can put the math formula here for trigger price .
+            trigger_price = 1100
+        else:
+            trigger_price = order_params["market_price"] + 100
+
         if trigger_price >= order_params["market_price"]:
 
             dydx_order = DydxOrder()
@@ -52,20 +57,25 @@ def open_order_on_dydx():
             order_manager.store_data(dydx_order_details, "dydx_orders")
             order_id = dydx_order_details["id"]
             open_position = True
+            print("SELL order is  placed")
 
     else:
         print("SELL order is already placed")
 
 
 @app.task(name="close_order_on_dydx", default_retry_delay=4 * 60)
-def close_order_on_dydx():
+def close_order_on_dydx(trigger_price=None):
     global open_position
     global order_id
     if open_position is True:
         order_manager_obj = OrderManager()
         order_params = order_manager_obj.order_params()
         # TODO: write a formula to calculate  the trigger_price
-        trigger_price = 1300
+        trigger_price = ""
+        if trigger_price is None:
+            trigger_price = 1100
+        else:
+            trigger_price = order_params["market_price"] - 100
         if trigger_price < order_params["market_price"]:
 
             dydx_order = DydxOrder()
@@ -90,6 +100,8 @@ def close_order_on_dydx():
             dydx_order_details = dydx_order_details["data"]["order"]
             order_manager.store_data(dydx_order_details, "dydx_orders")
             order_id = dydx_order_details["id"]
+            print("BUY order is  placed")
 
     else:
+        # bug need to fix it.
         print("BUY order is already placed")

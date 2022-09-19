@@ -27,11 +27,10 @@ class CruizeOperations(GenericViewSet):
         self.serializer_class = CruizeDepositRequestSerializer
         serializer = self.serializer_class(data=request.data)
         serializer.is_valid(raise_exception=True)
-        amount = serializer.data
-        cruize_contract_ref = Cruize()
+        deposit_data = serializer.data
         try:
-            result = "passs"
-            # result = cruize_contract_ref.deposit_to_cruize(amount)
+            cruize_contract_ref = Cruize()
+            result = cruize_contract_ref.deposit_to_cruize(deposit_data)
             return Response(result, status.HTTP_200_OK)
         except Exception as e:
             return Response(e, status.HTTP_500_INTERNAL_SERVER_ERROR)

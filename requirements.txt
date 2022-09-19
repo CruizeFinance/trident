@@ -3,9 +3,9 @@ aiosignal==1.2.0
 amqp==5.1.1
 asgiref==3.5.2
 async-timeout==4.0.2
+asyncio==3.4.3
 atomicwrites==1.4.1
 attrs==21.4.0
-backports.zoneinfo==0.2.1;python_version<"3.9"
 base58==2.1.1
 billiard==3.6.4.0
 bitarray==2.6.0
@@ -13,9 +13,14 @@ black==22.6.0
 CacheControl==0.12.11
 cachetools==5.2.0
 celery==5.2.7
-charset-normalizer==2.1.
+certifi @ file:///private/var/folders/sy/f16zz6x50xz3113nwtb9bvq00000gp/T/abs_83242e7e-f82d-4a71-8ef2-9d71d212d249gu_wxmeq/croots/recipe/certifi_1655968827803/work/certifi
+charset-normalizer==2.1.0
+click==8.1.3
+click-didyoumean==0.3.0
+click-plugins==1.1.1
+click-repl==0.2.0
 coverage==6.4.2
-cytoolz==0.12.0
+cytoolz==0.11.2
 dateparser==1.0.0
 Deprecated==1.2.13
 distlib==0.3.5
@@ -23,7 +28,7 @@ Django==4.0.6
 django-celery-beat==2.3.0
 django-timezone-field==5.0
 djangorestframework==3.13.1
-dydx-v3-python==1.6.1
+dydx-v3-python==1.7.0
 ecdsa==0.16.0
 eth-abi==2.2.0
 eth-account==0.5.8
@@ -64,7 +69,9 @@ multiaddr==0.0.9
 multidict==6.0.2
 mypy-extensions==0.4.3
 netaddr==0.8.0
+numpy==1.23.3
 packaging==21.3
+pandas==1.4.4
 parsimonious==0.8.1
 pathspec==0.9.0
 platformdirs==2.5.2
@@ -98,6 +105,7 @@ toml==0.10.2
 tomli==2.0.1
 toolz==0.12.0
 tox==3.13.2
+tvdatafeed==2.1.0
 typing_extensions==4.3.0
 tzdata==2022.1
 tzlocal==4.2
@@ -108,6 +116,7 @@ vine==5.0.0
 virtualenv==20.15.1
 wcwidth==0.2.5
 web3==5.30.0
+websocket-client==1.4.1
 websockets==9.1
 wrapt==1.14.1
 yarl==1.7.2
