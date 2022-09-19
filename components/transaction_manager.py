@@ -4,13 +4,7 @@ from services import LoadContracts
 from web3 import gas_strategies
 from web3.gas_strategies import time_based
 
-from utilities.constant import (
-    BLOCK_SAMPLE_SIZE,
-    MAX_WAIT_SECONDS,
-    PROBABILITY,
-    WALLET_ADDRESS,
-    RINKEBY_CHAIN_ID,
-)
+from utilities import constants
 
 
 class TransactionManager:
@@ -18,9 +12,9 @@ class TransactionManager:
         self.load_contract = LoadContracts()
         self.w3 = self.load_contract.web3_provider()
 
-    def sign_transactions(self, transaction):
+    def sign_transactions(self, transaction, private_key):
         signed_transaction = self.w3.eth.account.sign_transaction(
-            transaction, config("PRIVATE_KEY")
+            transaction, private_key
         )
         transaction_hash = self.w3.eth.send_raw_transaction(
             signed_transaction.rawTransaction
@@ -28,7 +22,13 @@ class TransactionManager:
         return str(self.w3.toHex(transaction_hash))
 
     def create_transaction(
-        self, nonce, max_fee_per_gas, max_priority_fee_per_gas, from_account, chain_id
+        self,
+        nonce,
+        max_fee_per_gas,
+        max_priority_fee_per_gas,
+        from_account,
+        chain_id,
+        eth_value,
     ):
         transaction = {
             "type": "0x2",
@@ -38,6 +38,8 @@ class TransactionManager:
             "maxPriorityFeePerGas": self.w3.toWei(max_priority_fee_per_gas, "gwei"),
             "chainId": chain_id,
         }
+        if eth_value is not None:
+            transaction["value"] = self.w3.toWei(eth_value, "ether")
         return transaction
 
     def transaction_gas_price(self, max_wait_seconds, sample_size, probability):
@@ -60,15 +62,20 @@ class TransactionManager:
         )
         return price_strategy
 
-    def build_transaction(
-        self,
-    ):
+    def build_transaction(self, wallet_address, eth_value=None):
         gas_price = self.transaction_gas_price(
-            MAX_WAIT_SECONDS, BLOCK_SAMPLE_SIZE, PROBABILITY
+            constants.MAX_WAIT_SECONDS,
+            constants.BLOCK_SAMPLE_SIZE,
+            constants.PROBABILITY,
         )
-        nonce = self.w3.eth.getTransactionCount(WALLET_ADDRESS)
+        nonce = self.w3.eth.getTransactionCount(wallet_address)
         transaction = self.create_transaction(
-            nonce, gas_price, gas_price, WALLET_ADDRESS, RINKEBY_CHAIN_ID
+            nonce,
+            gas_price,
+            gas_price,
+            wallet_address,
+            constants.GOERLI_CHAIN_ID,
+            eth_value,
         )
         return transaction
 

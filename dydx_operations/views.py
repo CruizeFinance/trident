@@ -99,10 +99,18 @@ class DydxOprations(GenericViewSet):
         result = {"message": None, "error": None}
         dydx_admin_obj = DydxAdmin()
         try:
-            fund_details = dydx_admin_obj.deposit_fund()
+            fund_details = dydx_admin_obj.deposit_test_fund()
+            fund_details = vars(fund_details)
             result["message"] = fund_details["data"]["transfer"]
+            print(result)
             return Response(result, status.HTTP_200_OK)
-        except Exception as e:
+        except DydxApiError as e:
             e = vars(e)
             result["error"] = e["msg"]["errors"][0]["msg"]
+            return Response(result, status.HTTP_400_BAD_REQUEST)
+
+        except Exception as e:
+            e = vars(e)
+            print(e)
+            result["error"] = e["errors"][0]["msg"]
             return Response(result, status.HTTP_500_INTERNAL_SERVER_ERROR)

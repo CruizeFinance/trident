@@ -31,6 +31,10 @@ class User(GenericViewSet):
                 raise Exception("Fail to register")
             result["message"] = user["data"]["signature"]
             return Response(result, status.HTTP_200_OK)
+        except DydxApiError or ValueError as e:
+            e = vars(e)
+            result["error"] = e["msg"]["errors"][0]["msg"]
+            return Response(result, status.HTTP_400_BAD_REQUEST)
         except Exception as e:
             result["error"] = str(e)
             return Response(result, status.HTTP_500_INTERNAL_SERVER_ERROR)

@@ -1,6 +1,7 @@
 from decouple import config
 from components import TransactionManager
 from services import LoadContracts, DydxAdmin
+from utilities import constants
 from utilities.exception import ContractException
 
 
@@ -22,12 +23,16 @@ class DydxStarkExContract:
     def withdraw(self):
         result = {"transaction_hash": None, "error": None}
         try:
-            transaction = self.transaction_manager.build_transaction()
+            transaction = self.transaction_manager.build_transaction(
+                wallet_address=constants.WALLET_ADDRESS
+            )
             transaction = self.contract.functions.withdraw(
                 starkKey=int(config("STARK_PUBLIC_KEY"), 16),
                 assetType=config("ASSET_TYPE"),
             ).buildTransaction(transaction)
-            signed_tx = self.transaction_manager.sign_transactions(transaction)
+            signed_tx = self.transaction_manager.sign_transactions(
+                transaction, config("PRIVATE_KEY")
+            )
             return signed_tx
 
         except ValueError as e:
@@ -44,11 +49,15 @@ class DydxStarkExContract:
         admin = DydxAdmin()
         position_id = admin.get_position_id()
         try:
-            transaction = self.transaction_manager.build_transaction()
+            transaction = self.transaction_manager.build_transaction(
+                wallet_address=constants.WALLET_ADDRESS
+            )
             contract_transaction = self.contract.functions.deposit(
                 self.w3.toWei(amount, "ether")
             ).buildTransaction(transaction)
-            tnx = self.transaction_manager.sign_transactions(contract_transaction)
+            tnx = self.transaction_manager.sign_transactions(
+                contract_transaction, config("PRIVATE_KEY")
+            )
             result["transaction_hash"] = tnx
             return result
         except ValueError as e:
