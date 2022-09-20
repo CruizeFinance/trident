@@ -3,7 +3,9 @@ from components import OrderManager
 from services import DydxWithdrawal, DydxOrder, DydxAdmin
 from tests.constants import SEVEN_DAYS_S
 from settings_config.celery_config import app
+
 open_position = False
+
 
 @app.task(name="check_withdrawal", default_retry_delay=4 * 60)
 def check_withdrawal():

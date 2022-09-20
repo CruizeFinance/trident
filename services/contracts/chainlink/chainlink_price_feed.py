@@ -1,5 +1,7 @@
 from services import LoadContracts
 from utilities.constant import DECIMAL_NOTATION
+
+
 class ChainlinkPriceFeed:
     def __init__(self):
         self.load_contract = LoadContracts()

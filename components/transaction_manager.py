@@ -1,7 +1,7 @@
 from decouple import config
 
 from services import LoadContracts
-from web3 import  gas_strategies
+from web3 import gas_strategies
 from web3.gas_strategies import time_based
 
 from utilities.constant import (
