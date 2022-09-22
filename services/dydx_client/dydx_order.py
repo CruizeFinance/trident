@@ -43,3 +43,10 @@ class DydxOrder:
             limit=order_params["limit"],
         )
         return all_orders
+
+    def get_order_book(self, market="ETH-USD"):
+
+        order_book = self.client.public.get_orderbook(
+            market=market,
+        )
+        return order_book.get_price_floors

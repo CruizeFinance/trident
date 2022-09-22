@@ -2,21 +2,30 @@ from datetime import datetime, timedelta
 
 import pytz
 
-TIMEZONE = pytz.timezone("Asia/Kolkata")
+from utilities import cruize_constants
+
+"""
+     :method   - convert_epoch_to_utcdatetime: convert epoch to utcdatetime.
+     :params   - epoch:epoch time.
+     :return   - utcdatetime
+   """
 
 
 def convert_epoch_to_utcdatetime(epoch, parser="%Y-%m-%dT%H:%M:%S"):
     return (
         (datetime.utcfromtimestamp(epoch))
         .replace(tzinfo=pytz.utc)
-        .astimezone(tz=TIMEZONE)
+        .astimezone(tz=cruize_constants.TIMEZONE)
         .strftime(parser)
     )
 
 
+"""
+    :method   - get_timezone_aware_datetime:  timezone aware datetime.
+    :params   - epoch:epoch time.
+    :return   - utcdatetime
+  """
+
+
 def get_timezone_aware_datetime(days_delta=0):
-    return datetime.now(tz=TIMEZONE) + timedelta(days=days_delta)
-
-
-if __name__ == "__main__":
-    print(convert_epoch_to_utcdatetime(1644659228))
+    return datetime.now(tz=cruize_constants.TIMEZONE) + timedelta(days=days_delta)
