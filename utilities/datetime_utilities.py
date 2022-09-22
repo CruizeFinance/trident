@@ -6,7 +6,6 @@ TIMEZONE = pytz.timezone("Asia/Kolkata")
 
 
 def convert_epoch_to_utcdatetime(epoch, parser="%Y-%m-%dT%H:%M:%S"):
-    print("e", epoch)
     return (
         (datetime.utcfromtimestamp(epoch))
         .replace(tzinfo=pytz.utc)

@@ -33,7 +33,6 @@ def market_chart_timestamp(
     )
     result = dict(requests.get(url).json())
     for key, value in result.items():
-        # print(key, value)
         for i, data in enumerate(result[key]):
 
             result[key][i][0] = datetime_utilities.convert_epoch_to_utcdatetime(
