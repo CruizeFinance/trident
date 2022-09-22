@@ -12,3 +12,8 @@ class MarketDataTimestampRequestSerializer(serializers.Serializer):
     vs_currency = serializers.CharField(required=False)
     time_from = serializers.IntegerField(required=True)
     time_to = serializers.IntegerField(required=True)
+
+
+class AssetPriceRequestSerializer(serializers.Serializer):
+    asset = serializers.CharField(required=True)
+    vs_currencies = serializers.CharField(required=False)

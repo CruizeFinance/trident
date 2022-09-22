@@ -12,7 +12,6 @@ def market_chart_day(asset="ethereum", vs_currency="usd", days=2):
     result = dict(requests.get(url).json())
     for key, value in result.items():
         for i, data in enumerate(result[key]):
-
             result[key][i][0] = datetime_utilities.convert_epoch_to_utcdatetime(
                 int(result[key][i][0]) / 1000, parser="%m-%d/%H:%M"
             )
@@ -26,7 +25,6 @@ def market_chart_timestamp(
     time_from=datetime.utcnow().timestamp() - SECONDS_PER_HOUR,
     time_to=datetime.utcnow().timestamp(),
 ):
-
     url = (
         HOST
         + f"/coins/{asset}/market_chart/range?vs_currency={vs_currency}&from={time_from}&to={time_to}"
@@ -34,7 +32,6 @@ def market_chart_timestamp(
     result = dict(requests.get(url).json())
     for key, value in result.items():
         for i, data in enumerate(result[key]):
-
             result[key][i][0] = datetime_utilities.convert_epoch_to_utcdatetime(
                 int(result[key][i][0]) / 1000, parser="%m-%d/%H:%M"
             )
@@ -43,6 +40,13 @@ def market_chart_timestamp(
     return result
 
 
+def asset_price(asset="bitcoin", vs_currencies="usd"):
+    url = HOST + f"/simple/price?ids={asset}&vs_currencies={vs_currencies}"
+    result = dict(requests.get(url).json())
+    return result[asset][vs_currencies]
+
+
 if __name__ == "__main__":
     print(market_chart_day())
     # print(market_chart_timestamp())
+    print(asset_price())
