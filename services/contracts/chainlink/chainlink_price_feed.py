@@ -1,5 +1,5 @@
 from services import LoadContracts
-from utilities.constant import DECIMAL_NOTATION
+from utilities import constants
 
 
 class ChainlinkPriceFeed:
@@ -11,5 +11,5 @@ class ChainlinkPriceFeed:
         contract = self.load_contract.load_contracts(asset_address, contract_abi)
         market_price = contract.functions.latestRoundData().call()
         market_price = market_price[1]
-        market_price = market_price / DECIMAL_NOTATION
+        market_price = market_price / constants.DECIMAL_NOTATION
         return market_price

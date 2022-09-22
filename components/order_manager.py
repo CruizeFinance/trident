@@ -1,10 +1,7 @@
-"""Class OrderManager is responsible for storing dydx_orders data in firebase cloud storage.
-
-   It has two method store_on_firebase() that is responsible for storing data in DB.
-   Method update_on_firebase() is used to update data in DB. """
 from services import DydxAdmin
 from services.contracts.chainlink import ChainlinkPriceFeed
 from settings_config import firebase_client
+from utilities import constants
 
 
 class OrderManager(object):
@@ -36,8 +33,8 @@ class OrderManager(object):
         order_prams = {"position_id": None, "size": None, "market_price": None}
         chainlink_price_feed_obj = ChainlinkPriceFeed()
         market_price = chainlink_price_feed_obj.get_asset_price(
-            "0x5f4eC3Df9cbd43714FE2740f5E3616155c5b8419",
-        )  # make it dynamic
+            constants.TEST_LINK_ADDRESS,
+        )
         admin = DydxAdmin()
         user = admin.get_account()
         user = vars(user)
@@ -45,7 +42,6 @@ class OrderManager(object):
         position_id = user["data"]["account"]["positionId"]
         size = float(user_balance) / market_price
         size *= 5
-
         order_prams["size"] = str(round(size, 3))
         order_prams["position_id"] = position_id
         order_prams["market_price"] = market_price
