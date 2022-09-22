@@ -1,3 +1,4 @@
+from django.http import HttpResponse
 from django.shortcuts import render
 
 # Create your views here.
@@ -14,6 +15,7 @@ from services.market_data import coingecko
 
 
 class MarketData(GenericViewSet):
+
     def market_chart_day(self, request):
         result = {"prices": None, "error": None}
         self.serializer_class = MarketDataDayRequestSerializer
