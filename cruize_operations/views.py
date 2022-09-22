@@ -10,19 +10,15 @@ from cruize_operations import (
     SetPriceFloorSerializer,
 )
 from services.avve_asset_apy import AaveApy
-
 from services.contracts.cruize.cruize_contract import Cruize
 from utilities import cruize_constants
-
 price_floor_manager = PriceFloorManager()
-
-
 class CruizeOperations(GenericViewSet):
     def repay_to_aave(self, request):
         result = {"message": None, "error": None}
         self.cruize_contract_ref = Cruize()
         self.serializer_class = RepayToAaveRequestSerializer
-        serializer = self.serializer_class(data=request.get_price_floors)
+        serializer = self.serializer_class(data=request.data)
         serializer.is_valid(raise_exception=True)
         amount = serializer.data
         try:
@@ -37,7 +33,7 @@ class CruizeOperations(GenericViewSet):
         self.cruize_contract_ref = Cruize()
         result = {"message": None, "error": None}
         self.serializer_class = CruizeDepositRequestSerializer
-        serializer = self.serializer_class(data=request.get_price_floors)
+        serializer = self.serializer_class(data=request.data)
         serializer.is_valid(raise_exception=True)
         deposit_data = serializer.data
         try:
@@ -51,7 +47,7 @@ class CruizeOperations(GenericViewSet):
         result = {"message": None, "error": None}
         self.cruize_contract_ref = Cruize()
         self.serializer_class = FirebaseRequestSerializer
-        serializer = self.serializer_class(data=request.get_price_floors)
+        serializer = self.serializer_class(data=request.data)
         serializer.is_valid(raise_exception=True)
         deposit_data = serializer.data
         try:
@@ -115,7 +111,7 @@ class CruizeOperations(GenericViewSet):
             result["error"] = e
             return Response(result, status.HTTP_500_INTERNAL_SERVER_ERROR)
 
-    def  fetch_asset_apy(self, request):
+    def fetch_asset_apy(self, request):
         result = {"result": None, "error": None}
         try:
             aave_apy_obj = AaveApy()

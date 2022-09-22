@@ -5,7 +5,7 @@ import pandas
 from dateutil.relativedelta import relativedelta
 from dydx3 import constants
 from tests.constants import SEVEN_DAYS_S
-from components import FirebaseDataManager, PriceFloorManager
+from components import PriceFloorManager
 from services import DydxOrder, DydxAdmin
 from services.binance_client.binance_client import BinanceClient
 from services.contracts.chainlink import ChainlinkPriceFeed
@@ -20,12 +20,11 @@ class DydxOrderManager:
     def __init__(self):
         self.dydx_admin = DydxAdmin()
         self.chainlink_price_feed = ChainlinkPriceFeed()
-        self.firebase_db_obj = FirebaseDataManager()
         self.binance_client_obj = BinanceClient()
+        self.price_floor_manager_obj = PriceFloorManager()
 
     def create_order(self, order_params):
         dydx_order = DydxOrder()
-        firebase_order_manager_obj = FirebaseDataManager()
         # we have to keep separate volume of btc and eth to open different position on dydx.
         # total_btc_volume * 5 --> would be the open size for the btc
         # total_eth_volume * 5 --> would be the open size for eth
@@ -35,9 +34,7 @@ class DydxOrderManager:
         return order_information
 
     def calculate_open_close_price(self, asset_pair, eth_order_size, symbol):
-
         bids_consumed = 0
-        price_floor_manager_obj = PriceFloorManager()
         dydx_order_obj = DydxOrder()
         asset_order_book = dydx_order_obj.get_order_book(asset_pair)
         order_asks = asset_order_book["asks"]
@@ -66,11 +63,12 @@ class DydxOrderManager:
 
         slippage = (obtained_price - market_price) / market_price
 
-        price_floor = price_floor_manager_obj.get_price_floor(
+        price_floor = self.price_floor_manager_obj.get_price_floor(
             AssetCodes.asset_name.value[asset_pair]
         )
-        ema_data = self.firebase_db_obj.get_ema_data("ema_data", symbol)
-        ema = ema_data["ema"]
+        ema_data = self.price_floor_manager_obj.firebase_data_manager_obj.fetch_data("ema_data", symbol)
+
+        ema = ema_data.get("_data")['ema']
         # K must change ,K being variable will cover price movement
         # within 30s under normal market conditions
         K = 2
@@ -95,7 +93,6 @@ class DydxOrderManager:
         size,
         market_price,
     ):
-        print(market_price)
         if side == "SELL":
             market_price = int(market_price) + 10
         else:
@@ -152,11 +149,10 @@ class DydxOrderManager:
         return volatility_data
 
     def market_volatility(self, symbol):
-
         volatility_data = {}
         # fetch price data from db .
-        price_data = self.firebase_db_obj.get_ema_data(
-            collection_name="price_data", id=symbol
+        price_data = self.price_floor_manager_obj.firebase_data_manager_obj.fetch_data(
+            "price_data", symbol
         )
 
         # TODO :  have to change the start time and end time in both if and else condition's
@@ -192,15 +188,15 @@ class DydxOrderManager:
             # compute market volatility .
             volatility_data = self.compute_market_volatility(prices_data=price_data)
         price_data = ",".join(price_data)
-        self.firebase_db_obj.store_ema_data(
+        self.price_floor_manager_obj.firebase_data_manager_obj.store_data(
             "price_data", symbol, {"prices": price_data}
         )
-        self.firebase_db_obj.store_ema_data(
+        self.price_floor_manager_obj.firebase_data_manager_obj.store_data(
             "ema_data", symbol, {"ema": volatility_data}
         )
 
 
 if __name__ == "__main__":
     a = DydxOrderManager()
-    a = a.calculate_open_close_price("ETH-USD", 10, "ETHBUSD")
+    a = a.calculate_open_close_price("BTC-USD", 10, "BTCBUSD")
     print(a)

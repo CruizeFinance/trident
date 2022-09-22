@@ -2,7 +2,6 @@ from dydx3 import DydxApiError
 from rest_framework import status
 from rest_framework.response import Response
 from rest_framework.viewsets import GenericViewSet
-from components import FirebaseDataManager
 from components.dydx_order_manager import DydxOrderManager
 from order.serializers import (
     OrderRequestSerializer,
@@ -22,21 +21,20 @@ class Order(GenericViewSet):
     """
 
     def initialize(self):
-        self.firebase_data_manager_obj = FirebaseDataManager()
         self.dydx_order_obj = DydxOrder()
         self.error_handler = ErrorHandler()
-        self.dydx_order_manager_obj = DydxOrderManager()
+
 
     def create(self, request):
         self.initialize()
         self.serializer_class = OrderRequestSerializer
-        serializer = self.serializer_class(data=request.get_price_floors)
+        serializer = self.serializer_class(data=request.data)
         serializer.is_valid(raise_exception=True)
         order_data = serializer.data
-
+        dydx_order_manager_obj = DydxOrderManager()
         result = {"message": None, "error": None}
         try:
-            order_data = self.dydx_order_manager_obj.create_order_params(
+            order_data = dydx_order_manager_obj.create_order_params(
                 order_data["side"],
                 order_data["market"],
                 order_data["size"],
@@ -64,7 +62,7 @@ class Order(GenericViewSet):
     def cancel(self, request):
         self.initialize()
         self.serializer_class = CancelOrderRequestSerializer(
-            data=request.get_price_floors
+            data=request.data
         )
         self.serializer_class.is_valid(raise_exception=True)
         order_id = self.serializer_class.data["order_id"]
@@ -73,9 +71,6 @@ class Order(GenericViewSet):
             cancelled_order_details = self.dydx_order_obj.cancel_order(order_id)
             cancelled_order_details = vars(cancelled_order_details)
             result["message"] = cancelled_order_details["data"]["cancelOrder"]
-            self.firebase_data_manager_obj.update_data(
-                order_id, "dydx_orders", "CANCEL"
-            )
             return Response(result, status.HTTP_200_OK)
         except DydxApiError or ValueError as e:
 
@@ -121,16 +116,14 @@ class Order(GenericViewSet):
         self.serializer_class = FirestoreOrdersRequestSerializer(data=request_data)
         self.serializer_class.is_valid(raise_exception=True)
         validated_data = self.serializer_class.data
-
-        order_manager_obj = FirebaseDataManager()
-
+        dydx_order_manager_obj = DydxOrderManager()
         try:
-            orders = order_manager_obj.fetch_orders(
+            orders = dydx_order_manager_obj.price_floor_manager_obj.firebase_data_manager_obj.fetch_orders(
                 order_id=validated_data.get("order_id")
             )
             if orders is None:
                 raise Exception("Order id not found")
-            result["message"] = orders
+            result["message"] = "order"
             return Response(result, status.HTTP_200_OK)
         except DydxApiError or ValueError as e:
             e = vars(e)

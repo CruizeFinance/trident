@@ -17,7 +17,7 @@ class MarketData(GenericViewSet):
         result = {"prices": None, "error": None}
         coin_gecko = CoinGecko()
         self.serializer_class = MarketDataDayRequestSerializer
-        serializer = self.serializer_class(data=request.get_price_floors)
+        serializer = self.serializer_class(data=request.data)
         serializer.is_valid(raise_exception=True)
         data = serializer.data
         try:
@@ -32,7 +32,7 @@ class MarketData(GenericViewSet):
         result = {"prices": None, "error": None}
         coin_gecko = CoinGecko()
         self.serializer_class = MarketDataTimestampRequestSerializer
-        serializer = self.serializer_class(data=request.get_price_floors)
+        serializer = self.serializer_class(data=request.data)
         serializer.is_valid(raise_exception=True)
         data = serializer.data
         try:

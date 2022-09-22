@@ -32,12 +32,14 @@ SECRET_KEY = "j7qelfcc!qe*%((o3p0ju20obkx^j9+9#%%d-t15gqnz^*$om#"
 DEBUG = True
 
 
+
 CORS_ALLOWED_ORIGINS = [
     "http://localhost:3000",
     "https://dev.dqnnihobvaqxo.amplifyapp.com",
 ]
 # TODO :  need to add server IP.
-ALLOWED_HOSTS = ["127.0.0.1", "34.229.218.168"]
+ALLOWED_HOSTS = ["127.0.0.1","52.20.55.165","test.trident.cruize.finance"]
+
 
 
 # Application definition
