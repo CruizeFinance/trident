@@ -37,7 +37,7 @@ class Cruize:
             result["transaction_hash"] = tnx
             return result
         except ValueError as e:
-            result['error'] = self.exception.validate_exceptions(e)
+            result["error"] = self.exception.validate_exceptions(e)
             return result
         except Exception as e:
             result["error"] = e
@@ -62,7 +62,7 @@ class Cruize:
             result["transaction_hash"] = tnx
             return result
         except ValueError as e:
-            result['error'] = self.exception.validate_exceptions(e)
+            result["error"] = self.exception.validate_exceptions(e)
             return result
         except Exception as e:
             result["error"] = e
@@ -87,8 +87,8 @@ class Cruize:
             result["transaction_hash"] = tnx
             return result
         except ValueError as e:
-             result['error']  = self.exception.validate_exceptions(e)
-             return result
+            result["error"] = self.exception.validate_exceptions(e)
+            return result
         except Exception as e:
             result["error"] = e
             return result
