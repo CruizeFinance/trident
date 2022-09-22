@@ -22,8 +22,6 @@ from sentry_sdk.integrations.django import DjangoIntegration
 BASE_DIR = Path(__file__).resolve().parent.parent
 
 
-
-
 # Quick-start development settings - unsuitable for production
 # See https://docs.djangoproject.com/en/3.1/howto/deployment/checklist/
 
@@ -34,12 +32,14 @@ SECRET_KEY = "j7qelfcc!qe*%((o3p0ju20obkx^j9+9#%%d-t15gqnz^*$om#"
 DEBUG = True
 
 
+
 CORS_ALLOWED_ORIGINS = [
     "http://localhost:3000",
     "https://dev.dqnnihobvaqxo.amplifyapp.com",
 ]
 # TODO :  need to add server IP.
 ALLOWED_HOSTS = ["127.0.0.1", "34.229.218.168"]
+
 
 
 # Application definition
@@ -156,3 +156,4 @@ STATIC_URL = "/static/"
 #     # django.contrib.auth) you may enable sending PII data.
 #     send_default_pii=True,
 # )
+1146418262036839915177450
