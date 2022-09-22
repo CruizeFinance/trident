@@ -72,7 +72,7 @@ class DydxAdmin(object):
     def deposit_test_fund(self):
         return self.client.private.request_testnet_tokens()
 
-    def deposit_to_dydx(self,amount):
+    def deposit_to_dydx(self, amount):
         try:
             transaction_manager = TransactionManager()
             transaction = transaction_manager.build_transaction(
@@ -80,22 +80,27 @@ class DydxAdmin(object):
             )
             print(transaction)
             position_id = self.get_position_id()
-            tnx_hash= self.client.eth.deposit_to_exchange(position_id=position_id, human_amount=amount, send_options=transaction)
+            tnx_hash = self.client.eth.deposit_to_exchange(
+                position_id=position_id, human_amount=amount, send_options=transaction
+            )
 
             return tnx_hash
         except Exception as e:
             raise Exception(e)
 
-    def withdraw_from_dydx(self,recipient_address):
+    def withdraw_from_dydx(self, recipient_address):
         try:
             transaction_manager = TransactionManager()
             transaction = transaction_manager.build_transaction(
                 wallet_address=cruize_constants.WALLET_ADDRESS
             )
-            tnx_hash = self.client.eth.withdraw_to(recipient=recipient_address,send_options=transaction)
+            tnx_hash = self.client.eth.withdraw_to(
+                recipient=recipient_address, send_options=transaction
+            )
             return tnx_hash
         except Exception as e:
             raise Exception(e)
+
 
 if __name__ == "__main__":
     a = DydxAdmin()

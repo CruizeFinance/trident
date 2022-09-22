@@ -1,5 +1,6 @@
 # MAINNET CONSTANTS
 import pytz
+
 # TODO:make sure to use the mainnet data here.
 MAINNET_INFURA_URL = "https://mainnet.infura.io/v3/4e55b6d7c94d4c58a931971dc807d055"
 STARK_CONTRACT_ADDRESS = "0x014F738EAd8Ec6C50BCD456a971F8B84Cd693BBe"
@@ -57,3 +58,30 @@ RESULT_BACKEND = "redis://127.0.0.1:6379/1"
 
 # FIREBASE CONSTANT
 CRUIZE_USER = "cruize_users"
+# AAVE APY CONSTANT
+AAVE_SUB_GRAPH_URL = "https://api.thegraph.com/subgraphs/name/aave/protocol-v2"
+AVVE_SUB_GRAPH_QUERY = """
+        query {
+          reserves (where: {
+            usageAsCollateralEnabled: true
+          }) {
+            id
+            name
+            price {
+              id
+              priceInEth
+            }
+            liquidityRate
+            variableBorrowRate
+            stableBorrowRate
+            aEmissionPerSecond
+            vEmissionPerSecond
+            decimals
+            totalATokenSupply
+            totalCurrentVariableDebt
+            symbol
+          }
+        }
+        """
+AAVE_RAY = 10.0**27
+AAVE_APY_ASSET = ["WBTC", "WETH", "LINK"]

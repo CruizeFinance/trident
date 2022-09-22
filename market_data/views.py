@@ -1,4 +1,3 @@
-
 from django.http import HttpResponse
 from django.shortcuts import render
 from rest_framework.response import Response
@@ -13,7 +12,6 @@ from services.market_data.coingecko import CoinGecko
 
 
 class MarketData(GenericViewSet):
-
     def market_chart_day(self, request):
         result = {"prices": None, "error": None}
         coin_gecko = CoinGecko()

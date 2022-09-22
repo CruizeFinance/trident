@@ -72,7 +72,7 @@ class FirebaseDataManager(object):
         price_floors = {}
         for doc in price_floor_data:
             doc = doc.to_dict()
-            price_floors[doc["id"]] = doc['price_floor']
+            price_floors[doc["id"]] = doc["price_floor"]
         return price_floors
 
 

@@ -63,7 +63,9 @@ class Order(GenericViewSet):
 
     def cancel(self, request):
         self.initialize()
-        self.serializer_class = CancelOrderRequestSerializer(data=request.get_price_floors)
+        self.serializer_class = CancelOrderRequestSerializer(
+            data=request.get_price_floors
+        )
         self.serializer_class.is_valid(raise_exception=True)
         order_id = self.serializer_class.data["order_id"]
         result = {"message": None, "error": None}
