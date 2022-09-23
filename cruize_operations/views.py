@@ -18,7 +18,7 @@ class CruizeOperations(GenericViewSet):
         cruize_contract_ref = Cruize()
         try:
             result = "passs"
-            # result = cruize_contract_ref.repay_to_aave(amount)
+            result = cruize_contract_ref.repay_to_aave(amount)
             return Response(result, status.HTTP_200_OK)
         except Exception as e:
             return Response(e, status.HTTP_500_INTERNAL_SERVER_ERROR)
