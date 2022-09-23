@@ -10,7 +10,6 @@ class OrderRequestSerializer(serializers.Serializer):
     side = serializers.CharField(max_length=4, required=True)
     order_type = serializers.CharField(max_length=6, required=True)
     post_only = serializers.BooleanField(required=True)
-    size = serializers.CharField(required=True)
     price = serializers.CharField(required=True)
     limit_fee = serializers.FloatField(required=True, min_value=0)
     expiration_epoch_seconds = serializers.IntegerField(required=True)
