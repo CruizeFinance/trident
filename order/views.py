@@ -26,9 +26,10 @@ class Order(GenericViewSet):
         order_data = serializer.data
         dydx_order_obj = DydxOrder()
         order_manager_obj = OrderManager()
+        order_params = order_manager_obj.order_params()
         result = {"message": None, "error": None}
-
         try:
+            order_data['size'] =  order_params["size"]
             dydx_order_details = dydx_order_obj.create_order(order_data)
             dydx_order_details = vars(dydx_order_details)
             result["message"] = dydx_order_details["data"]["order"]
