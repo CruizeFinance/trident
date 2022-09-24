@@ -1,23 +1,18 @@
-from django.http import HttpResponse
-from django.shortcuts import render
-
-# Create your views here.
 from rest_framework.response import Response
 from rest_framework import status
 from rest_framework.viewsets import GenericViewSet
-
 from market_data.serializers import (
     MarketDataDayRequestSerializer,
     MarketDataTimestampRequestSerializer,
     AssetPriceRequestSerializer,
 )
-from services.market_data import coingecko
+from services.market_data.coingecko import CoinGecko
 
 
 class MarketData(GenericViewSet):
-
     def market_chart_day(self, request):
         result = {"prices": None, "error": None}
+        coingecko =  CoinGecko()
         self.serializer_class = MarketDataDayRequestSerializer
         serializer = self.serializer_class(data=request.data)
         serializer.is_valid(raise_exception=True)
@@ -32,7 +27,7 @@ class MarketData(GenericViewSet):
 
     def market_chart_timestamp(self, request):
         result = {"prices": None, "error": None}
-        print(request)
+        coingecko = CoinGecko()
         self.serializer_class = MarketDataTimestampRequestSerializer
         serializer = self.serializer_class(data=request.data)
         serializer.is_valid(raise_exception=True)
@@ -50,6 +45,7 @@ class MarketData(GenericViewSet):
         self.serializer_class = AssetPriceRequestSerializer
         serializer = self.serializer_class(data=request.data)
         serializer.is_valid(raise_exception=True)
+        coingecko = CoinGecko()
         data = serializer.data
         try:
             asset_price = coingecko.asset_price(**data)

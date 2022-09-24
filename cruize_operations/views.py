@@ -10,27 +10,29 @@ from services.contracts.cruize.cruize_contract import Cruize
 
 
 class CruizeOperations(GenericViewSet):
+    def initialize(self):
+        self.cruize_contract_ref = Cruize()
+
     def repay_to_aave(self, request):
+        self.initialize()
         self.serializer_class = RepayToAaveRequestSerializer
         serializer = self.serializer_class(data=request.data)
         serializer.is_valid(raise_exception=True)
         amount = serializer.data
-        cruize_contract_ref = Cruize()
         try:
-            result = "passs"
-            result = cruize_contract_ref.repay_to_aave(amount)
+            result = self.cruize_contract_ref.repay_to_aave(amount)
             return Response(result, status.HTTP_200_OK)
         except Exception as e:
             return Response(e, status.HTTP_500_INTERNAL_SERVER_ERROR)
 
     def deposit(self, request):
+        self.initialize()
         self.serializer_class = CruizeDepositRequestSerializer
         serializer = self.serializer_class(data=request.data)
         serializer.is_valid(raise_exception=True)
         deposit_data = serializer.data
         try:
-            cruize_contract_ref = Cruize()
-            result = cruize_contract_ref.deposit_to_cruize(deposit_data)
+            result = self.cruize_contract_ref.deposit_to_cruize(deposit_data)
             return Response(result, status.HTTP_200_OK)
         except Exception as e:
             return Response(e, status.HTTP_500_INTERNAL_SERVER_ERROR)

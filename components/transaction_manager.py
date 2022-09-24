@@ -1,10 +1,8 @@
-from decouple import config
-
 from services import LoadContracts
 from web3 import gas_strategies
 from web3.gas_strategies import time_based
 
-from utilities import constants
+from utilities import cruize_constants
 
 
 class TransactionManager:
@@ -64,9 +62,9 @@ class TransactionManager:
 
     def build_transaction(self, wallet_address, eth_value=None):
         gas_price = self.transaction_gas_price(
-            constants.MAX_WAIT_SECONDS,
-            constants.BLOCK_SAMPLE_SIZE,
-            constants.PROBABILITY,
+            cruize_constants.MAX_WAIT_SECONDS,
+            cruize_constants.BLOCK_SAMPLE_SIZE,
+            cruize_constants.PROBABILITY,
         )
         nonce = self.w3.eth.getTransactionCount(wallet_address)
         transaction = self.create_transaction(
@@ -74,7 +72,7 @@ class TransactionManager:
             gas_price,
             gas_price,
             wallet_address,
-            constants.GOERLI_CHAIN_ID,
+            cruize_constants.GOERLI_CHAIN_ID,
             eth_value,
         )
         return transaction
