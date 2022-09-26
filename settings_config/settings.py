@@ -29,8 +29,11 @@ SECRET_KEY = "j7qelfcc!qe*%((o3p0ju20obkx^j9+9#%%d-t15gqnz^*$om#"
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = True
 
-CORS_ORIGIN_WHITELIST = "https://localhost:3000"
-ALLOWED_HOSTS = ["*"]
+CORS_ALLOWED_ORIGINS = [
+    "http://localhost:3000",
+    "https://dev.dqnnihobvaqxo.amplifyapp.com"
+]
+ALLOWED_HOSTS = ["http://127.0.0.1:8000",]
 
 
 # Application definition
@@ -43,9 +46,12 @@ INSTALLED_APPS = [
     "django.contrib.messages",
     "django.contrib.staticfiles",
     "django_celery_beat",
+    "corsheaders"
 ]
 
 MIDDLEWARE = [
+    "corsheaders.middleware.CorsMiddleware",
+    "django.middleware.common.CommonMiddleware",
     "django.middleware.security.SecurityMiddleware",
     "django.contrib.sessions.middleware.SessionMiddleware",
     "django.middleware.common.CommonMiddleware",
@@ -54,6 +60,8 @@ MIDDLEWARE = [
     "django.contrib.messages.middleware.MessageMiddleware",
     "django.middleware.clickjacking.XFrameOptionsMiddleware",
 ]
+
+
 
 ROOT_URLCONF = "settings_config.urls"
 
