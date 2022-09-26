@@ -1,5 +1,7 @@
 import requests
 from datetime import datetime
+
+from services.contracts.chainlink import ChainlinkPriceFeed
 from utilities import cruize_constants
 from utilities.utills import Utilities
 
@@ -53,13 +55,10 @@ class CoinGecko:
             return result
         raise Exception(result['error'])
 
-    def asset_price(self, asset="bitcoin", vs_currencies="usd"):
-        url = (
-                cruize_constants.COINGECKO_HOST
-                + f"/simple/price?ids={asset}&vs_currencies={vs_currencies}"
-        )
-        result = dict(requests.get(url).json())
-        return result[asset][vs_currencies]
+    def asset_price(self, asset_address):
+        chainlinkpricefeed =  ChainlinkPriceFeed()
+        market_price = chainlinkpricefeed.get_asset_price(asset_address['asset_address'])
+        return market_price
 
 
 if __name__ == '__main__':

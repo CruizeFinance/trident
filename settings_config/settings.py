@@ -33,7 +33,7 @@ CORS_ALLOWED_ORIGINS = [
     "http://localhost:3000",
     "https://dev.dqnnihobvaqxo.amplifyapp.com"
 ]
-ALLOWED_HOSTS = ["http://127.0.0.1:8000",]
+ALLOWED_HOSTS = ["127.0.0.1",]
 
 
 # Application definition

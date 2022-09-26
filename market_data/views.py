@@ -48,7 +48,8 @@ class MarketData(GenericViewSet):
         coingecko = CoinGecko()
         data = serializer.data
         try:
-            asset_price = coingecko.asset_price(**data)
+            print(data)
+            asset_price = coingecko.asset_price(data)
             result["price"] = asset_price
             return Response(data=result, status=status.HTTP_200_OK)
         except Exception as e:
