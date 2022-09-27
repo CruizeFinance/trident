@@ -9,6 +9,7 @@ https://docs.djangoproject.com/en/3.1/topics/settings/
 For the full list of settings and their values, see
 https://docs.djangoproject.com/en/3.1/ref/settings/
 """
+import os.path
 from datetime import timedelta
 from pathlib import Path
 import sentry_sdk
@@ -31,9 +32,11 @@ DEBUG = True
 
 CORS_ALLOWED_ORIGINS = [
     "http://localhost:3000",
-    "https://dev.dqnnihobvaqxo.amplifyapp.com"
+    "https://dev.dqnnihobvaqxo.amplifyapp.com",
 ]
-ALLOWED_HOSTS = ["127.0.0.1",]
+ALLOWED_HOSTS = [
+    "127.0.0.1","34.229.218.168"
+]
 
 
 # Application definition
@@ -46,7 +49,7 @@ INSTALLED_APPS = [
     "django.contrib.messages",
     "django.contrib.staticfiles",
     "django_celery_beat",
-    "corsheaders"
+    "corsheaders",
 ]
 
 MIDDLEWARE = [
@@ -62,8 +65,8 @@ MIDDLEWARE = [
 ]
 
 
-
 ROOT_URLCONF = "settings_config.urls"
+STATIC_ROOT = os.path.join(BASE_DIR,'static')
 
 TEMPLATES = [
     {

@@ -34,6 +34,8 @@ class Order(GenericViewSet):
         serializer = self.serializer_class(data=request.data)
         serializer.is_valid(raise_exception=True)
         order_data = serializer.data
+        admin = DydxAdmin()
+        order_data['position_id'] = admin.get_position_id()
         result = {"message": None, "error": None}
         try:
             # for testing only ..

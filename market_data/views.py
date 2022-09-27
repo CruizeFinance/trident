@@ -12,7 +12,7 @@ from services.market_data.coingecko import CoinGecko
 class MarketData(GenericViewSet):
     def market_chart_day(self, request):
         result = {"prices": None, "error": None}
-        coingecko =  CoinGecko()
+        coingecko = CoinGecko()
         self.serializer_class = MarketDataDayRequestSerializer
         serializer = self.serializer_class(data=request.data)
         serializer.is_valid(raise_exception=True)
@@ -48,7 +48,6 @@ class MarketData(GenericViewSet):
         coingecko = CoinGecko()
         data = serializer.data
         try:
-            print(data)
             asset_price = coingecko.asset_price(data)
             result["price"] = asset_price
             return Response(data=result, status=status.HTTP_200_OK)

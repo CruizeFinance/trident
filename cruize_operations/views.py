@@ -1,12 +1,18 @@
 from rest_framework import status
 from rest_framework.response import Response
 from rest_framework.viewsets import GenericViewSet
+
+from components import FirebaseDataManager
 from cruize_operations import (
     RepayToAaveRequestSerializer,
     CruizeDepositRequestSerializer,
+    FirebaeRequestSerializer,
+    FirebaseFecthRequestSerializer,
 )
 
+
 from services.contracts.cruize.cruize_contract import Cruize
+from utilities import cruize_constants
 
 
 class CruizeOperations(GenericViewSet):
@@ -14,25 +20,66 @@ class CruizeOperations(GenericViewSet):
         self.cruize_contract_ref = Cruize()
 
     def repay_to_aave(self, request):
+        result = {"message":None,"error":None}
         self.initialize()
         self.serializer_class = RepayToAaveRequestSerializer
         serializer = self.serializer_class(data=request.data)
         serializer.is_valid(raise_exception=True)
         amount = serializer.data
         try:
-            result = self.cruize_contract_ref.repay_to_aave(amount)
+            result['message'] = self.cruize_contract_ref.repay_to_aave(amount)
             return Response(result, status.HTTP_200_OK)
         except Exception as e:
-            return Response(e, status.HTTP_500_INTERNAL_SERVER_ERROR)
+            result['error'] = e
+            return Response(result, status.HTTP_500_INTERNAL_SERVER_ERROR)
 
     def deposit(self, request):
         self.initialize()
+        result = {"message": None, "error": None}
         self.serializer_class = CruizeDepositRequestSerializer
         serializer = self.serializer_class(data=request.data)
         serializer.is_valid(raise_exception=True)
         deposit_data = serializer.data
         try:
-            result = self.cruize_contract_ref.deposit_to_cruize(deposit_data)
+            result['message'] = self.cruize_contract_ref.deposit_to_cruize(deposit_data)
             return Response(result, status.HTTP_200_OK)
         except Exception as e:
-            return Response(e, status.HTTP_500_INTERNAL_SERVER_ERROR)
+            result['error'] = e
+            return Response(result, status.HTTP_500_INTERNAL_SERVER_ERROR)
+
+    def save_transactions(self, request):
+        result = {"message": None, "error": None}
+        self.initialize()
+        self.serializer_class = FirebaeRequestSerializer
+        serializer = self.serializer_class(data=request.data)
+        serializer.is_valid(raise_exception=True)
+        deposit_data = serializer.data
+        try:
+            self.firebase_data_manager_obj = FirebaseDataManager()
+            self.firebase_data_manager_obj.store_data(
+                deposit_data, cruize_constants.CRUIZE_USER
+            )
+            result['message'] = 'success'
+            return Response(result, status.HTTP_200_OK)
+        except Exception as e:
+            result['error'] = e
+            return Response(result, status.HTTP_500_INTERNAL_SERVER_ERROR)
+
+    def fetch_user_transactions(self, request):
+        result = {"message": None, "error": None}
+        self.initialize()
+        self.serializer_class = FirebaseFecthRequestSerializer
+        serializer = self.serializer_class(data=request.data)
+        serializer.is_valid(raise_exception=True)
+        data = serializer.data
+        try:
+            self.firebase_data_manager_obj = FirebaseDataManager()
+            result['message'] =            self.firebase_data_manager_obj.fetch_transaction_data(
+                cruize_constants.CRUIZE_USER, data
+            )
+
+
+            return Response(result, status.HTTP_200_OK)
+        except Exception as e:
+            result['error'] = e
+            return Response(result, status.HTTP_500_INTERNAL_SERVER_ERROR)

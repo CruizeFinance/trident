@@ -2,10 +2,6 @@ from rest_framework import serializers
 
 
 class OrderRequestSerializer(serializers.Serializer):
-    position_id = serializers.IntegerField(
-        required=True,
-        min_value=0,
-    )
     market = serializers.CharField(required=True)
     side = serializers.CharField(max_length=4, required=True)
     order_type = serializers.CharField(max_length=6, required=True)
