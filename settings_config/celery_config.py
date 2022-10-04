@@ -24,7 +24,7 @@ app.config_from_object(settings, namespace="CELERY")
 app.autodiscover_tasks(lambda: settings.INSTALLED_APPS)
 # all task
 app.conf.beat_schedule = {
-    # "check_withdrawal": {"task": "check_withdrawal", "schedule": 20.0},
+    "check_withdrawal": {"task": "check_withdrawal", "schedule": 20.0},
     "open_order_on_dydx": {"task": "open_order_on_dydx", "schedule": 20.0},
-    # "close_order_on_dydx": {"task": "close_order_on_dydx", "schedule": 20.0},
+    "close_order_on_dydx": {"task": "close_order_on_dydx", "schedule": 20.0},
 }

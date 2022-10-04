@@ -34,15 +34,15 @@ class Order(GenericViewSet):
         serializer = self.serializer_class(data=request.data)
         serializer.is_valid(raise_exception=True)
         order_data = serializer.data
-        admin = DydxAdmin()
-        order_data['position_id'] = admin.get_position_id()
         result = {"message": None, "error": None}
         try:
-            # for testing only ..
-            data = self.utilities.get_price_and_size(
-                cruize_constants.TEST_ETH_USD_ORACLE_ADDRESS, 100
+            order_data = self.utilities.create_order_params(
+                order_data["side"],
+                order_data["market"],
+                order_data["size"],
+                order_data["price"],
             )
-            order_data["size"] = data["size"]
+            print(order_data)
             dydx_order_details = self.dydx_order_obj.create_order(order_data)
             dydx_order_details = vars(dydx_order_details)
             result["message"] = dydx_order_details["data"]["order"]

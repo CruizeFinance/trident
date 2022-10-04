@@ -20,17 +20,17 @@ class CruizeOperations(GenericViewSet):
         self.cruize_contract_ref = Cruize()
 
     def repay_to_aave(self, request):
-        result = {"message":None,"error":None}
+        result = {"message": None, "error": None}
         self.initialize()
         self.serializer_class = RepayToAaveRequestSerializer
         serializer = self.serializer_class(data=request.data)
         serializer.is_valid(raise_exception=True)
         amount = serializer.data
         try:
-            result['message'] = self.cruize_contract_ref.repay_to_aave(amount)
+            result["message"] = self.cruize_contract_ref.repay_to_aave(amount)
             return Response(result, status.HTTP_200_OK)
         except Exception as e:
-            result['error'] = e
+            result["error"] = e
             return Response(result, status.HTTP_500_INTERNAL_SERVER_ERROR)
 
     def deposit(self, request):
@@ -41,10 +41,10 @@ class CruizeOperations(GenericViewSet):
         serializer.is_valid(raise_exception=True)
         deposit_data = serializer.data
         try:
-            result['message'] = self.cruize_contract_ref.deposit_to_cruize(deposit_data)
+            result["message"] = self.cruize_contract_ref.deposit_to_cruize(deposit_data)
             return Response(result, status.HTTP_200_OK)
         except Exception as e:
-            result['error'] = e
+            result["error"] = e
             return Response(result, status.HTTP_500_INTERNAL_SERVER_ERROR)
 
     def save_transactions(self, request):
@@ -59,10 +59,10 @@ class CruizeOperations(GenericViewSet):
             self.firebase_data_manager_obj.store_data(
                 deposit_data, cruize_constants.CRUIZE_USER
             )
-            result['message'] = 'success'
+            result["message"] = "success"
             return Response(result, status.HTTP_200_OK)
         except Exception as e:
-            result['error'] = e
+            result["error"] = e
             return Response(result, status.HTTP_500_INTERNAL_SERVER_ERROR)
 
     def fetch_user_transactions(self, request):
@@ -74,12 +74,10 @@ class CruizeOperations(GenericViewSet):
         data = serializer.data
         try:
             self.firebase_data_manager_obj = FirebaseDataManager()
-            result['message'] =            self.firebase_data_manager_obj.fetch_transaction_data(
+            result["message"] = self.firebase_data_manager_obj.fetch_transaction_data(
                 cruize_constants.CRUIZE_USER, data
             )
-
-
             return Response(result, status.HTTP_200_OK)
         except Exception as e:
-            result['error'] = e
+            result["error"] = e
             return Response(result, status.HTTP_500_INTERNAL_SERVER_ERROR)

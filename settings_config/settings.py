@@ -13,6 +13,7 @@ import os.path
 from datetime import timedelta
 from pathlib import Path
 import sentry_sdk
+from django.core.wsgi import get_wsgi_application
 from sentry_sdk.integrations.django import DjangoIntegration
 
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
@@ -34,9 +35,7 @@ CORS_ALLOWED_ORIGINS = [
     "http://localhost:3000",
     "https://dev.dqnnihobvaqxo.amplifyapp.com",
 ]
-ALLOWED_HOSTS = [
-    "127.0.0.1","34.229.218.168"
-]
+ALLOWED_HOSTS = ["127.0.0.1", "34.229.218.168"]
 
 
 # Application definition
@@ -66,7 +65,7 @@ MIDDLEWARE = [
 
 
 ROOT_URLCONF = "settings_config.urls"
-STATIC_ROOT = os.path.join(BASE_DIR,'static')
+STATIC_ROOT = os.path.join(BASE_DIR, "static")
 
 TEMPLATES = [
     {
@@ -86,7 +85,7 @@ TEMPLATES = [
 
 WSGI_APPLICATION = "settings_config.wsgi.application"
 
-
+application = get_wsgi_application()
 # Database
 # https://docs.djangoproject.com/en/3.1/ref/settings/#databases
 

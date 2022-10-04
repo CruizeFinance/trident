@@ -1,5 +1,6 @@
 # MAINNET CONSTANTS
 import pytz
+
 MAINNET_INFURA_URL = "https://mainnet.infura.io/v3/4e55b6d7c94d4c58a931971dc807d055"
 STARK_CONTRACT_ADDRESS = "0x014F738EAd8Ec6C50BCD456a971F8B84Cd693BBe"
 CRUIZE_CONTRACT_ADDRESS = ""
@@ -49,8 +50,10 @@ TIMEZONE = pytz.timezone("Asia/Kolkata")
 COINGECKO_HOST = "https://api.coingecko.com/api/v3"
 SECONDS_PER_HOUR = 3600
 # CELERY CONFIG CONSTANT
-BROKER_URL = ("redis://127.0.0.1:6379/0",)
-RESULT_BACKEND = ("redis://127.0.0.1:6379/1",)
+# need to run on server before testnet
+
+BROKER_URL = "redis://127.0.0.1:6379/0"
+RESULT_BACKEND = "redis://127.0.0.1:6379/1"
 
 # FIREBASE CONSTANT
 CRUIZE_USER = "cruize_users"

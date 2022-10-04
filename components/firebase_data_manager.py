@@ -46,7 +46,7 @@ class FirebaseDataManager(object):
             .get()
         )
 
-        if transaction_data  == []:
+        if transaction_data == []:
             return f"address {data['user_address']} don't have any transaction."
         data = []
         if transaction_data is not None:

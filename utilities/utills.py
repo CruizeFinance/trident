@@ -1,3 +1,8 @@
+import time
+
+from dydx3 import constants
+from tests.constants import SEVEN_DAYS_S
+
 from services import DydxAdmin
 from services.contracts.chainlink import ChainlinkPriceFeed
 from utilities import cruize_constants
@@ -101,16 +106,24 @@ class Utilities:
         size,
         market_price,
     ):
+        print(market_price)
         if side == "SELL":
             market_price = int(market_price) + 10
         else:
             market_price = int(market_price) - 10
-
+        dydx_admin = DydxAdmin()
+        position_id = dydx_admin.get_position_id()
         order_params = {
+            "position_id": position_id,
             "side": side,
+            "order_type": constants.ORDER_TYPE_MARKET,
             "market": market,
             "size": size,
-            "market_price": market_price,
+            "price": str(market_price),
+            "post_only": "false",
+            "limit_fee": "0.4",
+            "expiration_epoch_seconds": time.time() + SEVEN_DAYS_S + 60,
+            "time_in_force": constants.TIME_IN_FORCE_IOC,
         }
         return order_params
 
