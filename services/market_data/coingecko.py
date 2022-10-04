@@ -26,13 +26,17 @@ class CoinGecko:
             cruize_constants.COINGECKO_HOST
             + f"/coins/{asset}/market_chart?vs_currency={vs_currency}&days={days}"
         )
-
-        result = dict(requests.get(url).json())
-        error = result.get("error", "Not found")
-        if error is "Not found":
-            self.utilities.formate_price_data(result)
-            return result
-        raise Exception(result["error"])
+        try :
+            result = dict(requests.get(url).json())
+            print(result)
+            error = result.get("status", "Not found")
+            if error is "Not found":
+                self.utilities.formate_price_data(result)
+                return result
+            result =  result.get('status')
+            raise Exception(result['error_message'])
+        except Exception as e:
+            raise Exception(e)
 
     """
       :method   - market_chart_timestamp: will return market price data with timestamp like 1 day , 1 hour e,1 month etc.
@@ -53,11 +57,12 @@ class CoinGecko:
             + f"/coins/{asset}/market_chart/range?vs_currency={vs_currency}&from={time_from}&to={time_to}"
         )
         result = dict(requests.get(url).json())
-        error = result.get("error", "Not found")
+        error = result.get("status", "Not found")
         if error is "Not found":
             self.utilities.formate_price_data(result)
             return result
-        raise Exception(result["error"])
+        result = result.get('status')
+        raise Exception(result['error_message'])
 
     def asset_price(self, asset_address):
         chainlinkpricefeed = ChainlinkPriceFeed()

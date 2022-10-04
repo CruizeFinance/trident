@@ -1,9 +1,16 @@
+from decouple import config
 from dydx3 import DydxApiError
 from rest_framework import status
 from rest_framework.response import Response
 from rest_framework.viewsets import GenericViewSet
 from services import DydxAdmin
 from utilities.error_handler import ErrorHandler
+
+from django.conf import settings
+
+from rest_framework.permissions import BasePermission
+
+
 
 
 class User(GenericViewSet):
@@ -13,6 +20,7 @@ class User(GenericViewSet):
 
     def position_id(self, request):
         self.initialize()
+
         result = {"message": None, "error": None}
         try:
             position_id = self.dydx_admin_obj.get_position_id()
