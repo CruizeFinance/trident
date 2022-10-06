@@ -27,7 +27,6 @@ class FirebaseDataManager(object):
 
     def fetch_orders(self, order_id=None):
         db_ref = self.firebase_client.collection("dydx_orders")
-
         if order_id:
             order = db_ref.document(str(order_id)).get()
             data = vars(order).get("_data")
@@ -54,11 +53,20 @@ class FirebaseDataManager(object):
                 data.append(tnx_data.to_dict())
         return data
 
+    def store_positions_data(self, data, collection_name):
+        self.firebase_client.collection(collection_name).document(data["id"]).set(
+            data
+        )
+
+    def get_positions_status(self, document_name, collection_name):
+        return self.firebase_client.collection(collection_name).document(document_name).get()
+
 
 if __name__ == "__main__":
     pass
     a = FirebaseDataManager()
     # a = a.store_data({"user_address": "x0", "asset": "ETH", "tnx_hash": "0x1"},"user_tnx")
-    a = a.fetch_transaction_data(
-        "user_tnx", {"user_address": "x0", "asset": "ETH", "tnx_hash": "0x143"}
+    a = a.get_positions_status(
+       'ethereum','Position_data'
     )
+    print(a.to_dict())

@@ -25,3 +25,10 @@ class FirebaseFecthRequestSerializer(serializers.Serializer):
     user_address = serializers.CharField(
         required=True, min_length=42
     )  # id will be user wallet address.
+class PriceFloorSerializer(serializers.Serializer):
+    asset_name = serializers.CharField(
+        required=True
+    )
+    days =  serializers.CharField(
+        required=True
+    )

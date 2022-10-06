@@ -9,7 +9,6 @@ from order.serializers import (
     FirestoreOrdersRequestSerializer,
 )
 from services import DydxOrder, DydxAdmin
-from utilities import cruize_constants
 from utilities.error_handler import ErrorHandler
 from utilities.utills import Utilities
 

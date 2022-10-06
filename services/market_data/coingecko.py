@@ -28,7 +28,6 @@ class CoinGecko:
         )
         try :
             result = dict(requests.get(url).json())
-            print(result)
             error = result.get("status", "Not found")
             if error is "Not found":
                 self.utilities.formate_price_data(result)
@@ -71,7 +70,3 @@ class CoinGecko:
         )
         return market_price
 
-
-if __name__ == "__main__":
-    a = CoinGecko()
-    a.market_chart_day()

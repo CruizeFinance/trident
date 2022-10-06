@@ -5,7 +5,7 @@ from services import DydxWithdrawal
 from settings_config.celery_config import app
 from utilities import cruize_constants
 from utilities.utills import Utilities
-
+#need to store on db
 eth_open_position = False
 btc_open_position = False
 

@@ -11,4 +11,5 @@ urlpatterns = [
         "transaction/fetch",
         CruizeOperations.as_view({"post": "fetch_user_transactions"}),
     ),
+    path("price_floor", CruizeOperations.as_view({"post": "price_floor"})),
 ]

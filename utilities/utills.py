@@ -1,15 +1,10 @@
 import time
-
 from dydx3 import constants
 from tests.constants import SEVEN_DAYS_S
-
 from services import DydxAdmin
 from services.contracts.chainlink import ChainlinkPriceFeed
 from utilities import cruize_constants
-
-from datetime import datetime, timedelta
-
-import pytz
+from utilities.datetime_utilities import convert_epoch_to_utcdatetime
 
 
 class Utilities:
@@ -100,11 +95,11 @@ class Utilities:
       """
 
     def create_order_params(
-        self,
-        side,
-        market,
-        size,
-        market_price,
+            self,
+            side,
+            market,
+            size,
+            market_price,
     ):
         print(market_price)
         if side == "SELL":
@@ -142,35 +137,17 @@ class Utilities:
         data["size"] = self.get_asset_volume(other_asset_volume, data["market_price"])
         return data
 
-    """
-        :method   - convert_epoch_to_utcdatetime: convert epoch to utcdatetime.
-        :params   - epoch:epoch time.
-        :return   - utcdatetime
-      """
 
-    def convert_epoch_to_utcdatetime(self, epoch, parser="%Y-%m-%dT%H:%M:%S"):
-        return (
-            (datetime.utcfromtimestamp(epoch))
-            .replace(tzinfo=pytz.utc)
-            .astimezone(tz=cruize_constants.TIMEZONE)
-            .strftime(parser)
-        )
-
-    """
-        :method   - get_timezone_aware_datetime:  timezone aware datetime.
-        :params   - epoch:epoch time.
-        :return   - utcdatetime
-      """
-
-    def get_timezone_aware_datetime(self, days_delta=0):
-        return datetime.now(tz=cruize_constants.TIMEZONE) + timedelta(days=days_delta)
 
     def formate_price_data(self, price_data):
         for key, value in price_data.items():
             for i, data in enumerate(price_data[key]):
-                price_data[key][i][0] = self.convert_epoch_to_utcdatetime(
+                price_data[key][i][0] = convert_epoch_to_utcdatetime(
                     int(price_data[key][i][0]) / 1000, parser="%m-%d/%H:%M"
                 )
                 price_data[key][i][1] = round(int(price_data[key][i][1]), 3)
 
         return price_data
+
+
+
