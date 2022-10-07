@@ -13,7 +13,6 @@ from dydx_operations import (
 from services import DydxWithdrawal, DydxAdmin
 from services.contracts.dydx_starkex.dydx_starkex_contract import DydxStarkExContract
 from utilities.error_handler import ErrorHandler
-from utilities.utills import Utilities
 
 
 class DydxOprations(GenericViewSet):
@@ -38,7 +37,7 @@ class DydxOprations(GenericViewSet):
             result["message"] = withdrawal_data["data"]["withdrawal"]
             result["message"]["address"] = data["user_address"]
             firebase_order_manager_obj = FirebaseDataManager()
-            firebase_order_manager_obj.store_data(result["message"], "withdrawal")
+            firebase_order_manager_obj.store_data(result["message"],result["message"]['user_address'],"withdrawal")
             return Response(result, status.HTTP_200_OK)
         except DydxApiError or ValueError as e:
             result["error"] = self.error_handler.dydx_error_decoder(e)

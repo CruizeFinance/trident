@@ -9,7 +9,9 @@ from utilities import cruize_constants
      :params   - epoch:epoch time.
      :return   - utcdatetime
    """
-def convert_epoch_to_utcdatetime( epoch, parser="%Y-%m-%dT%H:%M:%S"):
+
+
+def convert_epoch_to_utcdatetime(epoch, parser="%Y-%m-%dT%H:%M:%S"):
     return (
         (datetime.utcfromtimestamp(epoch))
         .replace(tzinfo=pytz.utc)
@@ -25,5 +27,5 @@ def convert_epoch_to_utcdatetime( epoch, parser="%Y-%m-%dT%H:%M:%S"):
   """
 
 
-def get_timezone_aware_datetime(self, days_delta=0):
+def get_timezone_aware_datetime(days_delta=0):
     return datetime.now(tz=cruize_constants.TIMEZONE) + timedelta(days=days_delta)

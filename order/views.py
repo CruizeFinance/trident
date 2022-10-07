@@ -3,6 +3,7 @@ from rest_framework import status
 from rest_framework.response import Response
 from rest_framework.viewsets import GenericViewSet
 from components import FirebaseDataManager
+from components.dydx_order_manager import DydxOrderManager
 from order.serializers import (
     OrderRequestSerializer,
     CancelOrderRequestSerializer,
@@ -10,7 +11,7 @@ from order.serializers import (
 )
 from services import DydxOrder, DydxAdmin
 from utilities.error_handler import ErrorHandler
-from utilities.utills import Utilities
+
 
 
 class Order(GenericViewSet):
@@ -25,7 +26,7 @@ class Order(GenericViewSet):
         self.firebase_data_manager_obj = FirebaseDataManager()
         self.dydx_order_obj = DydxOrder()
         self.error_handler = ErrorHandler()
-        self.utilities = Utilities()
+        self.dydx_order_manager_obj = DydxOrderManager()
 
     def create(self, request):
         self.initialize()
@@ -35,7 +36,7 @@ class Order(GenericViewSet):
         order_data = serializer.data
         result = {"message": None, "error": None}
         try:
-            order_data = self.utilities.create_order_params(
+            order_data = self.dydx_order_manager_obj.create_order_params(
                 order_data["side"],
                 order_data["market"],
                 order_data["size"],
@@ -45,7 +46,7 @@ class Order(GenericViewSet):
             dydx_order_details = self.dydx_order_obj.create_order(order_data)
             dydx_order_details = vars(dydx_order_details)
             result["message"] = dydx_order_details["data"]["order"]
-            self.firebase_data_manager_obj.store_data(result["message"], "dydx_orders")
+            self.firebase_data_manager_obj.store_data(result["message"],dydx_order_details['id'], "dydx_orders")
             return Response(result, status.HTTP_201_CREATED)
         except DydxApiError or ValueError as e:
             result["error"] = self.error_handler.dydx_error_decoder(e)

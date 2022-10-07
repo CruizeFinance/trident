@@ -1,4 +1,4 @@
-import pytz
+
 from rest_framework import status
 from rest_framework.response import Response
 from rest_framework.viewsets import GenericViewSet
@@ -7,11 +7,13 @@ from cruize_operations import (
     RepayToAaveRequestSerializer,
     CruizeDepositRequestSerializer,
     FirebaeRequestSerializer,
-    FirebaseFecthRequestSerializer, PriceFloorSerializer,
+    FirebaseFecthRequestSerializer,
+    PriceFloorSerializer,
 )
-from datetime import  datetime
+
 from services.contracts.cruize.cruize_contract import Cruize
 from utilities import cruize_constants
+
 
 class CruizeOperations(GenericViewSet):
     def initialize(self):
@@ -54,9 +56,7 @@ class CruizeOperations(GenericViewSet):
         deposit_data = serializer.data
         try:
             self.firebase_data_manager_obj = FirebaseDataManager()
-            self.firebase_data_manager_obj.store_data(
-                deposit_data, cruize_constants.CRUIZE_USER
-            )
+            self.firebase_data_manager_obj.store_data(deposit_data,deposit_data['user_address'] ,cruize_constants.CRUIZE_USER)
             result["message"] = "success"
             return Response(result, status.HTTP_200_OK)
         except Exception as e:
@@ -72,9 +72,8 @@ class CruizeOperations(GenericViewSet):
         data = serializer.data
         try:
             self.firebase_data_manager_obj = FirebaseDataManager()
-            result["message"] = self.firebase_data_manager_obj.fetch_transaction_data(
-                cruize_constants.CRUIZE_USER, data
-            )
+            result["message"] = self.firebase_data_manager_obj.fetch_user_transaction(cruize_constants.CRUIZE_USER,
+                                                                                      data)
             return Response(result, status.HTTP_200_OK)
         except Exception as e:
             result["error"] = e
@@ -85,29 +84,13 @@ class CruizeOperations(GenericViewSet):
         serializer = self.serializer_class(data=request.data)
         serializer.is_valid(raise_exception=True)
         asset_data = serializer.data
-        result = {'result': None, 'error': None}
-        current_time = datetime.today()
-        utc = pytz.UTC
-        current_time = current_time.replace(tzinfo=utc)
-        firebase_data_manager_obj = FirebaseDataManager()
-        data = firebase_data_manager_obj.get_positions_status(asset_data['asset_name'], 'Position_data')
-        if data is not None:
-            data = data.to_dict()
-        price_floor_manager_obj = PriceFloorManager()
-        # try:
-        if data is None:
-            result['result'] = price_floor_manager_obj.calculate_price_floor(asset_data['asset_name'], asset_data['days'])
-            return Response(result, status.HTTP_200_OK)
-        price_floor_date = data["price_floor_time"]
-        price_floor_date = price_floor_date.replace(tzinfo=utc)
-        # price_floor_date = datetime.strptime(str(price_floor_date), '%Y-%m-%d')
-        if  current_time > price_floor_date :
-            result['result'] =  price_floor_manager_obj.calculate_price_floor(asset_data['asset_name'], asset_data['days'])
-            return Response(result, status.HTTP_200_OK)
-        result['result'] = data["price_floor"]
-        return Response(result, status.HTTP_200_OK)
-        # except Exception as e:
-        #     result["error"] = e
-        #     return Response(result, status.HTTP_500_INTERNAL_SERVER_ERROR)
-
-
+        result = {"result": None, "error": None}
+        try:
+            price_floor_manager_obj = PriceFloorManager()
+            result["result"] = price_floor_manager_obj.price_floor_details(
+                asset_data["asset_name"], asset_data["days"]
+            )
+            return Response(result,status.HTTP_200_OK)
+        except Exception as e:
+            result["error"] = e
+            return Response(result, status.HTTP_500_INTERNAL_SERVER_ERROR)

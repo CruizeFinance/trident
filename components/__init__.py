@@ -1,3 +1,3 @@
 from .transaction_manager import TransactionManager
 from .firebase_data_manager import FirebaseDataManager
-from .price_floor_manager import  PriceFloorManager
+from .price_floor_manager import PriceFloorManager

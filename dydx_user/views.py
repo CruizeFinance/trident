@@ -11,8 +11,6 @@ from django.conf import settings
 from rest_framework.permissions import BasePermission
 
 
-
-
 class User(GenericViewSet):
     def initialize(self):
         self.dydx_admin_obj = DydxAdmin()

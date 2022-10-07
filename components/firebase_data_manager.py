@@ -1,4 +1,4 @@
-import datetime
+
 import time
 
 from settings_config import firebase_client
@@ -13,10 +13,10 @@ class FirebaseDataManager(object):
             {"status": status}
         )
 
-    def store_data(self, data, collection_name):
+    def store_data(self, data, id, collection_name):
         user_address = data.get("user_address", "Not found")
         if user_address == "Not found":
-            self.firebase_client.collection(collection_name).document(data["id"]).set(
+            self.firebase_client.collection(collection_name).document(id).set(
                 data
             )
         else:
@@ -37,7 +37,7 @@ class FirebaseDataManager(object):
             orders.append(vars(order)["_data"])
         return orders
 
-    def fetch_transaction_data(self, collection, data):
+    def fetch_user_transaction(self, collection, data):
         transaction_data = (
             self.firebase_client.collection(collection)
             .document(data["user_address"])
@@ -45,7 +45,7 @@ class FirebaseDataManager(object):
             .get()
         )
 
-        if transaction_data == []:
+        if not transaction_data:
             return f"address {data['user_address']} don't have any transaction."
         data = []
         if transaction_data is not None:
@@ -53,20 +53,16 @@ class FirebaseDataManager(object):
                 data.append(tnx_data.to_dict())
         return data
 
-    def store_positions_data(self, data, collection_name):
-        self.firebase_client.collection(collection_name).document(data["id"]).set(
-            data
+    def fetch_data(self, document_name, collection_name):
+        return (
+            self.firebase_client.collection(collection_name)
+            .document(document_name)
+            .get()
         )
-
-    def get_positions_status(self, document_name, collection_name):
-        return self.firebase_client.collection(collection_name).document(document_name).get()
 
 
 if __name__ == "__main__":
-    pass
     a = FirebaseDataManager()
     # a = a.store_data({"user_address": "x0", "asset": "ETH", "tnx_hash": "0x1"},"user_tnx")
-    a = a.get_positions_status(
-       'ethereum','Position_data'
-    )
+    a = a.fetch_data("ethereum", "Position_data")
     print(a.to_dict())

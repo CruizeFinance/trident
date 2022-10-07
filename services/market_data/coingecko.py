@@ -1,17 +1,10 @@
 import requests
 from datetime import datetime
-
 from services.contracts.chainlink import ChainlinkPriceFeed
 from utilities import cruize_constants
-from utilities.utills import Utilities
-
-
 # class -  coinGecko:  is responsible for returning market data.
-
-
+from utilities.datetime_utilities import convert_epoch_to_utcdatetime
 class CoinGecko:
-    def __init__(self):
-        self.utilities = Utilities()
 
     """
       :method   - market_chart_day: will return daily market price data for each one hour.
@@ -26,14 +19,19 @@ class CoinGecko:
             cruize_constants.COINGECKO_HOST
             + f"/coins/{asset}/market_chart?vs_currency={vs_currency}&days={days}"
         )
-        try :
+        try:
             result = dict(requests.get(url).json())
             error = result.get("status", "Not found")
-            if error is "Not found":
-                self.utilities.formate_price_data(result)
+            if error == "Not found":
+                for key, value in result.items():
+                    for i, data in enumerate(result[key]):
+                        result[key][i][0] = convert_epoch_to_utcdatetime(
+                            int(result[key][i][0]) / 1000, parser="%m-%d/%H:%M"
+                        )
+                        result[key][i][1] = round(int(result[key][i][1]), 3)
                 return result
-            result =  result.get('status')
-            raise Exception(result['error_message'])
+            result = result.get("status")
+            raise Exception(result["error_message"])
         except Exception as e:
             raise Exception(e)
 
@@ -57,15 +55,21 @@ class CoinGecko:
         )
         result = dict(requests.get(url).json())
         error = result.get("status", "Not found")
-        if error is "Not found":
-            self.utilities.formate_price_data(result)
+        if error == "Not found":
+            for key, value in result.items():
+                for i, data in enumerate(result[key]):
+                    result[key][i][0] = convert_epoch_to_utcdatetime(
+                        int(result[key][i][0]) / 1000, parser="%m-%d/%H:%M"
+                    )
+                    result[key][i][1] = round(int(result[key][i][1]), 3)
+
             return result
-        result = result.get('status')
-        raise Exception(result['error_message'])
+        result = result.get("status")
+        raise Exception(result["error_message"])
 
     def asset_price(self, asset_address):
-        chainlinkpricefeed = ChainlinkPriceFeed()
-        market_price = chainlinkpricefeed.get_asset_price_mainnet(
+        chainlink_price_feed = ChainlinkPriceFeed()
+        market_price = chainlink_price_feed.get_asset_price_mainnet(
             asset_address["asset_address"]
         )
         return market_price
