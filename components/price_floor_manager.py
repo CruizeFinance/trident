@@ -1,18 +1,12 @@
-from datetime import datetime
-from pytz import UTC
-from dateutil.relativedelta import relativedelta
 
 from components import FirebaseDataManager
 from services.market_data.coingecko import CoinGecko
 
 
 class PriceFloorManager:
-    def get_price_floor(self, asset_name, number_of_days=30):
-        today = datetime.today()
-        price_floor_utc_time = today + relativedelta(months=1, day=1)
-        price_floor_utc_time = price_floor_utc_time.replace(tzinfo=UTC)
-        firebase_data_manager_obj = FirebaseDataManager()
 
+    def set_price_floor(self, asset_name, number_of_days=30):
+        firebase_data_manager_obj = FirebaseDataManager()
         coin_gecko = CoinGecko()
         try:
             asset_price_data = coin_gecko.market_chart_day(
@@ -26,7 +20,6 @@ class PriceFloorManager:
             asset_peak_price = asset_peak_price * 0.85
             data = {
                 "id": asset_name,
-                "price_floor_utc_time": price_floor_utc_time,
                 "price_floor": asset_peak_price,
             }
             firebase_data_manager_obj.store_data(data, data["id"], "price_floor_data")
@@ -34,28 +27,17 @@ class PriceFloorManager:
         except Exception as e:
             raise Exception(e)
 
-    def price_floor_details(self, asset_name, days):
-        current_time_utc = datetime.today()
-
-        current_time_utc = current_time_utc.replace(tzinfo=UTC)
+    def get_price_floor(self, asset_name):
         firebase_data_manager_obj = FirebaseDataManager()
+
         asset_price_floor_details = firebase_data_manager_obj.fetch_data(
             asset_name, "price_floor_data"
         )
-        if asset_price_floor_details is not None:
-            asset_price_floor_details = asset_price_floor_details.to_dict()
-        try:
-            if asset_price_floor_details is None:
-                return self.get_price_floor(asset_name, days)
-            price_floor_time_utc = asset_price_floor_details["price_floor_utc_time"]
-            price_floor_time_utc = price_floor_time_utc.replace(tzinfo=UTC)
-            if current_time_utc > price_floor_time_utc:
-                return self.get_price_floor(asset_name, days)
-            return asset_price_floor_details["price_floor"]
-        except Exception as e:
-            raise Exception(e)
+        asset_price_floor_details = asset_price_floor_details.to_dict()
+        return asset_price_floor_details["price_floor"]
+
 
 
 if __name__ == "__main__":
     a = PriceFloorManager()
-    a.get_price_floor("chainlink", 30)
+    print(a.set_price_floor("ethereum"))

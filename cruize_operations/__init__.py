@@ -3,5 +3,5 @@ from .serilaizer import (
     CruizeDepositRequestSerializer,
     FirebaeRequestSerializer,
     FirebaseFecthRequestSerializer,
-    PriceFloorSerializer,
+    PriceFloorSerializer,SetPriceFloorSerializer
 )

@@ -29,4 +29,7 @@ class FirebaseFecthRequestSerializer(serializers.Serializer):
 
 class PriceFloorSerializer(serializers.Serializer):
     asset_name = serializers.CharField(required=True)
+
+class SetPriceFloorSerializer(serializers.Serializer):
+    asset_name = serializers.CharField(required=True)
     days = serializers.CharField(required=True)

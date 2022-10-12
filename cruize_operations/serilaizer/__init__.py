@@ -3,5 +3,5 @@ from .cruize_operations_serilaizer import (
     RepayToAaveRequestSerializer,
     FirebaeRequestSerializer,
     FirebaseFecthRequestSerializer,
-    PriceFloorSerializer,
+    PriceFloorSerializer,SetPriceFloorSerializer
 )

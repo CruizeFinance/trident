@@ -7,7 +7,7 @@ from cruize_operations import (
     CruizeDepositRequestSerializer,
     FirebaeRequestSerializer,
     FirebaseFecthRequestSerializer,
-    PriceFloorSerializer,
+    PriceFloorSerializer, SetPriceFloorSerializer,
 )
 
 from services.contracts.cruize.cruize_contract import Cruize
@@ -89,8 +89,22 @@ class CruizeOperations(GenericViewSet):
         result = {"result": None, "error": None}
         try:
             price_floor_manager_obj = PriceFloorManager()
-            result["result"] = price_floor_manager_obj.price_floor_details(
-                asset_data["asset_name"], asset_data["days"]
+            result["result"] = price_floor_manager_obj.get_price_floor(asset_data["asset_name"])
+            return Response(result, status.HTTP_200_OK)
+        except Exception as e:
+            result["error"] = e
+            return Response(result, status.HTTP_500_INTERNAL_SERVER_ERROR)
+
+    def set_price_floor(self, request):
+        self.serializer_class = SetPriceFloorSerializer
+        serializer = self.serializer_class(data=request.data)
+        serializer.is_valid(raise_exception=True)
+        asset_data = serializer.data
+        result = {"result": None, "error": None}
+        try:
+            price_floor_manager_obj = PriceFloorManager()
+            result["result"] = price_floor_manager_obj.set_price_floor(
+                asset_data["asset_name"],asset_data['days']
             )
             return Response(result, status.HTTP_200_OK)
         except Exception as e:

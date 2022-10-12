@@ -35,6 +35,7 @@ CORS_ALLOWED_ORIGINS = [
     "http://localhost:3000",
     "https://dev.dqnnihobvaqxo.amplifyapp.com",
 ]
+#TODO :  need to add server IP.
 ALLOWED_HOSTS = ["127.0.0.1", "34.229.218.168"]
 
 
@@ -138,7 +139,7 @@ STATIC_URL = "/static/"
 
 # SENTRY SETTINGS
 
-
+# TODO : comment out this while deploying to server
 # sentry_sdk.init(
 #     dsn="https://c538434fedd94111965b0311cb467e87@o1377072.ingest.sentry.io/6687170",
 #     integrations=[

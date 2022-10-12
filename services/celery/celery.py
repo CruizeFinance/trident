@@ -1,5 +1,5 @@
 from dydx3 import constants
-from components import FirebaseDataManager
+from components import FirebaseDataManager, PriceFloorManager
 from components.dydx_order_manager import DydxOrderManager
 from services import DydxWithdrawal
 from services.binance_client.binance_client import BinanceClient
@@ -46,8 +46,11 @@ def open_order_on_dydx(eth_trigger_price=None, btc_trigger_price=None):
     # TODO: write a formula to calculate  the trigger_price
     if eth_trigger_price and btc_trigger_price is None:
         # here we will keep our trigger price formulas
-        eth_trigger_price = 900
-        btc_trigger_price = 1000
+        # TODO:size must  change of ETH and BTC .
+        #  size of ETH AND BTC must be equal to the staked asset to cruize protocol.
+        size =10
+        eth_trigger_price = dydx_order_manager.calculate_open_close_price('ETH-USD', size, 'ETHBUSD')
+        btc_trigger_price = dydx_order_manager.calculate_open_close_price('BTC-USD', size, 'BTCBUSD')
     else:
         # for_testing
         eth_trigger_price = eth_market_price + 10
@@ -112,7 +115,8 @@ def close_order_on_dydx(eth_trigger_price=None, btc_trigger_price=None):
     btc_position_size = data["size"]
 
     if eth_trigger_price and btc_trigger_price is None:
-        # TODO:size must be change of ETH and BTC
+        # TODO:size must  change of ETH and BTC .
+        #  size of ETH AND BTC must be equal to the staked asset to cruize protocol.
         size = 10
         eth_trigger_price = dydx_order_manager.calculate_open_close_price('ETH-USD',size,'ETHBUSD')
         btc_trigger_price =dydx_order_manager.calculate_open_close_price('BTC-USD',size,'BTCBUSD')
@@ -176,5 +180,14 @@ def computer_eth_usdc_volatility():
 def computer_btc_usdc_volatility():
     dydx_order_manager_obj = DydxOrderManager()
     dydx_order_manager_obj.market_volatility(symbol="BTCUSDC")
+
+# TODO: set price floor for other asset's too.
+@app.task(
+    name="set_price_floor",
+)
+def set_price_floor():
+    price_floor_manager_obj = PriceFloorManager()
+    a = price_floor_manager_obj.set_price_floor('ethereum')
+
 if __name__ == "__main__":
     computer_eth_usdc_volatility()
