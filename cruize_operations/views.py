@@ -1,4 +1,3 @@
-
 from rest_framework import status
 from rest_framework.response import Response
 from rest_framework.viewsets import GenericViewSet
@@ -56,7 +55,9 @@ class CruizeOperations(GenericViewSet):
         deposit_data = serializer.data
         try:
             self.firebase_data_manager_obj = FirebaseDataManager()
-            self.firebase_data_manager_obj.store_data(deposit_data,deposit_data['user_address'] ,cruize_constants.CRUIZE_USER)
+            self.firebase_data_manager_obj.store_data(
+                deposit_data, deposit_data["user_address"], cruize_constants.CRUIZE_USER
+            )
             result["message"] = "success"
             return Response(result, status.HTTP_200_OK)
         except Exception as e:
@@ -72,8 +73,9 @@ class CruizeOperations(GenericViewSet):
         data = serializer.data
         try:
             self.firebase_data_manager_obj = FirebaseDataManager()
-            result["message"] = self.firebase_data_manager_obj.fetch_user_transaction(cruize_constants.CRUIZE_USER,
-                                                                                      data)
+            result["message"] = self.firebase_data_manager_obj.fetch_user_transaction(
+                cruize_constants.CRUIZE_USER, data
+            )
             return Response(result, status.HTTP_200_OK)
         except Exception as e:
             result["error"] = e
@@ -90,7 +92,7 @@ class CruizeOperations(GenericViewSet):
             result["result"] = price_floor_manager_obj.price_floor_details(
                 asset_data["asset_name"], asset_data["days"]
             )
-            return Response(result,status.HTTP_200_OK)
+            return Response(result, status.HTTP_200_OK)
         except Exception as e:
             result["error"] = e
             return Response(result, status.HTTP_500_INTERNAL_SERVER_ERROR)

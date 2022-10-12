@@ -2,9 +2,11 @@ from dydx3 import constants
 from components import FirebaseDataManager
 from components.dydx_order_manager import DydxOrderManager
 from services import DydxWithdrawal
+from services.binance_client.binance_client import BinanceClient
 from settings_config.celery_config import app
 from utilities import cruize_constants
-
+import numpy
+import pandas
 
 # need to store on db
 eth_open_position = False
@@ -30,11 +32,15 @@ def open_order_on_dydx(eth_trigger_price=None, btc_trigger_price=None):
     global eth_open_position
     global btc_open_position
     dydx_order_manager = DydxOrderManager()
-    data = dydx_order_manager.get_asset_price_and_size(cruize_constants.TEST_ETH_USD_ORACLE_ADDRESS, 100)
+    data = dydx_order_manager.get_asset_price_and_size(
+        cruize_constants.TEST_ETH_USD_ORACLE_ADDRESS, 100
+    )
     eth_market_price = data["market_price"]
     # we have to change this with the actual btc volume
     eth_position_size = data["size"]
-    data = dydx_order_manager.get_asset_price_and_size(cruize_constants.TEST_BTC_USD_ORACLE_ADDRESS, 100)
+    data = dydx_order_manager.get_asset_price_and_size(
+        cruize_constants.TEST_BTC_USD_ORACLE_ADDRESS, 100
+    )
     btc_market_price = data["market_price"]
     btc_position_size = data["size"]
     # TODO: write a formula to calculate  the trigger_price
@@ -64,7 +70,9 @@ def open_order_on_dydx(eth_trigger_price=None, btc_trigger_price=None):
             if eth_trigger_price >= eth_market_price:
                 print("ETH position is already open")
             else:
-                print(f"eth trigger price {eth_trigger_price} is less than market price {eth_market_price}")
+                print(
+                    f"eth trigger price {eth_trigger_price} is less than market price {eth_market_price}"
+                )
     if btc_open_position is False:
         if btc_trigger_price >= btc_market_price:
             dydx_order_manager = DydxOrderManager()
@@ -81,7 +89,9 @@ def open_order_on_dydx(eth_trigger_price=None, btc_trigger_price=None):
             if btc_trigger_price >= btc_market_price:
                 print("BTC- short position is already open")
             else:
-                print(f"BTC trigger price {btc_trigger_price} is less than market price {btc_market_price}")
+                print(
+                    f"BTC trigger price {btc_trigger_price} is less than market price {btc_market_price}"
+                )
 
 
 @app.task(name="close_order_on_dydx", default_retry_delay=4 * 60)
@@ -89,18 +99,23 @@ def close_order_on_dydx(eth_trigger_price=None, btc_trigger_price=None):
     global eth_open_position
     global btc_open_position
     dydx_order_manager = DydxOrderManager()
-    data = dydx_order_manager.get_asset_price_and_size(cruize_constants.TEST_ETH_USD_ORACLE_ADDRESS, 1000)
+    data = dydx_order_manager.get_asset_price_and_size(
+        cruize_constants.TEST_ETH_USD_ORACLE_ADDRESS, 1000
+    )
     eth_market_price = data["market_price"]
     # we have to change this with the actual btc volume
     eth_position_size = data["size"]
-    data = dydx_order_manager.get_asset_price_and_size(cruize_constants.TEST_BTC_USD_ORACLE_ADDRESS, 1000)
+    data = dydx_order_manager.get_asset_price_and_size(
+        cruize_constants.TEST_BTC_USD_ORACLE_ADDRESS, 1000
+    )
     btc_market_price = data["market_price"]
     btc_position_size = data["size"]
-    # TODO: write a formula to calculate  the trigger_price
-    trigger_price = ""
+
     if eth_trigger_price and btc_trigger_price is None:
-        eth_trigger_price = 2000
-        btc_trigger_price = 1000
+        # TODO:size must be change of ETH and BTC
+        size = 10
+        eth_trigger_price = dydx_order_manager.calculate_open_close_price('ETH-USD',size,'ETHBUSD')
+        btc_trigger_price =dydx_order_manager.calculate_open_close_price('BTC-USD',size,'BTCBUSD')
     else:
         # for testing
         eth_trigger_price = eth_market_price - 10
@@ -116,14 +131,16 @@ def close_order_on_dydx(eth_trigger_price=None, btc_trigger_price=None):
                 eth_market_price,
             )
             dydx_order_manager.create_order(order_params)
-            eth_open_position =  False
+            eth_open_position = False
             print("ETH - Short position is Closed")
 
         else:
             if eth_trigger_price >= eth_market_price:
                 print("ETH- short position is already Closed")
             else:
-                print(f"ETH trigger price {eth_trigger_price} is less than market price {eth_market_price}")
+                print(
+                    f"ETH trigger price {eth_trigger_price} is less than market price {eth_market_price}"
+                )
 
     if btc_open_position is True:
         if btc_trigger_price < btc_market_price:
@@ -141,8 +158,23 @@ def close_order_on_dydx(eth_trigger_price=None, btc_trigger_price=None):
             if btc_trigger_price >= btc_market_price:
                 print("BTC- short position is already Closed")
             else:
-                print(f"BTC trigger price {btc_trigger_price} is less than market price {btc_market_price}")
+                print(
+                    f"BTC trigger price {btc_trigger_price} is less than market price {btc_market_price}"
+                )
 
 
+@app.task(
+    name="computer_eth_usdc_volatility",
+)
+def computer_eth_usdc_volatility():
+    dydx_order_manager_obj = DydxOrderManager()
+    dydx_order_manager_obj.market_volatility(symbol="ETHUSDC")
+
+@app.task(
+    name="computer_btc_usdc_volatility",
+)
+def computer_btc_usdc_volatility():
+    dydx_order_manager_obj = DydxOrderManager()
+    dydx_order_manager_obj.market_volatility(symbol="BTCUSDC")
 if __name__ == "__main__":
-    close_order_on_dydx()
+    computer_eth_usdc_volatility()

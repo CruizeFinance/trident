@@ -1,4 +1,3 @@
-
 import time
 
 from settings_config import firebase_client
@@ -16,9 +15,7 @@ class FirebaseDataManager(object):
     def store_data(self, data, id, collection_name):
         user_address = data.get("user_address", "Not found")
         if user_address == "Not found":
-            self.firebase_client.collection(collection_name).document(id).set(
-                data
-            )
+            self.firebase_client.collection(collection_name).document(id).set(data)
         else:
             data["timestamp"] = time.time()
             self.firebase_client.collection(collection_name).document(
@@ -46,7 +43,7 @@ class FirebaseDataManager(object):
         )
 
         if not transaction_data:
-            return f"address {data['user_address']} don't have any transaction."
+            return f"address {data['user_address']} does not have any transaction yet."
         data = []
         if transaction_data is not None:
             for tnx_data in transaction_data:
@@ -60,9 +57,17 @@ class FirebaseDataManager(object):
             .get()
         )
 
+    def store_ema_data(self, collection_name, id, data):
+        return self.firebase_client.collection(collection_name).document(id).set(data)
+
+    def get_ema_data(self, collection_name, id):
+        price_data = self.firebase_client.collection(collection_name).document(id).get()
+        price_data = price_data.to_dict()
+        return price_data
+
 
 if __name__ == "__main__":
     a = FirebaseDataManager()
     # a = a.store_data({"user_address": "x0", "asset": "ETH", "tnx_hash": "0x1"},"user_tnx")
-    a = a.fetch_data("ethereum", "Position_data")
-    print(a.to_dict())
+    a = a.get_ema_data("EMA_data", "ETHUSDC")
+    print(a)

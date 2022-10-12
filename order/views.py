@@ -13,7 +13,6 @@ from services import DydxOrder, DydxAdmin
 from utilities.error_handler import ErrorHandler
 
 
-
 class Order(GenericViewSet):
     """
      method create() is used to create order on dydx.
@@ -46,7 +45,9 @@ class Order(GenericViewSet):
             dydx_order_details = self.dydx_order_obj.create_order(order_data)
             dydx_order_details = vars(dydx_order_details)
             result["message"] = dydx_order_details["data"]["order"]
-            self.firebase_data_manager_obj.store_data(result["message"],dydx_order_details['id'], "dydx_orders")
+            self.firebase_data_manager_obj.store_data(
+                result["message"], dydx_order_details["id"], "dydx_orders"
+            )
             return Response(result, status.HTTP_201_CREATED)
         except DydxApiError or ValueError as e:
             result["error"] = self.error_handler.dydx_error_decoder(e)

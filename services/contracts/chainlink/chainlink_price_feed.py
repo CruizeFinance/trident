@@ -27,6 +27,7 @@ class ChainlinkPriceFeed:
         market_price = market_price[1]
         market_price = market_price / cruize_constants.DECIMAL_NOTATION
         return market_price
+
     """
       :method - get_oracle_market_price.
       :params   - asset_oracle_address:oracle address of asset.
@@ -34,7 +35,5 @@ class ChainlinkPriceFeed:
     """
 
     def get_oracle_market_price(self, asset_oracle_address):
-        market_price = self.get_asset_price(
-            asset_oracle_address
-        )
+        market_price = self.get_asset_price(asset_oracle_address)
         return market_price
