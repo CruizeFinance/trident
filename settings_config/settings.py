@@ -9,15 +9,19 @@ https://docs.djangoproject.com/en/3.1/topics/settings/
 For the full list of settings and their values, see
 https://docs.djangoproject.com/en/3.1/ref/settings/
 """
+import os.path
 from datetime import timedelta
 from pathlib import Path
 import sentry_sdk
+from django.core.wsgi import get_wsgi_application
 from sentry_sdk.integrations.django import DjangoIntegration
 
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
 # from services.celery.celery import check_withdrawal, borrow_usdc_from_aave
 
 BASE_DIR = Path(__file__).resolve().parent.parent
+
+
 
 
 # Quick-start development settings - unsuitable for production
@@ -28,10 +32,15 @@ SECRET_KEY = "j7qelfcc!qe*%((o3p0ju20obkx^j9+9#%%d-t15gqnz^*$om#"
 
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = True
-CORS_ORIGIN_WHITELIST = (
-    'https://localhost:3000'
-)
-ALLOWED_HOSTS = []
+
+
+CORS_ALLOWED_ORIGINS = [
+    "http://localhost:3000",
+    "https://dev.dqnnihobvaqxo.amplifyapp.com",
+]
+# TODO :  need to add server IP.
+ALLOWED_HOSTS = ["127.0.0.1", "34.229.218.168"]
+
 
 # Application definition
 
@@ -43,9 +52,12 @@ INSTALLED_APPS = [
     "django.contrib.messages",
     "django.contrib.staticfiles",
     "django_celery_beat",
+    "corsheaders",
 ]
 
 MIDDLEWARE = [
+    "corsheaders.middleware.CorsMiddleware",
+    "django.middleware.common.CommonMiddleware",
     "django.middleware.security.SecurityMiddleware",
     "django.contrib.sessions.middleware.SessionMiddleware",
     "django.middleware.common.CommonMiddleware",
@@ -55,7 +67,9 @@ MIDDLEWARE = [
     "django.middleware.clickjacking.XFrameOptionsMiddleware",
 ]
 
+
 ROOT_URLCONF = "settings_config.urls"
+STATIC_ROOT = os.path.join(BASE_DIR, "static")
 
 TEMPLATES = [
     {
@@ -75,7 +89,7 @@ TEMPLATES = [
 
 WSGI_APPLICATION = "settings_config.wsgi.application"
 
-
+application = get_wsgi_application()
 # Database
 # https://docs.djangoproject.com/en/3.1/ref/settings/#databases
 
@@ -128,7 +142,7 @@ STATIC_URL = "/static/"
 
 # SENTRY SETTINGS
 
-
+# TODO : comment out this while deploying to server
 # sentry_sdk.init(
 #     dsn="https://c538434fedd94111965b0311cb467e87@o1377072.ingest.sentry.io/6687170",
 #     integrations=[

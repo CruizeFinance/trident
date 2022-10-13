@@ -1,13 +1,8 @@
 import time
-
 from dydx3 import constants, epoch_seconds_to_iso
-
 from services.dydx_client.dydx_p_client import DydxPClient
 
-"""
-This class is used  to manage The order's on dydx .
-This class have   functions create_order() and cancel_orders() that are used to open and close position on dydx.
-"""
+# class  - DydxWithdrawal: is used to manage withdrawal on dydx .
 
 
 class DydxWithdrawal:
@@ -15,10 +10,11 @@ class DydxWithdrawal:
         self.client = DydxPClient()
         self.client = self.client.get_dydx_instance
 
-    """ function is responsible for withdrawing USDC from dydx.
-        @param order_params are order parameters that pass to dydx API.
-         @return withdrawal information.   
-    """
+    """    
+           :method  -   slow_withdrawal: responsible for withdrawing USDC from dydx . this send an request to dydx contract to withdraw usdc.
+           :param   -   withdrawal_params are  parameters that pass to dydx API.
+           :return  -   withdrawal information.   
+       """
 
     def slow_withdrawal(self, withdrawal_params):
         withdrawal = self.client.private.create_withdrawal(
@@ -30,13 +26,19 @@ class DydxWithdrawal:
         )
         return vars(withdrawal)
 
+    """ 
+        :method -   fast_withdrawal: responsible for withdrawing USDC from dydx.this send an request to dydx pool to withdraw usdc that is of chain.
+        :param   -   withdrawal_params are  parameters that pass to dydx API.
+        :return  -   withdrawal information.   
+    """
+
     def fast_withdrawal(self, withdrawal_params):
         withdrawal_amount = withdrawal_params["withdrawal_amount"]
         fast_withdrawal_result = self.fast_withdrawal_details(withdrawal_amount)
         lp_position_id_result = list(
-            fast_withdrawal_result.data["liquidityProviders"].keys()
+            fast_withdrawal_result.get_price_floors["liquidityProviders"].keys()
         )[0]
-        quote = fast_withdrawal_result.data["liquidityProviders"][
+        quote = fast_withdrawal_result.get_price_floors["liquidityProviders"][
             lp_position_id_result
         ]["quote"]
         if quote is None:
@@ -50,15 +52,25 @@ class DydxWithdrawal:
             to_address=withdrawal_params["to_address"],
             lp_position_id=lp_position_id_result,
             lp_stark_public_key=list(
-                fast_withdrawal_result.data["liquidityProviders"].values()
+                fast_withdrawal_result.get_price_floors["liquidityProviders"].values()
             )[0]["starkKey"],
             expiration=epoch_seconds_to_iso(time.time() + 604801),
         )
-        return create_fast_withdrawal_result.data
+        return create_fast_withdrawal_result.get_price_floors
+
+    """ 
+        :method -   all_transfer_details: responsible return all the transfer that has been   initiated.
+        :return  -   all transfer details .   
+    """
 
     def all_transfer_details(self, params):
         transfers = self.client.private.get_transfers(**params)
         return vars(transfers)
+
+    """ 
+         :method -   fast_withdrawal_details: responsible return all the fast withdrawal details that has been initiated.
+         :return  -   all transfer details .   
+     """
 
     def fast_withdrawal_details(self, withdrawal_amount):
         get_fast_withdrawal_result = self.client.public.get_fast_withdrawal(
