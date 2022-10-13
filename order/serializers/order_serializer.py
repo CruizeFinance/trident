@@ -4,8 +4,10 @@ from rest_framework import serializers
 class OrderRequestSerializer(serializers.Serializer):
     market = serializers.CharField(required=True)
     side = serializers.CharField(max_length=4, required=True)
+
     size = serializers.CharField(required=True)
     price = serializers.IntegerField(required=True)
+
     # trailing_percent = serializers.CharField(required=True)
     # trigger_price = serializers.CharField(required=True)
 

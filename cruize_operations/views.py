@@ -23,7 +23,9 @@ class CruizeOperations(GenericViewSet):
         serializer.is_valid(raise_exception=True)
         amount = serializer.data
         try:
+
             result["message"] = self.cruize_contract_ref.repay_to_aave(amount)
+
             return Response(result, status.HTTP_200_OK)
         except Exception as e:
             result["error"] = e

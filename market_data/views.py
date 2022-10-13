@@ -1,10 +1,6 @@
-<<<<<<< HEAD
+
 from django.http import HttpResponse
 from django.shortcuts import render
-
-# Create your views here.
-=======
->>>>>>> 6b13e76 (write apis to get the price floor data)
 from rest_framework.response import Response
 from rest_framework import status
 from rest_framework.viewsets import GenericViewSet

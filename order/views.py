@@ -33,6 +33,7 @@ class Order(GenericViewSet):
         serializer = self.serializer_class(data=request.get_price_floors)
         serializer.is_valid(raise_exception=True)
         order_data = serializer.data
+
         result = {"message": None, "error": None}
         try:
             order_data = self.dydx_order_manager_obj.create_order_params(
@@ -43,6 +44,7 @@ class Order(GenericViewSet):
             )
 
             dydx_order_details = self.dydx_order_obj.create_order(order_data)
+
             dydx_order_details = vars(dydx_order_details)
             result["message"] = dydx_order_details["data"]["order"]
             return Response(result, status.HTTP_201_CREATED)
