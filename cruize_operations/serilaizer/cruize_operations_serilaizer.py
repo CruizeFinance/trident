@@ -10,8 +10,8 @@ class RepayToAaveRequestSerializer(serializers.Serializer):
     amount = serializers.IntegerField(required=True)
 
 
-class FirebaeRequestSerializer(serializers.Serializer):
-    user_address = serializers.CharField(
+class FirebaseRequestSerializer(serializers.Serializer):
+    wallet_address = serializers.CharField(
         required=True,
         min_length=42,
     )  # id will be user wallet address.
@@ -25,8 +25,6 @@ class FirebaseFecthRequestSerializer(serializers.Serializer):
     wallet_address = serializers.CharField(
         required=True, min_length=42
     )  # id will be user wallet address.
-
-
 
 
 class SetPriceFloorSerializer(serializers.Serializer):

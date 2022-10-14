@@ -1,7 +1,7 @@
 from .serilaizer import (
     RepayToAaveRequestSerializer,
     CruizeDepositRequestSerializer,
-    FirebaeRequestSerializer,
+    FirebaseRequestSerializer,
     FirebaseFecthRequestSerializer,
     SetPriceFloorSerializer,
 )

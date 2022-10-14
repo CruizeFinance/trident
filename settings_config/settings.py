@@ -22,8 +22,6 @@ from sentry_sdk.integrations.django import DjangoIntegration
 BASE_DIR = Path(__file__).resolve().parent.parent
 
 
-
-
 # Quick-start development settings - unsuitable for production
 # See https://docs.djangoproject.com/en/3.1/howto/deployment/checklist/
 
@@ -156,3 +154,4 @@ STATIC_URL = "/static/"
 #     # django.contrib.auth) you may enable sending PII data.
 #     send_default_pii=True,
 # )
+1146418262036839915177450

@@ -72,8 +72,8 @@ class DydxOprations(GenericViewSet):
         serializer.is_valid(raise_exception=True)
         data = serializer.data
         # try:
-        hash =   self.dydx_admin_obj .deposit_to_dydx(data['amount'])
-        transaction_info = {"status": "pending", 'hash': hash}
+        hash = self.dydx_admin_obj.deposit_to_dydx(data["amount"])
+        transaction_info = {"status": "pending", "hash": hash}
         return Response(transaction_info, status.HTTP_200_OK)
         # except Exception as e:
         #     return Response(e, status.HTTP_500_INTERNAL_SERVER_ERROR)
@@ -114,4 +114,5 @@ class DydxOprations(GenericViewSet):
             e = vars(e)
             result["error"] = e["errors"][0]["msg"]
             return Response(result, status.HTTP_500_INTERNAL_SERVER_ERROR)
+
     # TODO :  write an api for withdrawing fund from dydx.

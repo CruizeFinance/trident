@@ -22,8 +22,7 @@ class DydxPClient(object):
             network_id=config("NETWORK_ID"),
             stark_private_key=config("STARK_PRIVATE_KEY"),
             web3=Web3(Web3.HTTPProvider(config("WEB_PROVIDER"))),
-            eth_private_key=config('PRIVATE_KEY'),
-
+            eth_private_key=config("PRIVATE_KEY"),
             api_key_credentials={
                 "key": config("API_KEY"),
                 "secret": config("SECRET_KEY"),
@@ -39,6 +38,6 @@ class DydxPClient(object):
             return self.client
         return self.create_dydx_Instance()
 
+
 if __name__ == "__main__":
     d = DydxPClient()
-

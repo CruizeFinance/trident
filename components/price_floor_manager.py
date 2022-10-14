@@ -5,6 +5,7 @@ from services.market_data.coingecko import CoinGecko
 class PriceFloorManager:
     def __init__(self):
         self.firebase_data_manager_obj = FirebaseDataManager()
+
     def set_price_floor(self, asset_name, number_of_days=30):
 
         coin_gecko = CoinGecko()
@@ -22,13 +23,14 @@ class PriceFloorManager:
                 "id": asset_name,
                 "price_floor": asset_peak_price,
             }
-            self.firebase_data_manager_obj.store_data(data, data["id"], "price_floor_data")
+            self.firebase_data_manager_obj.store_data(
+                data, data["id"], "price_floor_data"
+            )
             return asset_peak_price
         except Exception as e:
             raise Exception(e)
 
     def get_price_floor(self, asset_name):
-
 
         asset_price_floor_details = self.firebase_data_manager_obj.fetch_data(
             asset_name, "price_floor_data"
@@ -39,6 +41,7 @@ class PriceFloorManager:
     def asset_price_floor_details(self):
         asset_price_floor_details = self.firebase_data_manager_obj.get_price_floors()
         return asset_price_floor_details
+
 
 if __name__ == "__main__":
     a = PriceFloorManager()

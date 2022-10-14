@@ -1,17 +1,20 @@
 from rest_framework import status
 from rest_framework.response import Response
 from rest_framework.viewsets import GenericViewSet
-from components import FirebaseDataManager, PriceFloorManager
+from components import PriceFloorManager
 from cruize_operations import (
     RepayToAaveRequestSerializer,
     CruizeDepositRequestSerializer,
-    FirebaeRequestSerializer,
+    FirebaseRequestSerializer,
     FirebaseFecthRequestSerializer,
     SetPriceFloorSerializer,
 )
+from services.avve_asset_apy import AaveApy
 
 from services.contracts.cruize.cruize_contract import Cruize
 from utilities import cruize_constants
+
+price_floor_manager = PriceFloorManager()
 
 
 class CruizeOperations(GenericViewSet):
@@ -23,7 +26,6 @@ class CruizeOperations(GenericViewSet):
         serializer.is_valid(raise_exception=True)
         amount = serializer.data
         try:
-
             result["message"] = self.cruize_contract_ref.repay_to_aave(amount)
 
             return Response(result, status.HTTP_200_OK)
@@ -48,14 +50,18 @@ class CruizeOperations(GenericViewSet):
     def save_transactions(self, request):
         result = {"message": None, "error": None}
         self.cruize_contract_ref = Cruize()
-        self.serializer_class = FirebaeRequestSerializer
+        self.serializer_class = FirebaseRequestSerializer
         serializer = self.serializer_class(data=request.get_price_floors)
         serializer.is_valid(raise_exception=True)
         deposit_data = serializer.data
         try:
-            self.firebase_data_manager_obj = FirebaseDataManager()
-            self.firebase_data_manager_obj.store_data(
-                deposit_data, deposit_data["user_address"], cruize_constants.CRUIZE_USER
+
+            price_floor_manager.firebase_data_manager_obj.store_sub_collections(
+                deposit_data,
+                cruize_constants.CRUIZE_USER,
+                deposit_data["wallet_address"],
+                "transactions",
+                deposit_data["transaction_hash"],
             )
             result["message"] = "success"
             return Response(result, status.HTTP_200_OK)
@@ -66,14 +72,17 @@ class CruizeOperations(GenericViewSet):
     def fetch_user_transactions(self, request):
         result = {"message": None, "error": None}
         self.cruize_contract_ref = Cruize()
+        request_body = request.query_params
         self.serializer_class = FirebaseFecthRequestSerializer
-        serializer = self.serializer_class(data=request.get_price_floors)
+
+        serializer = self.serializer_class(data=request_body)
         serializer.is_valid(raise_exception=True)
         data = serializer.data
         try:
-            self.firebase_data_manager_obj = FirebaseDataManager()
-            result["message"] = self.firebase_data_manager_obj.fetch_user_transaction(
-                cruize_constants.CRUIZE_USER, data
+            result[
+                "message"
+            ] = price_floor_manager.firebase_data_manager_obj.fetch_sub_collections(
+                cruize_constants.CRUIZE_USER, data["wallet_address"], "transactions"
             )
             return Response(result, status.HTTP_200_OK)
         except Exception as e:
@@ -83,8 +92,8 @@ class CruizeOperations(GenericViewSet):
     def price_floor(self, request):
         result = {"result": None, "error": None}
         try:
-            price_floor_manager_obj = PriceFloorManager()
-            result["result"] = price_floor_manager_obj.asset_price_floor_details()
+
+            result["result"] = price_floor_manager.asset_price_floor_details()
             return Response(result, status.HTTP_200_OK)
         except Exception as e:
             result["error"] = e
@@ -97,10 +106,20 @@ class CruizeOperations(GenericViewSet):
         asset_data = serializer.data
         result = {"result": None, "error": None}
         try:
-            price_floor_manager_obj = PriceFloorManager()
-            result["result"] = price_floor_manager_obj.set_price_floor(
+
+            result["result"] = price_floor_manager.set_price_floor(
                 asset_data["asset_name"], asset_data["days"]
             )
+            return Response(result, status.HTTP_200_OK)
+        except Exception as e:
+            result["error"] = e
+            return Response(result, status.HTTP_500_INTERNAL_SERVER_ERROR)
+
+    def  fetch_asset_apy(self, request):
+        result = {"result": None, "error": None}
+        try:
+            aave_apy_obj = AaveApy()
+            result["result"] = aave_apy_obj.fetch_asset_apys()
             return Response(result, status.HTTP_200_OK)
         except Exception as e:
             result["error"] = e
