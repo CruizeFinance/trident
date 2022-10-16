@@ -15,4 +15,4 @@ class MarketDataTimestampRequestSerializer(serializers.Serializer):
 
 
 class AssetPriceRequestSerializer(serializers.Serializer):
-    asset_address = serializers.CharField(required=True)
+    asset_name = serializers.CharField(required=True)

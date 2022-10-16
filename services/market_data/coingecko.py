@@ -73,6 +73,6 @@ class CoinGecko:
     def asset_price(self, asset_address):
         chainlink_price_feed = ChainlinkPriceFeed()
         market_price = chainlink_price_feed.get_asset_price_mainnet(
-            asset_address["asset_address"]
+            asset_address
         )
         return market_price
