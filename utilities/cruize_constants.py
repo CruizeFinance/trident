@@ -50,6 +50,7 @@ TEST_ETH_USD_ORACLE_ADDRESS = "0xD4a33860578De61DBAbDc8BFdb98FD742fA7028e"
 TIMEZONE = pytz.timezone("Asia/Kolkata")
 COINGECKO_HOST = "https://api.coingecko.com/api/v3"
 SECONDS_PER_HOUR = 3600
+TIMESTAMP_MULTIPLIER = 1000
 # CELERY CONFIG CONSTANT
 # need to run on server before testnet
 

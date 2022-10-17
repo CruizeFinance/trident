@@ -1,15 +1,17 @@
 import time
-
 from services.firebase_cloud_client import FirebaseClient
 
-
 # TODO : refactor this file .
+firebase_instance = None
+
 class FirebaseDataManager(object):
-    def __init__(self):
-        self.firebase_client = FirebaseClient()
 
     def get_firebase_client(self):
-        return  self.firebase_client.get_firebase_instance
+        global firebase_instance
+        if firebase_instance is None:
+            self.firebase_client = FirebaseClient()
+            firebase_instance = self.firebase_client.get_firebase_instance
+        return firebase_instance
 
     def update_data(self, order_id, collection, status):
         firebase_client = self.get_firebase_client()
@@ -36,7 +38,7 @@ class FirebaseDataManager(object):
             ).collection(sub_collection).get()
         )
         if not firebase_data:
-            return f"No data found.."
+            return f"No data found for wallet address: {document_name}"
         data = []
         if data is not None:
             for tnx_data in firebase_data:
@@ -48,7 +50,7 @@ class FirebaseDataManager(object):
         data = firebase_client.collection(collection_name).document(document_name).get()
         if data is not None:
             data = vars(data)
-        return data
+        return data.get('_data',None)
 
     def fetch_collections(self):
         firebase_client = self.get_firebase_client()

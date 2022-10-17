@@ -33,10 +33,10 @@ class PriceFloorManager:
            document_name=asset_name, collection_name="price_floor_data"
         )
         asset_price_floor_details = asset_price_floor_details
-        asset_price_floor_details = asset_price_floor_details.get('_data')["price_floor"]
+        asset_price_floor_details = asset_price_floor_details.get("price_floor")
         return asset_price_floor_details
 
-    def asset_price_floor_details(self):
+    def assets_price_floor(self):
         asset_price_floor_details = self.firebase_data_manager_obj.fetch_collections()
         return asset_price_floor_details
 

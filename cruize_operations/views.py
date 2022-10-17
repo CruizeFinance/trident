@@ -1,7 +1,7 @@
 from rest_framework import status
 from rest_framework.response import Response
 from rest_framework.viewsets import GenericViewSet
-from components import PriceFloorManager
+from components import PriceFloorManager, FirebaseDataManager
 from cruize_operations import (
     RepayToAaveRequestSerializer,
     CruizeDepositRequestSerializer,
@@ -13,6 +13,9 @@ from services.avve_asset_apy import AaveApy
 from services.contracts.cruize.cruize_contract import Cruize
 from utilities import cruize_constants
 price_floor_manager = PriceFloorManager()
+
+
+
 class CruizeOperations(GenericViewSet):
     def repay_to_aave(self, request):
         result = {"message": None, "error": None}
@@ -50,9 +53,10 @@ class CruizeOperations(GenericViewSet):
         serializer = self.serializer_class(data=request.data)
         serializer.is_valid(raise_exception=True)
         deposit_data = serializer.data
+        firebase_db_obj = FirebaseDataManager()
         try:
 
-            price_floor_manager.firebase_data_manager_obj.store_sub_collections(
+            firebase_db_obj.store_sub_collections(
                 deposit_data,
                 cruize_constants.CRUIZE_USER,
                 deposit_data["wallet_address"],
@@ -75,9 +79,10 @@ class CruizeOperations(GenericViewSet):
         serializer.is_valid(raise_exception=True)
         data = serializer.data
         try:
+            firebase_db_obj = FirebaseDataManager()
             result[
                 "message"
-            ] = price_floor_manager.firebase_data_manager_obj.fetch_sub_collections(
+            ] = firebase_db_obj.fetch_sub_collections(
                 cruize_constants.CRUIZE_USER, data["wallet_address"], "transactions"
             )
             return Response(result, status.HTTP_200_OK)
@@ -89,7 +94,7 @@ class CruizeOperations(GenericViewSet):
         result = {"result": None, "error": None}
         try:
 
-            result["result"] = price_floor_manager.asset_price_floor_details()
+            result["result"] = price_floor_manager.assets_price_floor()
             return Response(result, status.HTTP_200_OK)
         except Exception as e:
             result["error"] = e
