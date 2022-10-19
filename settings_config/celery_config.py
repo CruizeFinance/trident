@@ -18,8 +18,18 @@ app.conf.update(
     task_always_eager=True,
     task_store_eager_result=True,
     # TODO:  need to deploy the redis server for celery task .
-    broker_url=cruize_constants.BROKER_URL,
-    result_backend=cruize_constants.RESULT_BACKEND,
+    broker_url="sqs://",
+    task_default_queue = "celerybroker",
+    task_create_missing_queues = False,
+    worker_enable_remote_control = False,
+    worker_send_task_events =False,
+    broker_transport_options = {
+        "predefined_queues": {
+            "celerybroker": {
+                "url": "https://sqs.us-east-1.amazonaws.com/052637204057/celerybroker",
+            },
+        },
+    }
 )
 app.config_from_object(settings, namespace="CELERY")
 app.autodiscover_tasks(lambda: settings.INSTALLED_APPS)
