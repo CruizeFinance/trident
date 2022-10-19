@@ -35,11 +35,11 @@ DEBUG = True
 
 CORS_ALLOWED_ORIGINS = [
     "http://localhost:3000",
-    "https://dev.dqnnihobvaqxo.amplifyapp.com",
+    "https://test.app.cruize.finance",
+    "https://www.test.app.cruize.finance"
 ]
 # TODO :  need to add server IP.
 ALLOWED_HOSTS = ["127.0.0.1","52.20.55.165","test.trident.cruize.finance"]
-
 
 
 # Application definition

@@ -1,5 +1,7 @@
 import time
 from dydx3 import constants, epoch_seconds_to_iso
+from tests.constants import SEVEN_DAYS_S
+
 from services.dydx_client.dydx_p_client import DydxPClient
 
 # class  - DydxWithdrawal: is used to manage withdrawal on dydx .
@@ -54,7 +56,7 @@ class DydxWithdrawal:
             lp_stark_public_key=list(
                 fast_withdrawal_result.fetch_collections["liquidityProviders"].values()
             )[0]["starkKey"],
-            expiration=epoch_seconds_to_iso(time.time() + 604801),
+            expiration=epoch_seconds_to_iso(time.time() + SEVEN_DAYS_S),
         )
         return create_fast_withdrawal_result.data
 

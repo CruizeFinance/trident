@@ -68,7 +68,6 @@ class CruizeOperations(GenericViewSet):
         except Exception as e:
             result["error"] = e
             return Response(result, status.HTTP_500_INTERNAL_SERVER_ERROR)
-
     def fetch_user_transactions(self, request):
         result = {"message": None, "error": None}
         self.cruize_contract_ref = Cruize()
