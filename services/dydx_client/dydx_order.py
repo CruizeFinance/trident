@@ -49,4 +49,6 @@ class DydxOrder:
         order_book = self.client.public.get_orderbook(
             market=market,
         )
-        return order_book.get_price_floors
+        if order_book is not None:
+            order_book = vars(order_book)
+        return order_book['data']

@@ -28,7 +28,7 @@ class DydxOprations(GenericViewSet):
         self.initialize()
         result = {"message": None, "error": None}
         self.serializer_class = SlowWithdrawalSerializer
-        serializer = self.serializer_class(data=request.get_price_floors)
+        serializer = self.serializer_class(data=request.data)
         serializer.is_valid(raise_exception=True)
         data = serializer.data
         try:
@@ -51,7 +51,7 @@ class DydxOprations(GenericViewSet):
         self.initialize()
         result = {"message": None, "error": None}
         self.serializer_class = FastWithdrawalSerializer
-        serializer = self.serializer_class(data=request.get_price_floors)
+        serializer = self.serializer_class(data=request.data)
         serializer.is_valid(raise_exception=True)
         withdrawal_data = serializer.data
         try:
@@ -68,7 +68,7 @@ class DydxOprations(GenericViewSet):
     def deposit(self, request):
         self.initialize()
         self.serializer_class = DepositSerializer
-        serializer = self.serializer_class(data=request.get_price_floors)
+        serializer = self.serializer_class(data=request.data)
         serializer.is_valid(raise_exception=True)
         data = serializer.data
         # try:
@@ -84,7 +84,7 @@ class DydxOprations(GenericViewSet):
         self.initialize()
         result = {"message": None, "error": None}
         self.serializer_class = TransferSerializer
-        serializer = self.serializer_class(data=request.get_price_floors)
+        serializer = self.serializer_class(data=request.data)
         serializer.is_valid(raise_exception=True)
         data = serializer.data
         try:

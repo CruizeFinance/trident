@@ -1,5 +1,7 @@
 import time
 from dydx3 import constants, epoch_seconds_to_iso
+from tests.constants import SEVEN_DAYS_S
+
 from services.dydx_client.dydx_p_client import DydxPClient
 
 # class  - DydxWithdrawal: is used to manage withdrawal on dydx .
@@ -36,9 +38,9 @@ class DydxWithdrawal:
         withdrawal_amount = withdrawal_params["withdrawal_amount"]
         fast_withdrawal_result = self.fast_withdrawal_details(withdrawal_amount)
         lp_position_id_result = list(
-            fast_withdrawal_result.get_price_floors["liquidityProviders"].keys()
+            fast_withdrawal_result.data["liquidityProviders"].keys()
         )[0]
-        quote = fast_withdrawal_result.get_price_floors["liquidityProviders"][
+        quote = fast_withdrawal_result.data["liquidityProviders"][
             lp_position_id_result
         ]["quote"]
         if quote is None:
@@ -52,11 +54,11 @@ class DydxWithdrawal:
             to_address=withdrawal_params["to_address"],
             lp_position_id=lp_position_id_result,
             lp_stark_public_key=list(
-                fast_withdrawal_result.get_price_floors["liquidityProviders"].values()
+                fast_withdrawal_result.fetch_collections["liquidityProviders"].values()
             )[0]["starkKey"],
-            expiration=epoch_seconds_to_iso(time.time() + 604801),
+            expiration=epoch_seconds_to_iso(time.time() + SEVEN_DAYS_S),
         )
-        return create_fast_withdrawal_result.get_price_floors
+        return create_fast_withdrawal_result.data
 
     """ 
         :method -   all_transfer_details: responsible return all the transfer that has been   initiated.

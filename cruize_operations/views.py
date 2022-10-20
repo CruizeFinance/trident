@@ -1,7 +1,7 @@
 from rest_framework import status
 from rest_framework.response import Response
 from rest_framework.viewsets import GenericViewSet
-from components import PriceFloorManager
+from components import PriceFloorManager, FirebaseDataManager
 from cruize_operations import (
     RepayToAaveRequestSerializer,
     CruizeDepositRequestSerializer,
@@ -10,11 +10,10 @@ from cruize_operations import (
     SetPriceFloorSerializer,
 )
 from services.avve_asset_apy import AaveApy
-
 from services.contracts.cruize.cruize_contract import Cruize
 from utilities import cruize_constants
-
 price_floor_manager = PriceFloorManager()
+
 
 
 class CruizeOperations(GenericViewSet):
@@ -22,7 +21,7 @@ class CruizeOperations(GenericViewSet):
         result = {"message": None, "error": None}
         self.cruize_contract_ref = Cruize()
         self.serializer_class = RepayToAaveRequestSerializer
-        serializer = self.serializer_class(data=request.get_price_floors)
+        serializer = self.serializer_class(data=request.data)
         serializer.is_valid(raise_exception=True)
         amount = serializer.data
         try:
@@ -37,7 +36,7 @@ class CruizeOperations(GenericViewSet):
         self.cruize_contract_ref = Cruize()
         result = {"message": None, "error": None}
         self.serializer_class = CruizeDepositRequestSerializer
-        serializer = self.serializer_class(data=request.get_price_floors)
+        serializer = self.serializer_class(data=request.data)
         serializer.is_valid(raise_exception=True)
         deposit_data = serializer.data
         try:
@@ -51,12 +50,13 @@ class CruizeOperations(GenericViewSet):
         result = {"message": None, "error": None}
         self.cruize_contract_ref = Cruize()
         self.serializer_class = FirebaseRequestSerializer
-        serializer = self.serializer_class(data=request.get_price_floors)
+        serializer = self.serializer_class(data=request.data)
         serializer.is_valid(raise_exception=True)
         deposit_data = serializer.data
+        firebase_db_obj = FirebaseDataManager()
         try:
 
-            price_floor_manager.firebase_data_manager_obj.store_sub_collections(
+            firebase_db_obj.store_sub_collections(
                 deposit_data,
                 cruize_constants.CRUIZE_USER,
                 deposit_data["wallet_address"],
@@ -68,7 +68,6 @@ class CruizeOperations(GenericViewSet):
         except Exception as e:
             result["error"] = e
             return Response(result, status.HTTP_500_INTERNAL_SERVER_ERROR)
-
     def fetch_user_transactions(self, request):
         result = {"message": None, "error": None}
         self.cruize_contract_ref = Cruize()
@@ -79,9 +78,10 @@ class CruizeOperations(GenericViewSet):
         serializer.is_valid(raise_exception=True)
         data = serializer.data
         try:
+            firebase_db_obj = FirebaseDataManager()
             result[
                 "message"
-            ] = price_floor_manager.firebase_data_manager_obj.fetch_sub_collections(
+            ] = firebase_db_obj.fetch_sub_collections(
                 cruize_constants.CRUIZE_USER, data["wallet_address"], "transactions"
             )
             return Response(result, status.HTTP_200_OK)
@@ -93,7 +93,7 @@ class CruizeOperations(GenericViewSet):
         result = {"result": None, "error": None}
         try:
 
-            result["result"] = price_floor_manager.asset_price_floor_details()
+            result["result"] = price_floor_manager.assets_price_floor()
             return Response(result, status.HTTP_200_OK)
         except Exception as e:
             result["error"] = e
@@ -115,7 +115,7 @@ class CruizeOperations(GenericViewSet):
             result["error"] = e
             return Response(result, status.HTTP_500_INTERNAL_SERVER_ERROR)
 
-    def  fetch_asset_apy(self, request):
+    def fetch_asset_apy(self, request):
         result = {"result": None, "error": None}
         try:
             aave_apy_obj = AaveApy()
