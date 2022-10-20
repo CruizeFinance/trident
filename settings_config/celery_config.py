@@ -1,12 +1,7 @@
 from __future__ import absolute_import, unicode_literals
 import os
-
-
 from celery import Celery
 from django.conf import settings
-
-from utilities import cruize_constants
-
 os.environ.setdefault("DJANGO_SETTINGS_MODULE", "settings_config.settings")
 app = Celery("trident", include=["services.celery.celery"])
 app.conf.enable_utc = True
@@ -17,7 +12,6 @@ app.conf.update(
     result_accept_content=["json"],
     task_always_eager=True,
     task_store_eager_result=True,
-    # TODO:  need to deploy the redis server for celery task .
     broker_url="sqs://",
     task_default_queue = "celerybroker",
     task_create_missing_queues = False,
