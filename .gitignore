@@ -116,3 +116,5 @@ dump.rdb
 
 HackdayTool_venv
 .vscode
+
+test/locustfile.py

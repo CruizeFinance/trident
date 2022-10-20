@@ -1,11 +1,10 @@
 from components import FirebaseDataManager
 from services.market_data.coingecko import CoinGecko
 
+firebase_data_manager_obj = FirebaseDataManager()
+
 
 class PriceFloorManager:
-    def __init__(self):
-        self.firebase_data_manager_obj = FirebaseDataManager()
-
     def set_price_floor(self, asset_name, number_of_days=30):
 
         coin_gecko = CoinGecko()
@@ -19,30 +18,38 @@ class PriceFloorManager:
             prices.sort(reverse=True)
             asset_peak_price = prices[0]
             asset_peak_price = asset_peak_price * 0.85
-            data = {
-                "id": asset_name,
-                "price_floor": asset_peak_price,
-            }
-            self.firebase_data_manager_obj.store_data(
-                data=data, id=data["id"], collection_name="price_floor_data"
+            firebase_data_manager_obj.store_data(
+                data={
+                    "id": asset_name,
+                    "price_floor": asset_peak_price,
+                },
+                id=asset_name,
+                collection_name="price_floor_data",
             )
             return asset_peak_price
         except Exception as e:
             raise Exception(e)
 
-    def get_price_floor(self, asset_name):
-        asset_price_floor_details = self.firebase_data_manager_obj.fetch_data(
+    def get_asset_price_floor(self, asset_name):
+        asset_price_floor_details = firebase_data_manager_obj.fetch_data(
             document_name=asset_name, collection_name="price_floor_data"
         )
-        asset_price_floor_details = asset_price_floor_details
         asset_price_floor_details = asset_price_floor_details.get("price_floor")
         return asset_price_floor_details
 
-    def assets_price_floor(self):
-        asset_price_floor_details = self.firebase_data_manager_obj.fetch_collections()
-        return asset_price_floor_details
+    def get_assets_price_floors(self):
+        asset_price_floor_details = firebase_data_manager_obj.fetch_collections(
+            "price_floor_data"
+        )
+        price_floors = {}
+        for price_floor_detail in asset_price_floor_details:
+            price_floor_detail_dict = price_floor_detail.to_dict()
+            price_floors[price_floor_detail_dict["id"]] = price_floor_detail_dict[
+                "price_floor"
+            ]
+        return price_floors
 
 
 if __name__ == "__main__":
     a = PriceFloorManager()
-    print(a.set_price_floor("bitcoin"))
+    print(a.get_asset_price_floor("ethereum"))

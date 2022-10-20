@@ -4,7 +4,7 @@ import os
 
 """
  class FirebaseClient is responsible for initializing firebase_admin client.
- It have to method create_firebase_client_instance() that initializing firebase_admin client and get_firebase_instance
+ It have to method create_firebase_client_instance() that initializing firebase_admin client and get_firebase_client
  that return firebase_admin client.
 """
 
@@ -23,7 +23,8 @@ class FirebaseClient(object):
         return self.client
 
     @property
-    def get_firebase_instance(self):
+    def get_firebase_client(self):
         if self.client is not None:
             return self.client
+        print("FirebaseClient :: Firebase client is None")
         return self.create_firebase_client_instance()

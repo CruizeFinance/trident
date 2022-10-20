@@ -1,14 +1,14 @@
 import time
-
 from binance.client import Client as Client_binance
-from decouple import config
+from settings_config import dydx_instances
 
 
 class BinanceClient(object):
     def __init__(self):
-        # TODO: need to stroe some where secure.
-        self.binance_api_key = config("BINANCE_API_KEY")
-        self.binance_api_secret = config("BINANCE_API_SECRET")
+        # TODO: need to store some where secure.
+        dydx_instances_details = dydx_instances["BTC-USD"]["binance_credentials"]
+        self.binance_api_key = dydx_instances_details["binance_api_key"]
+        self.binance_api_secret = dydx_instances_details["binance_api_secret"]
         self.client = Client_binance(
             api_key=self.binance_api_key, api_secret=self.binance_api_secret
         )

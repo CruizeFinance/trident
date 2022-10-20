@@ -1,9 +1,3 @@
-from components.transaction_manager import TransactionManager
-from services.dydx_client.dydx_p_client import DydxPClient
-from decouple import config
-
-from utilities import cruize_constants
-
 """
 Class DydxAdmin  is used to manage  the dydx_user activity on dydx with APIS.
 This class have some function that help the dydx_user to perform the activity on dydx.
@@ -11,28 +5,27 @@ This class have some function that help the dydx_user to perform the activity on
 
 
 class DydxAdmin(object):
-    def __init__(self):
-        self.client = DydxPClient()
-        self.client = self.client.get_dydx_instance
 
-    """ function createUser -  is used to create dydx_user on dydx
-        @return crated dydx_user
+    """function createUser -  is used to create dydx_user on dydx
+    @return crated dydx_user
     """
 
-    def create_user(self):
-        onboarding_information = self.client.onboarding.create_user(
+    def create_user(self, dydx_client):
+        dydx_p_client = dydx_client["dydx_instance"]
+        on_boarding_information = dydx_p_client.onboarding.create_user(
             # Optional if stark_private_key was provided.
-            stark_public_key=config("STARK_PUBLIC_KEY"),
-            stark_public_key_y_coordinate=config("STARK_KEY_Y_COORDINATE"),
+            stark_public_key=dydx_client["stark_public_key"],
+            stark_public_key_y_coordinate=dydx_client["stark_key_y_coordinate"],
             # Optional if eth_private_key or web3.eth.defaultAccount was provided.
-            ethereum_address=config("ETH_ADDRESS"),
+            ethereum_address=dydx_client["default_address"],
             country="SG",
         )
-        return onboarding_information
+        return on_boarding_information
 
     # function get_register_user is responsible register dydx_user on dydx.
-    def register_user(self):
-        signature = self.client.private.get_registration()
+    def register_user(self, dydx_client):
+        dydx_p_client = dydx_client["dydx_instance"]
+        signature = dydx_p_client.private.get_registration()
         if signature is None:
             return None
         return vars(signature)
@@ -41,9 +34,12 @@ class DydxAdmin(object):
        @return created api.
     """
 
-    def create_api_key(self):
-        api_key_response = self.client.eth_private.create_api_key(
-            ethereum_address=config("ETH_ADDRESS"),
+    def create_api_key(self, dydx_client):
+        dydx_p_client = dydx_client["dydx_instance"]
+        api_key_response = dydx_p_client.eth_private.create_api_key(
+            ethereum_address=dydx_client["dydx_data"]["wallet_credentials"][
+                "wallet_address"
+            ],
         )
         return api_key_response
 
@@ -51,57 +47,27 @@ class DydxAdmin(object):
       @return dydx_user all apis
     """
 
-    def get_api_keys(self):
-        api_keys = self.client.private.get_api_keys()
+    def get_api_keys(self, dydx_client):
+        dydx_p_client = dydx_client["dydx_instance"]
+        api_keys = dydx_p_client.private.get_api_keys()
         return api_keys
 
-    def get_account(self):
-        account_info = self.client.private.get_account(
-            ethereum_address=config("ETH_ADDRESS"),
+    def get_account(self, dydx_client):
+        dydx_p_client = dydx_client["dydx_instance"]
+        account_info = dydx_p_client.private.get_account(
+            ethereum_address=dydx_client["dydx_data"]["wallet_credentials"][
+                "wallet_address"
+            ]
         )
-
         return account_info
 
     # return dydx_user dydx position_id.
-    def get_position_id(self):
-        user = self.get_account()
+    def get_position_id(self, dydx_client):
+        user = self.get_account(dydx_client)
         user = vars(user)
         position_id = user["data"]["account"]["positionId"]
         return position_id
 
-    def deposit_test_fund(self):
-        return self.client.private.request_testnet_tokens()
-
-    def deposit_to_dydx(self, amount):
-        try:
-            transaction_manager = TransactionManager()
-            transaction = transaction_manager.build_transaction(
-                wallet_address=cruize_constants.WALLET_ADDRESS
-            )
-            print(transaction)
-            position_id = self.get_position_id()
-            tnx_hash = self.client.eth.deposit_to_exchange(
-                position_id=position_id, human_amount=amount, send_options=transaction
-            )
-
-            return tnx_hash
-        except Exception as e:
-            raise Exception(e)
-
-    def withdraw_from_dydx(self, recipient_address):
-        try:
-            transaction_manager = TransactionManager()
-            transaction = transaction_manager.build_transaction(
-                wallet_address=cruize_constants.WALLET_ADDRESS
-            )
-            tnx_hash = self.client.eth.withdraw_to(
-                recipient=recipient_address, send_options=transaction
-            )
-            return tnx_hash
-        except Exception as e:
-            raise Exception(e)
-
 
 if __name__ == "__main__":
     a = DydxAdmin()
-    print(a.deposit_to_dydx(1))
