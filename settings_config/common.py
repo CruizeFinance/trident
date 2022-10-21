@@ -1,4 +1,3 @@
-
 # Application definition
 INSTALLED_APPS = [
     "django.contrib.admin",
@@ -8,7 +7,8 @@ INSTALLED_APPS = [
     "django.contrib.messages",
     "django.contrib.staticfiles",
     "django_celery_beat",
-    "corsheaders","rest_framework"
+    "corsheaders",
+    "rest_framework",
 ]
 
 MIDDLEWARE = [
@@ -56,5 +56,3 @@ USE_TZ = True
 STATIC_URL = "/static/"
 
 ROOT_URLCONF = "settings_config.urls"
-
-

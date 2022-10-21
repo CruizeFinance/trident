@@ -52,7 +52,7 @@ class MarketData(GenericViewSet):
         coin_gecko = CoinGecko()
         data = serializer.data
         try:
-            asset_address = AssetCodes.asset_address.value[str(data['asset_name'])]
+            asset_address = AssetCodes.asset_address.value[str(data["asset_name"])]
             asset_price = coin_gecko.asset_price(asset_address)
             result["price"] = asset_price
             return Response(data=result, status=status.HTTP_200_OK)

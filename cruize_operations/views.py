@@ -12,8 +12,8 @@ from cruize_operations import (
 from services.avve_asset_apy import AaveApy
 from services.contracts.cruize.cruize_contract import Cruize
 from utilities import cruize_constants
-price_floor_manager = PriceFloorManager()
 
+price_floor_manager = PriceFloorManager()
 
 
 class CruizeOperations(GenericViewSet):
@@ -68,6 +68,7 @@ class CruizeOperations(GenericViewSet):
         except Exception as e:
             result["error"] = e
             return Response(result, status.HTTP_500_INTERNAL_SERVER_ERROR)
+
     def fetch_user_transactions(self, request):
         result = {"message": None, "error": None}
         self.cruize_contract_ref = Cruize()
@@ -79,9 +80,7 @@ class CruizeOperations(GenericViewSet):
         data = serializer.data
         try:
             firebase_db_obj = FirebaseDataManager()
-            result[
-                "message"
-            ] = firebase_db_obj.fetch_sub_collections(
+            result["message"] = firebase_db_obj.fetch_sub_collections(
                 cruize_constants.CRUIZE_USER, data["wallet_address"], "transactions"
             )
             return Response(result, status.HTTP_200_OK)
