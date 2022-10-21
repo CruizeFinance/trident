@@ -24,7 +24,6 @@ class Order(GenericViewSet):
         self.dydx_order_obj = DydxOrder()
         self.error_handler = ErrorHandler()
 
-
     def create(self, request):
         self.initialize()
         self.serializer_class = OrderRequestSerializer
@@ -61,9 +60,7 @@ class Order(GenericViewSet):
 
     def cancel(self, request):
         self.initialize()
-        self.serializer_class = CancelOrderRequestSerializer(
-            data=request.data
-        )
+        self.serializer_class = CancelOrderRequestSerializer(data=request.data)
         self.serializer_class.is_valid(raise_exception=True)
         order_id = self.serializer_class.data["order_id"]
         result = {"message": None, "error": None}

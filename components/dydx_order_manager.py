@@ -68,7 +68,9 @@ class DydxOrderManager:
         price_floor = self.price_floor_manager_obj.get_price_floor(
             AssetCodes.asset_name.value[asset_pair]
         )
-        ema_data =  self.firebase_data_manager_obj.fetch_data(collection_name= "ema_data",document_name=symbol)
+        ema_data = self.firebase_data_manager_obj.fetch_data(
+            collection_name="ema_data", document_name=symbol
+        )
 
         ema = ema_data.get("ema")
         # K must change ,K being variable will cover price movement
@@ -155,7 +157,7 @@ class DydxOrderManager:
         volatility_data = {}
         # fetch price data from db .
         price_data = self.firebase_data_manager_obj.fetch_data(
-           collection_name="price_data", document_name=symbol
+            collection_name="price_data", document_name=symbol
         )
 
         # TODO :  have to change the start time and end time in both if and else condition's
@@ -167,8 +169,12 @@ class DydxOrderManager:
             start_time = end_time - relativedelta(weeks=1)
             prices = self.binance_client_obj.price_data_per_interval(
                 symbol=symbol,
-                start_time=str(start_time.timestamp() * cruize_constants.TIMESTAMP_MULTIPLIER),
-                end_time=str(end_time.timestamp() * cruize_constants.TIMESTAMP_MULTIPLIER),
+                start_time=str(
+                    start_time.timestamp() * cruize_constants.TIMESTAMP_MULTIPLIER
+                ),
+                end_time=str(
+                    end_time.timestamp() * cruize_constants.TIMESTAMP_MULTIPLIER
+                ),
             )
             price_data = prices
             volatility_data = self.compute_market_volatility(prices)
@@ -177,8 +183,12 @@ class DydxOrderManager:
             start_time = datetime.utcnow() - timedelta(minutes=1)
             prices = self.binance_client_obj.price_data_per_interval(
                 symbol=symbol,
-                end_time=str(end_time.timestamp() * cruize_constants.TIMESTAMP_MULTIPLIER),
-                start_time=str(start_time.timestamp() * cruize_constants.TIMESTAMP_MULTIPLIER),
+                end_time=str(
+                    end_time.timestamp() * cruize_constants.TIMESTAMP_MULTIPLIER
+                ),
+                start_time=str(
+                    start_time.timestamp() * cruize_constants.TIMESTAMP_MULTIPLIER
+                ),
             )
 
             price_data = price_data["prices"]
@@ -193,28 +203,35 @@ class DydxOrderManager:
             volatility_data = self.compute_market_volatility(prices_data=price_data)
         price_data = ",".join(price_data)
         self.firebase_data_manager_obj.store_data(
-           collection_name= "price_data", id=symbol, data={"prices": price_data}
+            collection_name="price_data", id=symbol, data={"prices": price_data}
         )
         self.firebase_data_manager_obj.store_data(
-           collection_name= "ema_data", id=symbol, data={"ema": volatility_data}
+            collection_name="ema_data", id=symbol, data={"ema": volatility_data}
         )
 
-    def position_status(self,collection_name,symbol):
+    def position_status(self, collection_name, symbol):
 
         #  fetch data from db
-        position_status =  self.firebase_data_manager_obj.fetch_data(collection_name=collection_name, document_name=symbol)
+        position_status = self.firebase_data_manager_obj.fetch_data(
+            collection_name=collection_name, document_name=symbol
+        )
         if position_status is None:
             #  if there is no data for asset on db than set data to db and return false.
             #  return false :  because as of now the position is not yet open on db.
-            self.firebase_data_manager_obj.store_data(collection_name=collection_name, id=symbol, data={symbol:False})
+            self.firebase_data_manager_obj.store_data(
+                collection_name=collection_name, id=symbol, data={symbol: False}
+            )
             return False
         return position_status[symbol]
 
-    def set_position_status(self,collection_name,symbol,status):
+    def set_position_status(self, collection_name, symbol, status):
         #  store data to  db
-        self.firebase_data_manager_obj.store_data(collection_name=collection_name, id=symbol, data={symbol: status})
+        self.firebase_data_manager_obj.store_data(
+            collection_name=collection_name, id=symbol, data={symbol: status}
+        )
+
 
 if __name__ == "__main__":
     a = DydxOrderManager()
-    a = a.calculate_open_close_price("ETH-USD",10,"ETHBUSD")
+    a = a.calculate_open_close_price("ETH-USD", 10, "ETHBUSD")
     print(a)
