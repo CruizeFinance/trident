@@ -4,8 +4,8 @@ from services.firebase_cloud_client import FirebaseClient
 # TODO : refactor this file .
 firebase_instance = None
 
-class FirebaseDataManager(object):
 
+class FirebaseDataManager(object):
     def get_firebase_client(self):
         global firebase_instance
         if firebase_instance is None:
@@ -23,19 +23,22 @@ class FirebaseDataManager(object):
         firebase_client = self.get_firebase_client()
         firebase_client.collection(collection_name).document(id).set(data)
 
-    def store_sub_collections(self, data, collection, document_name, sub_collection, sub_document):
+    def store_sub_collections(
+        self, data, collection, document_name, sub_collection, sub_document
+    ):
         firebase_client = self.get_firebase_client()
         data["timestamp"] = time.time()
-        firebase_client.collection(collection).document(
-            document_name
-        ).collection(sub_collection).document(sub_document).set(data)
+        firebase_client.collection(collection).document(document_name).collection(
+            sub_collection
+        ).document(sub_document).set(data)
 
     def fetch_sub_collections(self, collection, document_name, sub_collection):
         firebase_client = self.get_firebase_client()
         firebase_data = (
-            firebase_client.collection(collection).document(
-                document_name
-            ).collection(sub_collection).get()
+            firebase_client.collection(collection)
+            .document(document_name)
+            .collection(sub_collection)
+            .get()
         )
         if not firebase_data:
             return f"No data found for wallet address: {document_name}"
@@ -50,7 +53,7 @@ class FirebaseDataManager(object):
         data = firebase_client.collection(collection_name).document(document_name).get()
         if data is not None:
             data = vars(data)
-        return data.get('_data',None)
+        return data.get("_data", None)
 
     def fetch_collections(self):
         firebase_client = self.get_firebase_client()

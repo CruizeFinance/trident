@@ -51,4 +51,4 @@ class DydxOrder:
         )
         if order_book is not None:
             order_book = vars(order_book)
-        return order_book['data']
+        return order_book["data"]

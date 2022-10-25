@@ -23,14 +23,16 @@ class PriceFloorManager:
                 "id": asset_name,
                 "price_floor": asset_peak_price,
             }
-            self.firebase_data_manager_obj.store_data(data=data, id= data["id"],collection_name="price_floor_data")
+            self.firebase_data_manager_obj.store_data(
+                data=data, id=data["id"], collection_name="price_floor_data"
+            )
             return asset_peak_price
         except Exception as e:
             raise Exception(e)
 
     def get_price_floor(self, asset_name):
         asset_price_floor_details = self.firebase_data_manager_obj.fetch_data(
-           document_name=asset_name, collection_name="price_floor_data"
+            document_name=asset_name, collection_name="price_floor_data"
         )
         asset_price_floor_details = asset_price_floor_details
         asset_price_floor_details = asset_price_floor_details.get("price_floor")

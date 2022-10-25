@@ -87,3 +87,6 @@ AVVE_SUB_GRAPH_QUERY = """
 AAVE_RAY = 10.0**27
 #  can add more symbol here .
 AAVE_APY_ASSET = ["WBTC", "WETH"]
+
+# VAULT
+VAULT_URL = "https://cruize-finance-cluster-public-vault-ffad0228.95440b3b.z1.hashicorp.cloud:8200"

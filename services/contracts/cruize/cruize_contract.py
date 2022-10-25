@@ -56,7 +56,7 @@ class Cruize:
     def withdraw_from_cruize(self, withdraw_data):
         result = {"transaction_hash": None, "error": None}
         amount = withdraw_data["amount"]
-        asset_address =withdraw_data["asset_address"]
+        asset_address = withdraw_data["asset_address"]
         try:
             transaction = self.transaction_manager.build_transaction(
                 cruize_constants.WALLET_ADDRESS

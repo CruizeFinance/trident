@@ -9,7 +9,6 @@ from utilities import cruize_constants
 # TODO : need to store on db fetch from db as well
 
 
-
 @app.task(name="check_withdrawal", default_retry_delay=4 * 60)
 def check_withdrawal():
     dydx_withdrawal_obj = DydxWithdrawal()
@@ -29,8 +28,8 @@ def open_order_on_dydx(eth_trigger_price=None, btc_trigger_price=None):
 
     dydx_order_manager = DydxOrderManager()
 
-    eth_open_position = dydx_order_manager.position_status('position_status', "ETHBUSD")
-    btc_open_position = dydx_order_manager.position_status('position_status', "BTCBUSD")
+    eth_open_position = dydx_order_manager.position_status("position_status", "ETHBUSD")
+    btc_open_position = dydx_order_manager.position_status("position_status", "BTCBUSD")
     data = dydx_order_manager.get_asset_price_and_size(
         cruize_constants.TEST_ETH_USD_ORACLE_ADDRESS, 100
     )
@@ -70,8 +69,11 @@ def open_order_on_dydx(eth_trigger_price=None, btc_trigger_price=None):
             )
             dydx_order_manager.create_order(order_params)
             eth_open_position = True
-            dydx_order_manager.set_position_status(collection_name="position_status", symbol="ETHBUSD",
-                                                   status=eth_open_position)
+            dydx_order_manager.set_position_status(
+                collection_name="position_status",
+                symbol="ETHBUSD",
+                status=eth_open_position,
+            )
             print("ETH - Short position is open")
 
         else:
@@ -92,8 +94,11 @@ def open_order_on_dydx(eth_trigger_price=None, btc_trigger_price=None):
             )
             dydx_order_manager.create_order(order_params)
             btc_open_position = True
-            dydx_order_manager.set_position_status(collection_name="position_status", symbol="BTCBUSD",
-                                                   status=btc_open_position)
+            dydx_order_manager.set_position_status(
+                collection_name="position_status",
+                symbol="BTCBUSD",
+                status=btc_open_position,
+            )
             print("BTC - Short position is open")
         else:
             if btc_trigger_price >= btc_market_price:
@@ -107,8 +112,8 @@ def open_order_on_dydx(eth_trigger_price=None, btc_trigger_price=None):
 @app.task(name="close_order_on_dydx", default_retry_delay=4 * 60)
 def close_order_on_dydx(eth_trigger_price=None, btc_trigger_price=None):
     dydx_order_manager = DydxOrderManager()
-    eth_open_position = dydx_order_manager.position_status('position_status', "ETHBUSD")
-    btc_open_position = dydx_order_manager.position_status('position_status', "BTCBUSD")
+    eth_open_position = dydx_order_manager.position_status("position_status", "ETHBUSD")
+    btc_open_position = dydx_order_manager.position_status("position_status", "BTCBUSD")
 
     data = dydx_order_manager.get_asset_price_and_size(
         cruize_constants.TEST_ETH_USD_ORACLE_ADDRESS, 1000
@@ -149,8 +154,11 @@ def close_order_on_dydx(eth_trigger_price=None, btc_trigger_price=None):
             )
             dydx_order_manager.create_order(order_params)
             eth_open_position = False
-            dydx_order_manager.set_position_status(collection_name="position_status", symbol="ETHBUSD",
-                                                   status=eth_open_position)
+            dydx_order_manager.set_position_status(
+                collection_name="position_status",
+                symbol="ETHBUSD",
+                status=eth_open_position,
+            )
             print("ETH - Short position is Closed")
 
         else:
@@ -172,7 +180,11 @@ def close_order_on_dydx(eth_trigger_price=None, btc_trigger_price=None):
             )
             dydx_order_manager.create_order(order_params)
             btc_open_position = False
-            dydx_order_manager.set_position_status(collection_name="position_status",symbol="BTCBUSD",status=btc_open_position)
+            dydx_order_manager.set_position_status(
+                collection_name="position_status",
+                symbol="BTCBUSD",
+                status=btc_open_position,
+            )
             print("BTC - Short position is Closed")
         else:
             if btc_trigger_price >= btc_market_price:

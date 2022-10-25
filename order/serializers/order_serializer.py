@@ -7,7 +7,6 @@ class OrderRequestSerializer(serializers.Serializer):
     size = serializers.CharField(required=True)
     price = serializers.IntegerField(required=True)
 
-
     def validate(self, data):
         if not data["market"].isupper() or not data["side"].isupper():
             raise serializers.ValidationError(

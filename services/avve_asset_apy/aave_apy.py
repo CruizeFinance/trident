@@ -17,7 +17,7 @@ class AaveApy:
 
         response = client.execute(query)
         apy_graph_data = response["reserves"]
-        subset_of_apy_asset= set(cruize_constants.AAVE_APY_ASSET)
+        subset_of_apy_asset = set(cruize_constants.AAVE_APY_ASSET)
         apy_data = [i for i in apy_graph_data if i["symbol"] in subset_of_apy_asset]
         asset_apy = {}
 
