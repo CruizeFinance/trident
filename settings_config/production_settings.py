@@ -8,7 +8,7 @@ CORS_ALLOWED_ORIGINS = [
     "https://test.app.cruize.finance",
     "https://www.test.app.cruize.finance",
 ]
-ALLOWED_HOSTS = ["52.20.55.165", "test.trident.cruize.finance"]
+ALLOWED_HOSTS = ["52.20.55.165", "test.trident.cruize.finance","52.72.210.207","3.210.156.188"]
 
 WSGI_APPLICATION = "settings_config.wsgi.application"
 

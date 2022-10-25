@@ -66,6 +66,7 @@ class FirebaseDataManager(object):
         return price_floors
 
 
+
 if __name__ == "__main__":
     a = FirebaseDataManager()
     # a = a.store_data({"user_address": "x0", "asset": "ETH", "tnx_hash": "0x1"},"user_tnx")
