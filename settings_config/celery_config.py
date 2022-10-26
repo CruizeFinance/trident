@@ -3,7 +3,7 @@ import os
 from celery import Celery
 from django.conf import settings
 
-os.environ.setdefault("DJANGO_SETTINGS_MODULE", "settings_config.settings")
+os.environ.setdefault("DJANGO_SETTINGS_MODULE", "settings_config.production_settings")
 app = Celery("trident", include=["services.celery.celery"])
 app.conf.enable_utc = True
 app.conf.update(
