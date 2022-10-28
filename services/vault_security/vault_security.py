@@ -3,7 +3,7 @@ from decouple import config
 
 from utilities import cruize_constants
 
-
+# need to create an API for this .
 class VaultSecurity:
     def get_vault_client(self):
         client = hvac.Client(
@@ -15,9 +15,7 @@ class VaultSecurity:
 
     def save(self, path, data):
         client = self.get_vault_client()
-        response = client.secrets.kv.v2.create_or_update_secret(
-            path=path, secret={path: data}
-        )
+        response = client.secrets.kv.v2.create_or_update_secret(path=path, secret=data)
         print("Successfully saved data: {}".format(response))
 
     def fetch(self, path):
@@ -29,5 +27,5 @@ class VaultSecurity:
 
 if __name__ == "__main__":
     a = VaultSecurity()
-    a.save("PRIVATE_KEY", "123")
-    # print(a.fetch("PRIVATE_KEY"))
+    # a.save()
+    # print(a.fetch("1"))

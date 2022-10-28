@@ -6,9 +6,11 @@ from dateutil.relativedelta import relativedelta
 from dydx3 import constants
 from tests.constants import SEVEN_DAYS_S
 from components import PriceFloorManager, FirebaseDataManager
+from components.transaction_manager import TransactionManager
 from services import DydxOrder, DydxAdmin
 from services.binance_client.binance_client import BinanceClient
 from services.contracts.chainlink import ChainlinkPriceFeed
+from settings_config import asset_dydx_instance
 from utilities import cruize_constants
 from utilities.enums import AssetCodes
 
@@ -17,28 +19,30 @@ from utilities.enums import AssetCodes
 
 
 class DydxOrderManager:
-    def __init__(self):
+    def __init__(self, dydx_client):
         self.dydx_admin = DydxAdmin()
         self.chainlink_price_feed = ChainlinkPriceFeed()
         self.binance_client_obj = BinanceClient()
         self.price_floor_manager_obj = PriceFloorManager()
         self.firebase_data_manager_obj = FirebaseDataManager()
+        self.dydx_client = dydx_client
 
-    def create_order(self, order_params):
+    def create_order(self, order_params, dydx_client):
         dydx_order = DydxOrder()
         # we have to keep separate volume of btc and eth to open different position on dydx.
         # total_btc_volume * 5 --> would be the open size for the btc
         # total_eth_volume * 5 --> would be the open size for eth
-        order_information = dydx_order.create_order(order_params)
+        order_information = dydx_order.create_order(order_params, dydx_client)
         dydx_order_details = vars(order_information)
         dydx_order_details = dydx_order_details["data"]["order"]
         return dydx_order_details
 
     def calculate_open_close_price(self, asset_pair, eth_order_size, symbol):
-
         bids_consumed = 0
         dydx_order_obj = DydxOrder()
-        asset_order_book = dydx_order_obj.get_order_book(asset_pair)
+        asset_order_book = dydx_order_obj.get_order_book(
+            market=asset_pair, dydx_client=self.dydx_client
+        )
         order_asks = asset_order_book["asks"]
         order_bids = asset_order_book["bids"]
         lowest_ask = float(order_asks[0]["price"])
@@ -65,7 +69,7 @@ class DydxOrderManager:
 
         slippage = (obtained_price - market_price) / market_price
 
-        price_floor = self.price_floor_manager_obj.get_price_floor(
+        price_floor = self.price_floor_manager_obj.get_asset_price_floor(
             AssetCodes.asset_name.value[asset_pair]
         )
         ema_data = self.firebase_data_manager_obj.fetch_data(
@@ -90,19 +94,13 @@ class DydxOrderManager:
           :return   - order params 
         """
 
-    def create_order_params(
-        self,
-        side,
-        market,
-        size,
-        market_price,
-    ):
+    def create_order_params(self, side, market, size, market_price, dydx_client):
         if side == "SELL":
             market_price = int(market_price) + 10
         else:
             market_price = int(market_price) - 10
         dydx_admin = DydxAdmin()
-        position_id = dydx_admin.get_position_id()
+        position_id = dydx_admin.get_position_id(dydx_client)
         order_params = {
             "position_id": position_id,
             "side": side,
@@ -124,13 +122,12 @@ class DydxOrderManager:
       :return   - asset total value in usd.
     """
 
-    def get_asset_price_and_size(self, asset_address, other_asset_volume):
-        user = self.dydx_admin.get_account()
+    def get_asset_price_and_size(self, asset_address, dydx_client):
+        user = self.dydx_admin.get_account(dydx_client)
         user = vars(user)
         market_price = self.chainlink_price_feed.get_oracle_market_price(asset_address)
         total_volume = user["data"]["account"]["equity"]
-        asset_volume = float(total_volume) - float(other_asset_volume)
-        asset_volume = float(asset_volume) / market_price
+        asset_volume = float(total_volume) / market_price
         asset_volume *= cruize_constants.POSITION_LEVERAGE
         asset_volume_with_leverage = str(
             round(asset_volume, cruize_constants.PRICE_ROUNDED_VALUE)
@@ -225,13 +222,47 @@ class DydxOrderManager:
         return position_status[symbol]
 
     def set_position_status(self, collection_name, symbol, status):
-        #  store data to  db
+        #  store data to db
         self.firebase_data_manager_obj.store_data(
             collection_name=collection_name, id=symbol, data={symbol: status}
         )
 
+    def deposit_test_fund(self, dydx_client):
+        dydx_p_client = dydx_client["dydx_instance"]
+        return dydx_p_client.private.request_testnet_tokens()
+
+    def deposit_to_dydx(self, amount, dydx_client):
+        try:
+            dydx_p_client = dydx_client["dydx_instance"]
+            transaction_manager = TransactionManager()
+            transaction = transaction_manager.build_transaction(
+                wallet_address=cruize_constants.WALLET_ADDRESS
+            )
+            position_id = dydx_p_client.get_position_id(dydx_client)
+            tnx_hash = dydx_p_client.eth.deposit_to_exchange(
+                position_id=position_id, human_amount=amount, send_options=transaction
+            )
+
+            return tnx_hash
+        except Exception as e:
+            raise Exception(e)
+
+    def withdraw_from_dydx(self, recipient_address, dydx_client):
+        try:
+            dydx_p_client = dydx_client["dydx_instance"]
+            transaction_manager = TransactionManager()
+            transaction = transaction_manager.build_transaction(
+                wallet_address=cruize_constants.WALLET_ADDRESS
+            )
+            tnx_hash = dydx_p_client.eth.withdraw_to(
+                recipient=recipient_address, send_options=transaction
+            )
+            return tnx_hash
+        except Exception as e:
+            raise Exception(e)
+
 
 if __name__ == "__main__":
-    a = DydxOrderManager()
-    a = a.calculate_open_close_price("ETH-USD", 10, "ETHBUSD")
+    a = DydxOrderManager(asset_dydx_instance["ETH-USD"])
+    a = a.calculate_open_close_price("ETH-USD", 177, "ETHBUSD")
     print(a)

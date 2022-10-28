@@ -59,34 +59,6 @@ RESULT_BACKEND = "redis://127.0.0.1:6379/1"
 
 # FIREBASE CONSTANT
 CRUIZE_USER = "cruize_users"
-# AAVE APY CONSTANT
-AAVE_SUB_GRAPH_URL = "https://api.thegraph.com/subgraphs/name/aave/protocol-v2"
-AVVE_SUB_GRAPH_QUERY = """
-        query {
-          reserves (where: {
-            usageAsCollateralEnabled: true
-          }) {
-            id
-            name
-            price {
-              id
-              priceInEth
-            }
-            liquidityRate
-            variableBorrowRate
-            stableBorrowRate
-            aEmissionPerSecond
-            vEmissionPerSecond
-            decimals
-            totalATokenSupply
-            totalCurrentVariableDebt
-            symbol
-          }
-        }
-        """
-AAVE_RAY = 10.0**27
-#  can add more symbol here .
-AAVE_APY_ASSET = ["WBTC", "WETH"]
 
 # VAULT
 VAULT_URL = "https://cruize-finance-cluster-public-vault-ffad0228.95440b3b.z1.hashicorp.cloud:8200"

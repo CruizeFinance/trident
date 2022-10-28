@@ -3,14 +3,17 @@ from rest_framework import status
 from rest_framework.response import Response
 from rest_framework.viewsets import GenericViewSet
 from components import FirebaseDataManager
+from components.dydx_order_manager import DydxOrderManager
 from dydx_operations import (
     SlowWithdrawalSerializer,
     FastWithdrawalSerializer,
     TransferSerializer,
     DepositSerializer,
+    DepositTestSerializer,
 )
 
 from services import DydxWithdrawal, DydxAdmin
+from settings_config import asset_dydx_instance
 from utilities.error_handler import ErrorHandler
 
 
@@ -20,7 +23,6 @@ class DydxOprations(GenericViewSet):
     """
 
     def initialize(self):
-        self.dydx_withdrawal_obj = DydxWithdrawal()
         self.dydx_admin_obj = DydxAdmin()
         self.error_handler = ErrorHandler()
 
@@ -30,9 +32,12 @@ class DydxOprations(GenericViewSet):
         self.serializer_class = SlowWithdrawalSerializer
         serializer = self.serializer_class(data=request.data)
         serializer.is_valid(raise_exception=True)
-        data = serializer.data
+        data = serializer.validated_data
+
         try:
-            withdrawal_data = self.dydx_withdrawal_obj.slow_withdrawal(data)
+            deposited_asset = data.get("deposited_asset")
+            dydx_withdrawal_obj = DydxWithdrawal(asset_dydx_instance[deposited_asset])
+            withdrawal_data = dydx_withdrawal_obj.slow_withdrawal(data)
             result["message"] = withdrawal_data["data"]["withdrawal"]
             result["message"]["address"] = data["user_address"]
             firebase_order_manager_obj = FirebaseDataManager()
@@ -53,10 +58,12 @@ class DydxOprations(GenericViewSet):
         self.serializer_class = FastWithdrawalSerializer
         serializer = self.serializer_class(data=request.data)
         serializer.is_valid(raise_exception=True)
-        withdrawal_data = serializer.data
+        data = serializer.validated_data
         try:
-            self.dydx_withdrawal_obj.fast_withdrawal(withdrawal_data)
-            result["message"] = withdrawal_data.get("withdrawal")
+            deposited_asset = data.get("deposited_asset")
+            dydx_withdrawal_obj = DydxWithdrawal(asset_dydx_instance[deposited_asset])
+            dydx_withdrawal_obj.fast_withdrawal(data)
+            result["message"] = data.get("withdrawal")
             return Response(result, status.HTTP_200_OK)
         except DydxApiError or ValueError as e:
             result["error"] = self.error_handler.dydx_error_decoder(e)
@@ -67,16 +74,22 @@ class DydxOprations(GenericViewSet):
 
     def deposit(self, request):
         self.initialize()
+        result = {"message": None, "error": None}
         self.serializer_class = DepositSerializer
         serializer = self.serializer_class(data=request.data)
         serializer.is_valid(raise_exception=True)
-        data = serializer.data
-        # try:
-        hash = self.dydx_admin_obj.deposit_to_dydx(data["amount"])
-        transaction_info = {"status": "pending", "hash": hash}
-        return Response(transaction_info, status.HTTP_200_OK)
-        # except Exception as e:
-        #     return Response(e, status.HTTP_500_INTERNAL_SERVER_ERROR)
+        data = serializer.validated_data
+
+        try:
+            asset = data.get("asset")
+            dydx_order_manager_obj = DydxOrderManager(asset_dydx_instance[asset])
+            result["message"] = dydx_order_manager_obj.deposit_to_dydx(
+                data["amount"], asset_dydx_instance[asset]
+            )
+            return Response(result, status.HTTP_200_OK)
+        except Exception as e:
+            result["error"] = str(e)
+            return Response(result, status.HTTP_500_INTERNAL_SERVER_ERROR)
 
     """ :return user transfer history."""
 
@@ -86,9 +99,11 @@ class DydxOprations(GenericViewSet):
         self.serializer_class = TransferSerializer
         serializer = self.serializer_class(data=request.data)
         serializer.is_valid(raise_exception=True)
-        data = serializer.data
+        data = serializer.validated_data
         try:
-            transfer_data = self.dydx_withdrawal_obj.all_transfer_details(data)
+            asset = data.pop("asset")
+            dydx_withdrawal_obj = DydxWithdrawal(asset_dydx_instance[asset])
+            transfer_data = dydx_withdrawal_obj.all_transfer_details(data)
             result["message"] = transfer_data["data"]["transfers"]
             return Response(result, status.HTTP_200_OK)
         except DydxApiError or ValueError as e:
@@ -99,10 +114,19 @@ class DydxOprations(GenericViewSet):
             return Response(result, status.HTTP_500_INTERNAL_SERVER_ERROR)
 
     def deposit_test_fund(self, request):
+        self.serializer_class = DepositTestSerializer
+        serializer = self.serializer_class(data=request.data)
+        serializer.is_valid(raise_exception=True)
+        data = serializer.validated_data
         self.initialize()
         result = {"message": None, "error": None}
+
         try:
-            fund_details = self.dydx_admin_obj.deposit_test_fund()
+            asset = data.get("asset")
+            dydx_order_manager_obj = DydxOrderManager(asset_dydx_instance[asset])
+            fund_details = dydx_order_manager_obj.deposit_test_fund(
+                asset_dydx_instance[asset]
+            )
             fund_details = vars(fund_details)
             result["message"] = fund_details["data"]["transfer"]
             return Response(result, status.HTTP_200_OK)

@@ -1,4 +1,3 @@
-from decouple import config
 from dydx3 import DydxApiError
 from rest_framework import status
 from rest_framework.response import Response
@@ -6,11 +5,7 @@ from rest_framework.viewsets import GenericViewSet
 from services import DydxAdmin
 from utilities.error_handler import ErrorHandler
 
-from django.conf import settings
-
-from rest_framework.permissions import BasePermission
-
-
+# will fix it letter .
 class User(GenericViewSet):
     def initialize(self):
         self.dydx_admin_obj = DydxAdmin()
