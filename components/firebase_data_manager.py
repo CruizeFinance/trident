@@ -18,9 +18,9 @@ class FirebaseDataManager(object):
         self.firebase_client = self.get_firebase_client()
         self.firebase_client.collection(collection).document(order_id).update(data)
 
-    def store_data(self, data, id, collection_name):
+    def store_data(self, data, document, collection_name):
         self.firebase_client = self.get_firebase_client()
-        self.firebase_client.collection(collection_name).document(id).set(data)
+        self.firebase_client.collection(collection_name).document(document).set(data)
 
     def bulk_store(self, data, collection_name, field):
         self.firebase_client = self.get_firebase_client()
@@ -69,5 +69,6 @@ class FirebaseDataManager(object):
 
 if __name__ == "__main__":
     a = FirebaseDataManager()
-    # a = a.store_data({"user_address": "x0", "asset": "ETH", "tnx_hash": "0x1"},"user_tnx")
+    a = a.fetch_collections('asset_volume')
+    print(a)
     # print(a.fetch_collections())

@@ -2,7 +2,7 @@ from rest_framework import status
 from rest_framework.exceptions import ValidationError
 from rest_framework.response import Response
 from rest_framework.viewsets import GenericViewSet
-from components import PriceFloorManager, FirebaseDataManager
+from components import PriceFloorManager, FirebaseDataManager, CruizeDataManager
 from cruize_operations import (
     RepayToAaveRequestSerializer,
     CruizeDepositRequestSerializer,
@@ -10,6 +10,7 @@ from cruize_operations import (
     FirebaseFecthRequestSerializer,
     SetPriceFloorSerializer,
 )
+from cruize_operations.serilaizer import Tvl_Serializer
 from services.avve_asset_apy import AaveApy
 from services.contracts.cruize.cruize_contract import Cruize
 from utilities import cruize_constants
@@ -134,3 +135,18 @@ class CruizeOperations(GenericViewSet):
         except Exception as e:
             result["error"] = e
             return Response(result, status.HTTP_500_INTERNAL_SERVER_ERROR)
+    def save_stacked_asset_amount(self,request):
+        serializer_class = Tvl_Serializer
+        serializer = serializer_class(data=request.data)
+        serializer.is_valid(raise_exception=True)
+        asset_data = serializer.data
+        result = {"result": None, "error": None}
+        try:
+         cruize_data_manager_obj  =    CruizeDataManager()
+         cruize_data_manager_obj.save_TVL(asset_data)
+         result['result'] = 'success'
+         return Response(result, status.HTTP_200_OK)
+        except Exception as e:
+            result["error"] = e
+            return Response(result, status.HTTP_500_INTERNAL_SERVER_ERROR)
+

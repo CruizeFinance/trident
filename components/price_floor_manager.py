@@ -18,14 +18,10 @@ class PriceFloorManager:
             prices.sort(reverse=True)
             asset_peak_price = prices[0]
             asset_peak_price = asset_peak_price * 0.85
-            firebase_data_manager_obj.store_data(
-                data={
-                    "id": asset_name,
-                    "price_floor": asset_peak_price,
-                },
-                id=asset_name,
-                collection_name="price_floor_data",
-            )
+            firebase_data_manager_obj.store_data(data={
+                "id": asset_name,
+                "price_floor": asset_peak_price,
+            }, document=asset_name, collection_name="price_floor_data")
             return asset_peak_price
         except Exception as e:
             raise Exception(e)
@@ -41,6 +37,7 @@ class PriceFloorManager:
         asset_price_floor_details = firebase_data_manager_obj.fetch_collections(
             "price_floor_data"
         )
+
         price_floors = {}
         for price_floor_detail in asset_price_floor_details:
             price_floor_detail_dict = price_floor_detail.to_dict()
@@ -52,4 +49,4 @@ class PriceFloorManager:
 
 if __name__ == "__main__":
     a = PriceFloorManager()
-    print(a.get_asset_price_floor("ethereum"))
+    print(a.get_assets_price_floors())
