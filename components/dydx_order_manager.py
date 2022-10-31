@@ -200,10 +200,10 @@ class DydxOrderManager:
             volatility_data = self.compute_market_volatility(prices_data=price_data)
         price_data = ",".join(price_data)
         self.firebase_data_manager_obj.store_data(
-            collection_name="price_data", id=symbol, data={"prices": price_data}
+            data={"prices": price_data}, document=symbol, collection_name="price_data"
         )
         self.firebase_data_manager_obj.store_data(
-            collection_name="ema_data", id=symbol, data={"ema": volatility_data}
+            data={"ema": volatility_data}, document=symbol, collection_name="ema_data"
         )
 
     def position_status(self, collection_name, symbol):
@@ -216,7 +216,7 @@ class DydxOrderManager:
             #  if there is no data for asset on db than set data to db and return false.
             #  return false :  because as of now the position is not yet open on db.
             self.firebase_data_manager_obj.store_data(
-                collection_name=collection_name, id=symbol, data={symbol: False}
+                data={symbol: False}, document=symbol, collection_name=collection_name
             )
             return False
         return position_status[symbol]
@@ -224,7 +224,7 @@ class DydxOrderManager:
     def set_position_status(self, collection_name, symbol, status):
         #  store data to db
         self.firebase_data_manager_obj.store_data(
-            collection_name=collection_name, id=symbol, data={symbol: status}
+            data={symbol: status}, document=symbol, collection_name=collection_name
         )
 
     def deposit_test_fund(self, dydx_client):

@@ -2,7 +2,7 @@ from rest_framework import status
 from rest_framework.exceptions import ValidationError
 from rest_framework.response import Response
 from rest_framework.viewsets import GenericViewSet
-from components import PriceFloorManager, FirebaseDataManager
+from components import PriceFloorManager, FirebaseDataManager, CruizeDataManager
 from cruize_operations import (
     RepayToAaveRequestSerializer,
     CruizeDepositRequestSerializer,
@@ -10,6 +10,7 @@ from cruize_operations import (
     FirebaseFecthRequestSerializer,
     SetPriceFloorSerializer,
 )
+from cruize_operations.serilaizer import TvlSerializer
 from services.avve_asset_apy import AaveApy
 from services.contracts.cruize.cruize_contract import Cruize
 from utilities import cruize_constants
@@ -76,24 +77,12 @@ class CruizeOperations(GenericViewSet):
 
         serializer = serializer_class(data=request_body)
         serializer.is_valid(raise_exception=True)
-        data = serializer.data
+        data = serializer.validated_data
 
         try:
-            firebase_db_obj = FirebaseDataManager()
-            firebase_data = firebase_db_obj.fetch_sub_collections(
-                cruize_constants.CRUIZE_USER, data["wallet_address"], "transactions"
-            )
-            if not firebase_data:
-                raise ValidationError(
-                    f"No data found for wallet address: {data['wallet_address']}"
-                )
-
-            data = []
-            if data is not None:
-                for tnx_data in firebase_data:
-                    data.append(tnx_data.to_dict())
+            cruize_data_manager_obj = CruizeDataManager()
+            data = cruize_data_manager_obj.fetch_user_transactions(data)
             result["message"] = data
-
             return Response(result, status.HTTP_200_OK)
         except Exception as e:
             result["error"] = e
@@ -130,6 +119,21 @@ class CruizeOperations(GenericViewSet):
         try:
             aave_apy_obj = AaveApy()
             result["result"] = aave_apy_obj.fetch_asset_apys()
+            return Response(result, status.HTTP_200_OK)
+        except Exception as e:
+            result["error"] = e
+            return Response(result, status.HTTP_500_INTERNAL_SERVER_ERROR)
+
+    def save_asset_tvl(self, request):
+        serializer_class = TvlSerializer
+        serializer = serializer_class(data=request.data)
+        serializer.is_valid(raise_exception=True)
+        asset_data = serializer.validated_data
+        result = {"result": None, "error": None}
+        try:
+            cruize_data_manager_obj = CruizeDataManager()
+            cruize_data_manager_obj.save_asset_tvl(asset_data)
+            result["result"] = "success"
             return Response(result, status.HTTP_200_OK)
         except Exception as e:
             result["error"] = e

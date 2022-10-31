@@ -14,4 +14,5 @@ urlpatterns = [
     path("price_floor", CruizeOperations.as_view({"get": "price_floor"})),
     path("price_floor/", CruizeOperations.as_view({"put": "set_price_floor"})),
     path("apy", CruizeOperations.as_view({"get": "fetch_asset_apy"})),
+    path("asset_tvl", CruizeOperations.as_view({"post": "save_asset_tvl"})),
 ]
