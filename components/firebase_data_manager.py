@@ -69,6 +69,6 @@ class FirebaseDataManager(object):
 
 if __name__ == "__main__":
     a = FirebaseDataManager()
-    a = a.fetch_collections('asset_volume')
+    a = a.fetch_collections("asset_volume")
     print(a)
     # print(a.fetch_collections())

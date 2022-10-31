@@ -18,10 +18,14 @@ class PriceFloorManager:
             prices.sort(reverse=True)
             asset_peak_price = prices[0]
             asset_peak_price = asset_peak_price * 0.85
-            firebase_data_manager_obj.store_data(data={
-                "id": asset_name,
-                "price_floor": asset_peak_price,
-            }, document=asset_name, collection_name="price_floor_data")
+            firebase_data_manager_obj.store_data(
+                data={
+                    "id": asset_name,
+                    "price_floor": asset_peak_price,
+                },
+                document=asset_name,
+                collection_name="price_floor_data",
+            )
             return asset_peak_price
         except Exception as e:
             raise Exception(e)
