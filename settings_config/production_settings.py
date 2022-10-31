@@ -7,6 +7,7 @@ CORS_ALLOWED_ORIGINS = [
     "http://localhost:3000",
     "https://test.app.cruize.finance",
     "https://www.test.app.cruize.finance",
+    "https://www.beta.app.cruize.finance",
 ]
 ALLOWED_HOSTS = [
     "52.20.55.165",
@@ -17,6 +18,7 @@ ALLOWED_HOSTS = [
     "3.210.156.188",
     "3.231.35.12",
     "34.225.2.31",
+    "beta.trident.cruize.finance",
 ]
 
 WSGI_APPLICATION = "settings_config.wsgi.application"
