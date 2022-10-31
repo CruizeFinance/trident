@@ -57,6 +57,13 @@ class CruizeOperations(GenericViewSet):
         firebase_db_obj = FirebaseDataManager()
 
         try:
+            cruize_data_manager_obj = CruizeDataManager()
+            asset_data = {
+                "asset_name": deposit_data.get("assset_name"),
+                "type": deposit_data.get("type"),
+                "ammount": deposit_data.get("amount"),
+            }
+            cruize_data_manager_obj.save_asset_tvl(asset_data=asset_data)
             firebase_db_obj.store_sub_collections(
                 data=deposit_data,
                 collection="cruize_users",
