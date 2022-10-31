@@ -23,5 +23,4 @@ urlpatterns = [
     path("dydx_operations/", include("dydx_operations.urls")),
     path("cruize_operations/", include("cruize_operations.urls")),
     path("market_data/", include("market_data.urls")),
-    path("auth/", include("auth.urls")),
 ]
