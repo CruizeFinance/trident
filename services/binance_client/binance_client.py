@@ -5,7 +5,6 @@ from settings_config import dydx_instances
 
 class BinanceClient(object):
     def __init__(self):
-        # TODO: need to store some where secure.
         dydx_instances_details = dydx_instances["BTC-USD"]["binance_credentials"]
         self.binance_api_key = dydx_instances_details["binance_api_key"]
         self.binance_api_secret = dydx_instances_details["binance_api_secret"]

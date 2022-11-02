@@ -69,6 +69,8 @@ class FirebaseDataManager(object):
 
 if __name__ == "__main__":
     a = FirebaseDataManager()
-    a = a.fetch_collections("asset_volume")
-    print(a)
+    a = a.fetch_collections("ETHBUSD")
+    for price_floor_detail in a:
+        print(price_floor_detail.to_dict())
+
     # print(a.fetch_collections())
