@@ -17,7 +17,8 @@ from utilities.enums import AssetCodes
 
 # class: DydxOrderManager - is responsible for managing order on dydx.
 
-
+fethced =  False
+months_price_data = []
 class DydxOrderManager:
     def __init__(self, dydx_client):
         self.dydx_admin = DydxAdmin()
@@ -150,19 +151,19 @@ class DydxOrderManager:
         return volatility_data
 
     def market_volatility(self, symbol):
-
+        global fethced
+        global  months_price_data
         volatility_data = {}
         # fetch price data from db .
-        price_data = self.firebase_data_manager_obj.fetch_collections(
-            collection_name=symbol
-        )
-        is_price_data = self.firebase_data_manager_obj.fetch_data(
-            collection_name=symbol, document_name="month_1"
-        )
-        # print(is_price_data)
-
-        # TODO :  have to change the start time and end time in both if and else condition's
-        months_price_data = []
+        is_price_data = ''
+        price_data = None
+        if fethced is False:
+            price_data = self.firebase_data_manager_obj.fetch_collections(
+                collection_name=symbol
+            )
+            is_price_data = self.firebase_data_manager_obj.fetch_data(
+                collection_name=symbol, document_name="month_1"
+            )
         if is_price_data is None:
             # if db price data is none than  fetch prices for past 6 months .
             end_time = datetime.utcnow()
@@ -190,17 +191,18 @@ class DydxOrderManager:
                     start_time.timestamp() * cruize_constants.TIMESTAMP_MULTIPLIER
                 ),
             )
-
-            for month_price_data in price_data:
-                month_price_data = month_price_data.to_dict()
-                month_price_data = month_price_data["prices"].split(",")
-                for minute_price_data in range(0,len(month_price_data)):
-                     months_price_data.append(month_price_data[minute_price_data])
+            if fethced is False:
+                for month_price_data in price_data:
+                    month_price_data = month_price_data.to_dict()
+                    month_price_data = month_price_data["prices"].split(",")
+                    for minute_price_data in range(0,len(month_price_data)):
+                         months_price_data.append(month_price_data[minute_price_data])
 
 
             # remove old price from the  list that should be equal to  new price's length  .
             del months_price_data[0: len(minutes_price_data)]
             # # append new prices to price_data array
+            print(minutes_price_data)
             for i in range(len(minutes_price_data)):
                 months_price_data.append(minutes_price_data[i])
             # compute market volatility .
@@ -226,10 +228,12 @@ class DydxOrderManager:
             start_index = end_index
             end_index = end_index + data_size_for_month
 
+
         self.firebase_data_manager_obj.store_data(
             data={"ema": volatility_data}, document=symbol, collection_name="ema_data"
         )
 
+        fethced =  True
 
     def position_status(self, collection_name, symbol):
 
