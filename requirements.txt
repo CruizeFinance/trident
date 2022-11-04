@@ -72,7 +72,7 @@ hexbytes==0.2.2
 httplib2==0.20.4
 hvac==1.0.2
 idna==3.3
-importlib-metadata==5.0.0
+importlib-metadata
 importlib-resources==5.9.0
 ipfshttpclient==0.8.0a2
 itsdangerous==2.1.2
