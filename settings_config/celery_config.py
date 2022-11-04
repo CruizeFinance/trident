@@ -32,7 +32,7 @@ app.conf.update(
     task_always_eager=True,
     task_store_eager_result=True,
     broker_url="redis://127.0.0.1:6379/0",
-    result_backend="redis://127.0.0.1:6379/1"
+    result_backend="redis://127.0.0.1:6379/1",
 )
 app.config_from_object(settings, namespace="CELERY")
 app.autodiscover_tasks(lambda: settings.INSTALLED_APPS)

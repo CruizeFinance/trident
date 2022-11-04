@@ -146,13 +146,14 @@ def close_order_on_dydx(eth_trigger_price=None, btc_trigger_price=None):
 def compute_eth_usdc_volatility():
     print("Start::compute_eth_usdc_volatility")
     current_time = time.time()
-    print("compute_eth_usdc_volatility",current_time)
+    print("compute_eth_usdc_volatility", current_time)
     dydx_order_manager_obj = DydxOrderManager(asset_dydx_instance["ETH-USD"])
     dydx_order_manager_obj.market_volatility(symbol="ETHBUSD")
     print("End::compute_eth_usdc_volatility")
     end_time = time.time()
-    print("compute_eth_usdc_volatility",end_time)
+    print("compute_eth_usdc_volatility", end_time)
     print("time all", end_time - current_time)
+
 
 @app.task(
     name="compute_btc_usdc_volatility",

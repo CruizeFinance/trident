@@ -10,15 +10,13 @@ from components.transaction_manager import TransactionManager
 from services import DydxOrder, DydxAdmin
 from services.binance_client.binance_client import BinanceClient
 from services.contracts.chainlink import ChainlinkPriceFeed
-from settings_config import asset_dydx_instance
 from utilities import cruize_constants
 from utilities.enums import AssetCodes
 
 
 # class: DydxOrderManager - is responsible for managing order on dydx.
 
-fethced =  False
-months_price_data = []
+
 class DydxOrderManager:
     def __init__(self, dydx_client):
         self.dydx_admin = DydxAdmin()
@@ -54,8 +52,8 @@ class DydxOrderManager:
         while asset_order_size > 0:
             bids_consumed += float(
                 (
-                        float(order_bids[interval]["size"])
-                        * float(order_bids[interval]["price"])
+                    float(order_bids[interval]["size"])
+                    * float(order_bids[interval]["price"])
                 )
             )
             asset_order_size -= float(order_bids[interval]["size"])
@@ -82,7 +80,7 @@ class DydxOrderManager:
         # within 30s under normal market conditions
         K = 2
         p_open_close = (price_floor * (1 + slippage)) * (
-                (1 + ema["mu_ema"]) + (K * ema["sigma_ema"])
+            (1 + ema["mu_ema"]) + (K * ema["sigma_ema"])
         )
         return p_open_close
 
@@ -151,24 +149,17 @@ class DydxOrderManager:
         return volatility_data
 
     def market_volatility(self, symbol):
-        global fethced
-        global  months_price_data
         volatility_data = {}
-        # fetch price data from db .
-        is_price_data = ''
-        price_data = None
-        if fethced is False:
-            price_data = self.firebase_data_manager_obj.fetch_collections(
-                collection_name=symbol
-            )
-            is_price_data = self.firebase_data_manager_obj.fetch_data(
-                collection_name=symbol, document_name="month_1"
-            )
-        if is_price_data is None:
+        months_price_data = []
+        price_data = self.firebase_data_manager_obj.fetch_sub_collections(
+            collection="asset_price", document_name=symbol, sub_collection="prices"
+        )
+
+        if not price_data:
             # if db price data is none than  fetch prices for past 6 months .
             end_time = datetime.utcnow()
             start_time = end_time - relativedelta(months=6)
-            prices = self.binance_client_obj.price_data_per_interval(
+            months_price_data = self.binance_client_obj.price_data_per_interval(
                 symbol=symbol,
                 start_time=str(
                     start_time.timestamp() * cruize_constants.TIMESTAMP_MULTIPLIER
@@ -177,8 +168,7 @@ class DydxOrderManager:
                     end_time.timestamp() * cruize_constants.TIMESTAMP_MULTIPLIER
                 ),
             )
-            months_price_data = prices
-            volatility_data = self.compute_market_volatility(prices)
+            volatility_data = self.compute_market_volatility(months_price_data)
         else:
             end_time = datetime.utcnow()
             start_time = datetime.utcnow() - timedelta(minutes=1)
@@ -191,22 +181,20 @@ class DydxOrderManager:
                     start_time.timestamp() * cruize_constants.TIMESTAMP_MULTIPLIER
                 ),
             )
-            if fethced is False:
-                for month_price_data in price_data:
-                    month_price_data = month_price_data.to_dict()
-                    month_price_data = month_price_data["prices"].split(",")
-                    for minute_price_data in range(0,len(month_price_data)):
-                         months_price_data.append(month_price_data[minute_price_data])
 
+            for month_price_data in price_data:
+                month_price_data = month_price_data.to_dict()
+                month_price_data = month_price_data["prices"].split(",")
+                months_price_data.extend(month_price_data)
 
             # remove old price from the  list that should be equal to  new price's length  .
-            del months_price_data[0: len(minutes_price_data)]
-            # # append new prices to price_data array
-            print(minutes_price_data)
-            for i in range(len(minutes_price_data)):
-                months_price_data.append(minutes_price_data[i])
+            del months_price_data[0 : len(minutes_price_data)]
+            # append new prices to months_price_data array
+            months_price_data.extend(minutes_price_data)
             # compute market volatility .
-            volatility_data = self.compute_market_volatility(prices_data=months_price_data)
+            volatility_data = self.compute_market_volatility(
+                prices_data=months_price_data
+            )
 
         total_month = 6
         data_size_for_month = int(len(months_price_data) / total_month)
@@ -220,20 +208,19 @@ class DydxOrderManager:
                 month_price_data[idx] = str(price)
             month_price_data_str = ",".join(month_price_data)
 
-            self.firebase_data_manager_obj.store_data(
+            self.firebase_data_manager_obj.store_sub_collections(
+                collection="asset_price",
+                sub_collection="prices",
+                document_name=symbol,
                 data={"prices": month_price_data_str},
-                document=f"month_{index+1}",
-                collection_name=symbol,
+                sub_document=f"month_{index+1}",
             )
             start_index = end_index
             end_index = end_index + data_size_for_month
 
-
         self.firebase_data_manager_obj.store_data(
             data={"ema": volatility_data}, document=symbol, collection_name="ema_data"
         )
-
-        fethced =  True
 
     def position_status(self, collection_name, symbol):
 
@@ -294,4 +281,3 @@ class DydxOrderManager:
 if __name__ == "__main__":
     a = DydxOrderManager(None)
     a.market_volatility("ETHBUSD")
-
