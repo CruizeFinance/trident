@@ -11,8 +11,8 @@ hooks:
       runas: root
   BeforeInstall:
     - location: deployment_scripts/clean.sh
-        timeout: 300
-        runas: root
+      timeout: 300
+      runas: root
     - location: deployment_scripts/install_requirements.sh
       timeout: 300
       runas: root
