@@ -16,7 +16,7 @@ from utilities import cruize_constants
 @app.task(name="check_withdrawal", default_retry_delay=4 * 60)
 def check_withdrawal():
 
-    dydx_withdrawal_obj = DydxWithdrawal(asset_dydx_instance)
+    dydx_withdrawal_obj = DydxWithdrawal(asset_dydx_instance["BTC-USD"])
     order_manager_obj = FirebaseDataManager()
     result = dydx_withdrawal_obj.all_transfer_details(
         {"limit": 100, "transfer_type": "WITHDRAWAL"},
@@ -32,8 +32,8 @@ def check_withdrawal():
 
 ## For ETH
 @app.task(name="open_order_on_dydx", track_started=True)
-def open_order_on_dydx(eth_trigger_price=None, btc_trigger_price=None):
-
+def open_order_on_dydx(eth_trigger_price=None):
+    print("Start::open_order_on_dydx")
     dydx_eth_instance = asset_dydx_instance["ETH-USD"]
     dydx_order_manager = DydxOrderManager(asset_dydx_instance["ETH-USD"])
     eth_open_position = dydx_order_manager.position_status("position_status", "ETHBUSD")
@@ -50,7 +50,7 @@ def open_order_on_dydx(eth_trigger_price=None, btc_trigger_price=None):
         # here we will keep our trigger price formulas
         #  TODO:size must  change of ETH and BTC .
         #   size of ETH AND BTC must be equal to the staked asset to cruize protocol.
-
+        print("Start::calculate open close")
         eth_trigger_price = dydx_order_manager.calculate_open_close_price(
             asset_pair="ETH-USD",
             eth_order_size=float(eth_position_size),
@@ -77,7 +77,10 @@ def open_order_on_dydx(eth_trigger_price=None, btc_trigger_price=None):
                 status=eth_open_position,
             )
             print("ETH - Short position is open")
-
+        else:
+            print(
+                f"eth trigger price {eth_trigger_price} is less than market price {eth_market_price}"
+            )
     else:
         if eth_trigger_price >= eth_market_price:
             print("ETH position is already open")
@@ -90,6 +93,7 @@ def open_order_on_dydx(eth_trigger_price=None, btc_trigger_price=None):
 # For ETH
 @app.task(name="close_order_on_dydx", default_retry_delay=4 * 60)
 def close_order_on_dydx(eth_trigger_price=None, btc_trigger_price=None):
+    print("Start::close order on dydx")
     dydx_order_manager = DydxOrderManager(asset_dydx_instance["ETH-USD"])
     eth_open_position = dydx_order_manager.position_status("position_status", "ETHBUSD")
 
@@ -130,7 +134,10 @@ def close_order_on_dydx(eth_trigger_price=None, btc_trigger_price=None):
                 status=eth_open_position,
             )
             print("ETH - Short position is Closed")
-
+        else:
+            print(
+                f"ETH trigger price {eth_trigger_price} is less than market price {eth_market_price}"
+            )
     else:
         if eth_trigger_price >= eth_market_price:
             print("ETH- short position is already Closed")
