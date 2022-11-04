@@ -1,17 +1,16 @@
-version: 0.0
+version: 0.1
 os: linux
 files:
   - source: /
     destination: /home/ubuntu/trident
+
 hooks:
-  ApplicationStop:
-    - location: deployment_scripts/stop.sh
-      timeout: 300
-      runas: root
+
   BeforeInstall:
     - location: deployment_scripts/install_requirements.sh
       timeout: 300
       runas: root
+
   ApplicationStart:
     - location: deployment_scripts/deploy.sh
       timeout: 300
