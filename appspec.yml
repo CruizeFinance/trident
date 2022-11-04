@@ -3,12 +3,17 @@ os: linux
 files:
   - source: /
     destination: /home/ubuntu/trident
+    overwrite: true
+file_exists_behavior: OVERWRITE
 hooks:
   ApplicationStop:
     - location: deployment_scripts/stop.sh
       timeout: 300
       runas: root
   BeforeInstall:
+    - location: deployment_scripts/clean.sh
+        timeout: 300
+        runas: root
     - location: deployment_scripts/install_requirements.sh
       timeout: 300
       runas: root
