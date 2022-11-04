@@ -7,8 +7,7 @@ from tests.constants import SEVEN_DAYS_S
 
 class DydxWithdrawal(object):
     def __init__(self, dydx_client_instance_details):
-        self.dydx_client_instance_details = dydx_client_instance_details
-        self.dydx_client = self.dydx_client_instance_details["dydx_instance"]
+        self.dydx_client = dydx_client_instance_details["dydx_instance"]
 
     """
     :method  -   slow_withdrawal: responsible for withdrawing USDC from dydx . this send an request to dydx contract to withdraw usdc.

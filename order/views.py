@@ -75,7 +75,7 @@ class Order(GenericViewSet):
             return Response(result, status.HTTP_400_BAD_REQUEST)
         except Exception as e:
             e = vars(e)
-            print("this is error", e)
+
             result["error"] = e["msg"]["errors"][0]["msg"]
             return Response(result, status.HTTP_500_INTERNAL_SERVER_ERROR)
 

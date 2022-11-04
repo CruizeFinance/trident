@@ -40,16 +40,17 @@ app.autodiscover_tasks(lambda: settings.INSTALLED_APPS)
 # TODO : need to add time interval for each task .
 app.conf.beat_schedule = {
     "check_withdrawal": {"task": "check_withdrawal", "schedule": 20.0},
-    "open_order_on_dydx": {"task": "open_order_on_dydx", "schedule": 40.0},
-    "close_order_on_dydx": {"task": "close_order_on_dydx", "schedule": 40.0},
+    "open_order_on_dydx": {"task": "open_order_on_dydx", "schedule": 30.0},
+    "close_order_on_dydx": {"task": "close_order_on_dydx", "schedule": 30.0},
     "compute_eth_usdc_volatility": {
         "task": "compute_eth_usdc_volatility",
         "schedule": 30.0,
     },
-    "compute_btc_usdc_volatility": {
-        "task": "compute_btc_usdc_volatility",
-        "schedule": 30.0,
-    },
+    #  we are not using this task ..
+    # "compute_btc_usdc_volatility": {
+    #     "task": "compute_btc_usdc_volatility",
+    #     "schedule": 30.0,
+    # },
     "set_price_floor": {
         "task": "set_price_floor",
         "schedule": 30.0,

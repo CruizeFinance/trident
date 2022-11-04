@@ -72,4 +72,3 @@ class AaveApy(object):
 
 if __name__ == "__main__":
     a = AaveApy()
-    print(a.store_asset_apys())
