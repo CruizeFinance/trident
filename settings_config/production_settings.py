@@ -1,3 +1,6 @@
+import sentry_sdk
+from sentry_sdk.integrations.django import DjangoIntegration
+
 from .common import *
 from django.core.wsgi import get_wsgi_application
 
@@ -24,3 +27,19 @@ ALLOWED_HOSTS = [
 WSGI_APPLICATION = "settings_config.wsgi.application"
 
 application = get_wsgi_application()
+
+# SENTRY SETTINGS
+
+sentry_sdk.init(
+    dsn="https://c538434fedd94111965b0311cb467e87@o1377072.ingest.sentry.io/6687170",
+    integrations=[
+        DjangoIntegration(),
+    ],
+    # Set traces_sample_rate to 1.0 to capture 100%
+    # of transactions for performance monitoring.
+    # We recommend adjusting this value in production.
+    traces_sample_rate=1.0,
+    # If you wish to associate users to errors (assuming you are using
+    # django.contrib.auth) you may enable sending PII data.
+    send_default_pii=True,
+)
