@@ -7,7 +7,7 @@ asyncio==3.4.3
 atomicwrites==1.4.1
 attrs==21.4.0
 backoff==2.2.1
-backports.zoneinfo==0.2.1
+backports.zoneinfo;python_version<"3.9"
 base58==2.1.1
 billiard==3.6.4.0
 binance==0.3
