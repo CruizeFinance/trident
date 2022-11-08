@@ -31,7 +31,7 @@ application = get_wsgi_application()
 # SENTRY SETTINGS
 
 sentry_sdk.init(
-    dsn="https://c538434fedd94111965b0311cb467e87@o1377072.ingest.sentry.io/6687170",
+    dsn="https://7aa93f500f6d418092217e58f8a9557c@o4504123615084544.ingest.sentry.io/4504123647721472",
     integrations=[
         DjangoIntegration(),
     ],
