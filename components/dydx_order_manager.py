@@ -10,6 +10,7 @@ from components.transaction_manager import TransactionManager
 from services import DydxOrder, DydxAdmin
 from services.binance_client.binance_client import BinanceClient
 from services.contracts.chainlink import ChainlinkPriceFeed
+from settings_config import asset_dydx_instance
 from utilities import cruize_constants
 from utilities.enums import AssetCodes
 
@@ -18,7 +19,7 @@ from utilities.enums import AssetCodes
 
 
 class DydxOrderManager:
-    def __init__(self, dydx_client):
+    def __init__(self, dydx_client=None):
         self.dydx_admin = DydxAdmin()
         self.chainlink_price_feed = ChainlinkPriceFeed()
         self.binance_client_obj = BinanceClient()
@@ -276,6 +277,112 @@ class DydxOrderManager:
             return tnx_hash
         except Exception as e:
             raise Exception(e)
+
+    #    open order on dydx celery task algo
+    #     asset type -- ETH-USD,BTC-USD etc
+    def open_order_on_dydx(self, order_details):
+        dydx_asset_instance = asset_dydx_instance[order_details["asset_pair"]]
+        dydx_order_manager = DydxOrderManager(dydx_asset_instance)
+        asset_open_position = dydx_order_manager.position_status(
+            "position_status", order_details["binance_asset_pair"]
+        )
+        data = dydx_order_manager.get_asset_price_and_size(
+            order_details["asset_oracle_address"], dydx_asset_instance
+        )
+        asset_market_price = data["price"]
+
+        asset_position_size = data["size"]
+
+        if order_details["asset_trigger_price"] is None:
+            print("Start::calculate open close")
+            asset_trigger_price = dydx_order_manager.calculate_open_close_price(
+                asset_pair=order_details["asset_pair"],
+                eth_order_size=float(asset_position_size),
+                symbol=order_details["binance_asset_pair"],
+            )
+        else:
+            asset_trigger_price = asset_market_price + 10
+        if asset_open_position is False:
+
+            if asset_trigger_price >= asset_market_price:
+                order_params = dydx_order_manager.create_order_params(
+                    order_details["order_side"],
+                    order_details["asset_pair"],
+                    asset_position_size,
+                    asset_market_price,
+                    dydx_asset_instance,
+                )
+                dydx_order_manager.create_order(order_params, dydx_asset_instance)
+                asset_open_position = True
+                dydx_order_manager.set_position_status(
+                    collection_name="position_status",
+                    symbol=order_details["binance_asset_pair"],
+                    status=asset_open_position,
+                )
+                print(f"{order_details['asset_pair']} - Short position is open")
+            else:
+                print(
+                    f"{order_details['asset_pair']} {asset_trigger_price} is less than market price {asset_market_price}"
+                )
+        else:
+            if asset_trigger_price >= asset_market_price:
+                print(f"{order_details['asset_pair']} position is already open")
+            else:
+                print(
+                    f"{order_details['asset_pair']} trigger price {asset_trigger_price} is less than market price {asset_market_price}"
+                )
+
+    def close_order_on_dydx(self, order_details):
+        dydx_asset_instance = asset_dydx_instance[order_details["asset_pair"]]
+        dydx_order_manager = DydxOrderManager(dydx_asset_instance)
+        asset_open_position = dydx_order_manager.position_status(
+            "position_status", order_details["binance_asset_pair"]
+        )
+        data = dydx_order_manager.get_asset_price_and_size(
+            order_details["asset_oracle_address"], dydx_asset_instance
+        )
+        asset_market_price = data["price"]
+
+        asset_position_size = data["size"]
+
+        if order_details["asset_trigger_price"] is None:
+            print("Start::calculate open close")
+            asset_trigger_price = dydx_order_manager.calculate_open_close_price(
+                asset_pair=order_details["asset_pair"],
+                eth_order_size=float(asset_position_size),
+                symbol=order_details["binance_asset_pair"],
+            )
+        else:
+            asset_trigger_price = asset_market_price - 10
+        if asset_open_position is True:
+            if asset_trigger_price < asset_market_price:
+                order_params = dydx_order_manager.create_order_params(
+                    order_details["order_side"],
+                    order_details["asset_pair"],
+                    asset_position_size,
+                    asset_market_price,
+                    dydx_asset_instance,
+                )
+                dydx_order_manager.create_order(order_params, dydx_asset_instance)
+                asset_open_position = False
+                dydx_order_manager.set_position_status(
+                    collection_name="position_status",
+                    symbol=order_details["binance_asset_pair"],
+                    status=asset_open_position,
+                )
+
+                print(f"{order_details['asset_pair']} - Short position is closed")
+            else:
+                print(
+                    f"{order_details['asset_pair']} trigger price {asset_trigger_price} is greater than market price {asset_market_price}"
+                )
+        else:
+            if asset_trigger_price < asset_market_price:
+                print(f"{order_details['asset_pair']} short position is closed")
+            else:
+                print(
+                    f"{order_details['asset_pair']} trigger price {asset_trigger_price} is less than market price {asset_market_price}"
+                )
 
 
 if __name__ == "__main__":
