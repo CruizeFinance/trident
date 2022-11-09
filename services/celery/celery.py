@@ -146,6 +146,121 @@ def close_order_on_dydx(eth_trigger_price=None, btc_trigger_price=None):
                 f"ETH trigger price {eth_trigger_price} is less than market price {eth_market_price}"
             )
 
+# BTC --> positions
+@app.task(name="open_btc_order_on_dydx", track_started=True)
+def open_btc_order_on_dydx(btc_trigger_price=None):
+    print("Start::open_order_on_dydx")
+    dydx_btc_instance = asset_dydx_instance["BTC-USD"]
+    dydx_order_manager = DydxOrderManager(asset_dydx_instance["BTC-USD"])
+    btc_open_position = dydx_order_manager.position_status("position_status", "BTCBUSD")
+    data = dydx_order_manager.get_asset_price_and_size(
+        cruize_constants.TEST_BTC_USD_ORACLE_ADDRESS, dydx_btc_instance
+    )
+    btc_market_price = data["price"]
+    # we have to change this with the actual btc volume
+    btc_position_size = data["size"]
+
+    # TODO: write a formula to calculate  the trigger_price
+
+    if btc_trigger_price is None:
+        # here we will keep our trigger price formulas
+        #  TODO:size must  change of ETH and BTC .
+        #   size of ETH AND BTC must be equal to the staked asset to cruize protocol.
+        print("Start::calculate open close")
+        btc_trigger_price = dydx_order_manager.calculate_open_close_price(
+            asset_pair="ETH-USD",
+            eth_order_size=float(btc_position_size),
+            symbol="BTCBUSD",
+        )
+
+    else:
+        btc_trigger_price = btc_market_price + 10
+
+    if btc_open_position is False:
+        if btc_trigger_price >= btc_market_price:
+            order_params = dydx_order_manager.create_order_params(
+                constants.ORDER_SIDE_SELL,
+                constants.MARKET_BTC_USD,
+                btc_position_size,
+                btc_market_price,
+                dydx_btc_instance,
+            )
+            dydx_order_manager.create_order(order_params, dydx_btc_instance)
+            btc_open_position = True
+            dydx_order_manager.set_position_status(
+                collection_name="position_status",
+                symbol="BTCBUSD",
+                status=btc_open_position,
+            )
+            print("BTC - Short position is open")
+        else:
+            print(
+                f"BTC trigger price {btc_trigger_price} is less than market price {btc_market_price}"
+            )
+    else:
+        if btc_trigger_price >= btc_market_price:
+            print("BTC position is already open")
+        else:
+            print(
+                f"BTC trigger price {btc_trigger_price} is less than market price {btc_market_price}"
+            )
+
+@app.task(name="close_order_on_dydx", default_retry_delay=4 * 60)
+def close_btc_order_on_dydx(btc_trigger_price=None):
+    print("Start::close order on dydx")
+    dydx_order_manager = DydxOrderManager(asset_dydx_instance["BTC-USD"])
+    btc_open_position = dydx_order_manager.position_status("position_status", "BTCBUSD")
+
+    dydx_eth_instance = asset_dydx_instance["BTC-USD"]
+
+    asset_data = dydx_order_manager.get_asset_price_and_size(
+        cruize_constants.TEST_BTC_USD_ORACLE_ADDRESS, dydx_eth_instance
+    )
+    btc_market_price = asset_data["price"]
+    # we have to change this with the actual btc volume
+    btc_position_size = asset_data["size"]
+
+    if btc_trigger_price is None:
+
+        btc_trigger_price = dydx_order_manager.calculate_open_close_price(
+            "ETH-USD", btc_position_size, "ETHBUSD"
+        )
+
+    else:
+        # for testing
+        btc_trigger_price = btc_market_price - 10
+
+    if btc_open_position is True:
+        if btc_trigger_price < btc_market_price:
+
+            order_params = dydx_order_manager.create_order_params(
+                constants.ORDER_SIDE_BUY,
+                constants.MARKET_BTC_USD,
+                btc_position_size,
+                btc_market_price,
+                dydx_eth_instance,
+            )
+            dydx_order_manager.create_order(order_params, dydx_eth_instance)
+            btc_open_position = False
+            dydx_order_manager.set_position_status(
+                collection_name="position_status",
+                symbol="BTCBUSD",
+                status=btc_open_position,
+            )
+            print("BTC - Short position is Closed")
+        else:
+            print(
+                f"BTC trigger price {btc_trigger_price} is less than market price {btc_market_price}"
+            )
+    else:
+        if btc_trigger_price >= btc_market_price:
+            print("BTC- short position is already Closed")
+        else:
+            print(
+                f"BTC trigger price {btc_trigger_price} is less than market price {btc_market_price}"
+            )
+
+
 
 @app.task(
     name="compute_eth_usdc_volatility",

@@ -2,7 +2,7 @@ import time
 
 from django.test import TestCase
 
-from services.celery.celery import open_order_on_dydx, close_order_on_dydx
+from services.celery.celery import open_order_on_dydx, close_btc_order_on_dydx
 from services.contracts.cruize.cruize_contract import Cruize
 
 
@@ -25,7 +25,7 @@ class TestCruizeWorkflow(TestCase):
     def test_open_and_close_position(self):
         open_order_on_dydx("1500")
         time.sleep(30)
-        close_order_on_dydx("1500")
+        close_btc_order_on_dydx()
 
     def test_repay_cruize(self):
         self.cruize = Cruize()
