@@ -17,16 +17,18 @@ class PriceFloorManager:
                 prices.append(asset_price_data["prices"][i][1])
             prices.sort(reverse=True)
             asset_peak_price = prices[0]
-            asset_peak_price = asset_peak_price * 0.85
+            current_price_floor  = asset_peak_price * 0.60
+            #TODO: if  perivous_price_floor < current_price_floor : update the price floor, else don't update
+            # get price floor
             firebase_data_manager_obj.store_data(
                 data={
                     "id": asset_name,
-                    "price_floor": asset_peak_price,
+                    "price_floor": current_price_floor,
                 },
                 document=asset_name,
                 collection_name="price_floor_data",
             )
-            return asset_peak_price
+
         except Exception as e:
             raise Exception(e)
 
@@ -53,4 +55,4 @@ class PriceFloorManager:
 
 if __name__ == "__main__":
     a = PriceFloorManager()
-    print(a.get_assets_price_floors())
+    print(a.set_price_floor('bitcoin'))
