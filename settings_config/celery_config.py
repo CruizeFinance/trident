@@ -1,6 +1,7 @@
 from __future__ import absolute_import, unicode_literals
 import os
 from celery import Celery
+from celery.schedules import crontab
 from django.conf import settings
 
 os.environ.setdefault("DJANGO_SETTINGS_MODULE", "settings_config.production_settings")
@@ -54,7 +55,7 @@ app.conf.beat_schedule = {
     },
     "set_price_floor": {
         "task": "set_price_floor",
-        "schedule": 30.0,
+        "schedule": crontab(day_of_month="1", hour=7, minute=30),
     },
     "store_asset_apy": {"task": "store_asset_apy", "schedule": 30},
 }
