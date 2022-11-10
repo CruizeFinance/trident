@@ -33,7 +33,7 @@ def check_withdrawal():
 ## For ETH
 @app.task(name="open_eth_order_on_dydx", track_started=True)
 def open_eth_order_on_dydx(eth_trigger_price=None):
-    print("Start::open_order_on_dydx")
+    print("Start::open eth order on dydx")
     dydx_order_manager_obj = DydxOrderManager()
     asset_details = {
         "asset_trigger_price": None,
@@ -52,7 +52,7 @@ def open_eth_order_on_dydx(eth_trigger_price=None):
 def close_eth_order_on_dydx(
     eth_trigger_price=None,
 ):
-    print("Start::close order on dydx")
+    print("Start::close eth order on dydx")
     dydx_order_manager_obj = DydxOrderManager()
     asset_details = {
         "asset_trigger_price": None,
@@ -69,7 +69,7 @@ def close_eth_order_on_dydx(
 # BTC --> positions
 @app.task(name="open_btc_order_on_dydx", track_started=True)
 def open_btc_order_on_dydx(btc_trigger_price=None):
-    print("Start::open order on dydx")
+    print("Start::open btc order on dydx")
     dydx_order_manager_obj = DydxOrderManager()
     asset_details = {
         "asset_trigger_price": None,
@@ -85,7 +85,7 @@ def open_btc_order_on_dydx(btc_trigger_price=None):
 
 @app.task(name="close_btc_order_on_dydx", default_retry_delay=4 * 60)
 def close_btc_order_on_dydx(btc_trigger_price=None):
-    print("Start::close order on dydx")
+    print("Start::close btc order on dydx")
     dydx_order_manager_obj = DydxOrderManager()
     asset_details = {
         "asset_trigger_price": None,
@@ -94,7 +94,7 @@ def close_btc_order_on_dydx(btc_trigger_price=None):
         "order_side": "BUY",
         "asset_oracle_address": cruize_constants.TEST_BTC_USD_ORACLE_ADDRESS,
     }
-    if btc_trigger_price is not  None:
+    if btc_trigger_price is not None:
         asset_details["asset_trigger_price"] = 0
     dydx_order_manager_obj.close_order_on_dydx(asset_details)
 

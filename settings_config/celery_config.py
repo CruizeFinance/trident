@@ -48,11 +48,10 @@ app.conf.beat_schedule = {
         "task": "compute_eth_usdc_volatility",
         "schedule": 30.0,
     },
-    #  we are not using this task ..
-    # "compute_btc_usdc_volatility": {
-    #     "task": "compute_btc_usdc_volatility",
-    #     "schedule": 30.0,
-    # },
+    "compute_btc_usdc_volatility": {
+        "task": "compute_btc_usdc_volatility",
+        "schedule": 30.0,
+    },
     "set_price_floor": {
         "task": "set_price_floor",
         "schedule": 30.0,
