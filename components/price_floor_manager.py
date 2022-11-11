@@ -17,8 +17,8 @@ class PriceFloorManager:
                 prices.append(asset_price_data["prices"][i][1])
             prices.sort(reverse=True)
             asset_peak_price = prices[0]
-            current_price_floor  = asset_peak_price * 0.60
-            #TODO: if  perivous_price_floor < current_price_floor : update the price floor, else don't update
+            current_price_floor = asset_peak_price * 0.60
+            # TODO: if  perivous_price_floor < current_price_floor : update the price floor, else don't update
             # get price floor
             firebase_data_manager_obj.store_data(
                 data={
@@ -55,4 +55,4 @@ class PriceFloorManager:
 
 if __name__ == "__main__":
     a = PriceFloorManager()
-    print(a.set_price_floor('bitcoin'))
+    print(a.set_price_floor("bitcoin"))

@@ -75,7 +75,6 @@ class DydxOrderManager:
         ema_data = self.firebase_data_manager_obj.fetch_data(
             collection_name="ema_data", document_name=symbol
         )
-
         ema = ema_data.get("ema")
         # K must change ,K being variable will cover price movement
         # within 30s under normal market conditions
@@ -319,7 +318,9 @@ class DydxOrderManager:
                     symbol=order_details["binance_asset_pair"],
                     status=is_position_open,
                 )
-                print(f"DydxOrderManager:: {order_details['asset_pair']} - Short position is open")
+                print(
+                    f"DydxOrderManager:: {order_details['asset_pair']} - Short position is open"
+                )
             else:
                 print(
                     f"DydxOrderManager:: { order_details['asset_pair']} {asset_trigger_price} is less than market price {asset_market_price}"
@@ -369,14 +370,18 @@ class DydxOrderManager:
                     status=is_position_open,
                 )
 
-                print(f"class::DydxOrderManager {order_details['asset_pair']} - Short position is closed")
+                print(
+                    f"class::DydxOrderManager {order_details['asset_pair']} - Short position is closed"
+                )
             else:
                 print(
                     f"DydxOrderManager:: {order_details['asset_pair']} trigger price {asset_trigger_price} is greater than market price {asset_market_price}"
                 )
         else:
             if asset_trigger_price < asset_market_price:
-                print(f"DydxOrderManager:: {order_details['asset_pair']} short position is closed")
+                print(
+                    f"DydxOrderManager:: {order_details['asset_pair']} short position is closed"
+                )
             else:
                 print(
                     f"DydxOrderManager::{order_details['asset_pair']} trigger price {asset_trigger_price} is less than market price {asset_market_price}"
@@ -384,5 +389,9 @@ class DydxOrderManager:
 
 
 if __name__ == "__main__":
-    a = DydxOrderManager(None)
-    a.market_volatility("ETHBUSD")
+    a = DydxOrderManager(asset_dydx_instance["ETH-USD"])
+    a = a.calculate_open_close_price(
+        asset_pair="ETH-USD", eth_order_size=10, symbol="ETHBUSD"
+    )
+    print(a)
+    # print(a.market_volatility(symbol="ETHBUSD"))
