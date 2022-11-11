@@ -13,7 +13,7 @@ from cruize_operations import (
 from cruize_operations.serilaizer import TvlSerializer
 from services.avve_asset_apy import AaveApy
 from services.contracts.cruize.cruize_contract import Cruize
-from utilities import cruize_constants
+
 
 price_floor_manager = PriceFloorManager()
 
@@ -95,10 +95,10 @@ class CruizeOperations(GenericViewSet):
             return Response(result, status.HTTP_500_INTERNAL_SERVER_ERROR)
 
     def price_floor(self, request):
-        result = {"result": None, "error": None}
+        result = {"message": None, "error": None}
         try:
 
-            result["result"] = price_floor_manager.get_assets_price_floors()
+            result["message"] = price_floor_manager.get_assets_price_floors()
             return Response(result, status.HTTP_200_OK)
         except Exception as e:
             result["error"] = e
@@ -109,10 +109,10 @@ class CruizeOperations(GenericViewSet):
         serializer = serializer_class(data=request.data)
         serializer.is_valid(raise_exception=True)
         asset_data = serializer.data
-        result = {"result": None, "error": None}
+        result = {"message": None, "error": None}
         try:
 
-            result["result"] = price_floor_manager.set_price_floor(
+            result["message"] = price_floor_manager.set_price_floor(
                 asset_data["asset_name"], asset_data["days"]
             )
             return Response(result, status.HTTP_200_OK)
@@ -121,10 +121,10 @@ class CruizeOperations(GenericViewSet):
             return Response(result, status.HTTP_500_INTERNAL_SERVER_ERROR)
 
     def fetch_asset_apy(self, request):
-        result = {"result": None, "error": None}
+        result = {"message": None, "error": None}
         try:
             aave_apy_obj = AaveApy()
-            result["result"] = aave_apy_obj.fetch_asset_apys()
+            result["message"] = aave_apy_obj.fetch_asset_apys()
             return Response(result, status.HTTP_200_OK)
         except Exception as e:
             result["error"] = e
@@ -135,11 +135,11 @@ class CruizeOperations(GenericViewSet):
         serializer = serializer_class(data=request.data)
         serializer.is_valid(raise_exception=True)
         asset_data = serializer.validated_data
-        result = {"result": None, "error": None}
+        result = {"message": None, "error": None}
         try:
             cruize_data_manager_obj = CruizeDataManager()
             cruize_data_manager_obj.save_asset_tvl(asset_data)
-            result["result"] = "success"
+            result["message"] = "success"
             return Response(result, status.HTTP_200_OK)
         except Exception as e:
             result["error"] = e

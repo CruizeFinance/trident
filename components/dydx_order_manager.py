@@ -1,6 +1,5 @@
 import time
 from datetime import datetime, timedelta
-
 import pandas
 from dateutil.relativedelta import relativedelta
 from dydx3 import constants
@@ -15,7 +14,10 @@ from utilities import cruize_constants
 from utilities.enums import AssetCodes
 
 
-# class: DydxOrderManager - is responsible for managing order on dydx.
+"""class::DydxOrderManager is responsible for managing operation on Dydx 
+  such us opening and closing  order on dydx, calculating open and close price for position,
+  computing market volatility for an asset etc, to perform all of these task there are function written is  the class 
+ """
 
 
 class DydxOrderManager:
@@ -27,15 +29,26 @@ class DydxOrderManager:
         self.firebase_data_manager_obj = FirebaseDataManager()
         self.dydx_client = dydx_client
 
+    """ 
+    method :: create_order -  is used to open and close orders on dydx. 
+    params :: order_params - contains all the necessary parameter to open an order on dydx. 
+    params :: dydx_client -  is a dydx client. with the help of this 
+              client we perform operation on dydx it's different for the different asset. 
+    """
+
     def create_order(self, order_params, dydx_client):
         dydx_order = DydxOrder()
-        # we have to keep separate volume of btc and eth to open different position on dydx.
-        # total_btc_volume * 5 --> would be the open size for the btc
-        # total_eth_volume * 5 --> would be the open size for eth
         order_information = dydx_order.create_order(order_params, dydx_client)
         dydx_order_details = vars(order_information)
         dydx_order_details = dydx_order_details["data"]["order"]
         return dydx_order_details
+
+    """ 
+      method :: calculate_open_close_price -  is used to  calculate the open and close price for  orders on dydx. 
+      params :: asset_pair - is the pair of asset such as ETH-USD,BTC-USD. 
+      params :: eth_order_size -  it is the size of the order for which we have to calculate the open and close price.
+      params :: symbol -  symbol is the sign for the asset ETH-USD,LINK-USD.
+      """
 
     def calculate_open_close_price(self, asset_pair, eth_order_size, symbol):
         bids_consumed = 0
@@ -116,10 +129,10 @@ class DydxOrderManager:
         return order_params
 
     """
-      :method   - calculate_asst_volume.
-      :params   - market_price:current market price of asset.
-      :params   - total_volume:total volume of asset.
-      :return   - asset total value in usd.
+       method :: get_asset_price_and_size -  is used to get the total equity of an asset multiply by leverage and the market price of an asset.
+       params :: asset_address - is the  chainlink Oracal address .
+       params :: dydx_client -  is a dydx client. with the help of this client we perform operation on dydx it's different for the different asset.
+       return :: asset total equity in dydx multiply by leverage  and the market price of the asset. 
     """
 
     def get_asset_price_and_size(self, asset_address, dydx_client):
@@ -136,6 +149,12 @@ class DydxOrderManager:
 
         return asset_details
 
+    """
+          method :: compute_market_volatility -  is used compute the market volatility for an asset.
+          params :: prices_data - an array of 6 months price data.
+          return :: sigma ema and mu ema for an given asset price data.
+    """
+
     def compute_market_volatility(self, prices_data):
         volatility_data = {"sigma_ema": None, "mu_ema": None}
         percentage_EMA = []
@@ -148,6 +167,11 @@ class DydxOrderManager:
         volatility_data["sigma_ema"] = float(sigma_ema)
         volatility_data["mu_ema"] = float(mu_ema)
         return volatility_data
+
+    """
+          method :: market_volatility -  is used compute the market volatility for an asset.
+          params :: symbol - symbol of an asset such as ETH-USD, BTC-USD.
+     """
 
     def market_volatility(self, symbol):
         volatility_data = {}
@@ -223,6 +247,13 @@ class DydxOrderManager:
             data={"ema": volatility_data}, document=symbol, collection_name="ema_data"
         )
 
+    """
+           method :: position_status -  is used to get open position status on dydx for an asset.
+           params :: collection_name - collection for the asset ex ETHBUSD,BTCBUSD.
+           params :: symbol -  symbol of an asset such as ETH-USD, BTC-USD.
+           return ::  True if the short position is open on dydx  else False.
+     """
+
     def position_status(self, collection_name, symbol):
 
         #  fetch data from db
@@ -238,6 +269,14 @@ class DydxOrderManager:
             return False
         return position_status[symbol]
 
+    """
+           method :: set_position_status -  is used to set open position status on dydx for an asset.
+           params :: collection_name - collection for the asset ex ETHBUSD,BTCBUSD.
+           params :: symbol -  symbol of an asset such as ETH-USD, BTC-USD.
+           params :: status -  status of an position ex. True or false.
+           return ::  None.
+    """
+
     def set_position_status(self, collection_name, symbol, status):
         #  store data to db
         self.firebase_data_manager_obj.store_data(
@@ -247,6 +286,13 @@ class DydxOrderManager:
     def deposit_test_fund(self, dydx_client):
         dydx_p_client = dydx_client["dydx_instance"]
         return dydx_p_client.private.request_testnet_tokens()
+
+    """
+            method :: deposit_to_dydx -  is used to deposit USDC to dydx.
+            params :: amount - USDC value in number.
+            params ::dydx_client -  is a dydx client. with the help of this client we perform operation on dydx it's different for the different asset.
+            return ::  transaction hash for deposit transaction.
+     """
 
     def deposit_to_dydx(self, amount, dydx_client):
         try:
@@ -264,6 +310,13 @@ class DydxOrderManager:
         except Exception as e:
             raise Exception(e)
 
+    """
+             method :: withdraw_from_dydx -  is used to withdraw USDC from dydx.
+             params :: recipient_address - the account in which we want to withdraw fund.
+             params ::dydx_client -  is a dydx client. with the help of this client we perform operation on dydx it's different for the different asset.
+             return ::  transaction hash for deposit transaction.
+      """
+
     def withdraw_from_dydx(self, recipient_address, dydx_client):
         try:
             dydx_p_client = dydx_client["dydx_instance"]
@@ -278,8 +331,11 @@ class DydxOrderManager:
         except Exception as e:
             raise Exception(e)
 
-    #    open order on dydx celery task algo
-    #     asset type -- ETH-USD,BTC-USD etc
+    """ 
+      method :: open_order_on_dydx -  is used to open orders on dydx. it has  algorithm to open order's on dydx  
+      params :: order_details - contains all the necessary parameter to open an order on dydx. 
+      """
+
     def open_order_on_dydx(self, order_details):
         dydx_asset_instance = asset_dydx_instance[order_details["asset_pair"]]
         dydx_order_manager = DydxOrderManager(dydx_asset_instance)

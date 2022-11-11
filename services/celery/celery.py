@@ -30,7 +30,7 @@ def check_withdrawal():
             # need to send an notification for the order conformation
 
 
-## For ETH
+# Task ::  open_eth_order_on_dydx - is used to open eth order on dydx
 @app.task(name="open_eth_order_on_dydx", track_started=True)
 def open_eth_order_on_dydx(eth_trigger_price=None):
     print("Start::open eth order on dydx")
@@ -47,7 +47,7 @@ def open_eth_order_on_dydx(eth_trigger_price=None):
     dydx_order_manager_obj.open_order_on_dydx(asset_details)
 
 
-# For ETH
+# Task ::  close_eth_order_on_dydx - is used to close eth order on dydx
 @app.task(name="close_eth_order_on_dydx", default_retry_delay=4 * 60)
 def close_eth_order_on_dydx(
     eth_trigger_price=None,
@@ -66,7 +66,7 @@ def close_eth_order_on_dydx(
     dydx_order_manager_obj.close_order_on_dydx(asset_details)
 
 
-# BTC --> positions
+# Task ::  open_btc_order_on_dydx - is used to open btc order on dydx
 @app.task(name="open_btc_order_on_dydx", track_started=True)
 def open_btc_order_on_dydx(btc_trigger_price=None):
     print("Start::open btc order on dydx")
@@ -83,6 +83,7 @@ def open_btc_order_on_dydx(btc_trigger_price=None):
     dydx_order_manager_obj.open_order_on_dydx(asset_details)
 
 
+# Task ::  close_btc_order_on_dydx - is used to close btc order on dydx
 @app.task(name="close_btc_order_on_dydx", default_retry_delay=4 * 60)
 def close_btc_order_on_dydx(btc_trigger_price=None):
     print("Start::close btc order on dydx")
@@ -99,6 +100,7 @@ def close_btc_order_on_dydx(btc_trigger_price=None):
     dydx_order_manager_obj.close_order_on_dydx(asset_details)
 
 
+# Task ::  compute_eth_usdc_volatility - is used to compute eth usdc volatility.
 @app.task(
     name="compute_eth_usdc_volatility",
 )
@@ -114,6 +116,9 @@ def compute_eth_usdc_volatility():
     print("time all", end_time - current_time)
 
 
+# Task ::  compute_btc_usdc_volatility - is used to compute btc usdc volatility.
+
+
 @app.task(
     name="compute_btc_usdc_volatility",
 )
@@ -124,6 +129,7 @@ def compute_btc_usdc_volatility():
     print("End::compute_btc_usdc_volatility")
 
 
+# Task ::  set_price_floor - is used to set the price.
 # TODO: set price floor for other asset's too.
 @app.task(
     name="set_price_floor",
@@ -135,6 +141,7 @@ def set_price_floor():
     price_floor_manager_obj.set_price_floor("bitcoin")
 
 
+# Task ::  store_asset_apys - is used to store assets apys.
 @app.task(name="store_asset_apy")
 def store_asset_apys():
     print("store_asset_apys :: Setting apy")

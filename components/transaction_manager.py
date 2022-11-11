@@ -4,11 +4,20 @@ from web3.gas_strategies import time_based
 from services.contracts import LoadContracts
 from utilities import cruize_constants
 
+"""class :: TransactionManager -  is used to manage the on chain transactions for our dydx wallets."""
+
 
 class TransactionManager:
     def __init__(self):
         self.load_contract = LoadContracts()
         self.w3 = self.load_contract.web3_provider()
+
+    """
+       method :: sign_transactions - is used to sing transactions for wallets.
+       params :: transaction -  is the transaction details.
+       params :: private_key - private key of cruize wallet.
+       returns :: sing transaction.
+    """
 
     def sign_transactions(self, transaction, private_key):
         signed_transaction = self.w3.eth.account.sign_transaction(
@@ -18,6 +27,18 @@ class TransactionManager:
             signed_transaction.rawTransaction
         )
         return str(self.w3.toHex(transaction_hash))
+
+    """
+          method :: create_transaction - is used to create transactions for wallets.
+          params :: nonce -  nonce of cruize wallets.
+          params :: private_key - private key of cruize wallet.
+          params ::  max_fee_per_gas - max fee per gas for transactions.
+          params :: from_account - wallet address.
+          params :: chain_id - id for chain.
+          params ::  eth_value - value of eth in the transactions.
+          return :: transaction.
+          
+       """
 
     def create_transaction(
         self,
@@ -40,6 +61,11 @@ class TransactionManager:
             transaction["value"] = self.w3.toWei(eth_value, "ether")
         return transaction
 
+    """
+        method :: transaction_gas_price - is used to predict the transactions  gas fee.
+        returns ::transaction gas price.
+     """
+
     def transaction_gas_price(self, max_wait_seconds, sample_size, probability):
         price_strategy = self.get_gas_price_strategy(
             max_wait_seconds, sample_size, probability
@@ -59,6 +85,12 @@ class TransactionManager:
             )
         )
         return price_strategy
+
+    """
+        method :: build_transaction  - is used to build the transactions .
+        params :: wallet_address - wallet address of cruize wallet.
+        returns :: build transaction 
+     """
 
     def build_transaction(self, wallet_address, eth_value=None):
         gas_price = self.transaction_gas_price(

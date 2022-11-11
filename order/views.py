@@ -7,8 +7,10 @@ from order.serializers import (
     OrderRequestSerializer,
     CancelOrderRequestSerializer,
     FirestoreOrdersRequestSerializer,
+    DydxAllOrdersRequestSerializer,
 )
 from services import DydxOrder, DydxAdmin
+from settings_config import dydx_p_client_obj, asset_dydx_instance
 from utilities.error_handler import ErrorHandler
 
 
@@ -38,9 +40,12 @@ class Order(GenericViewSet):
                 order_data["market"],
                 order_data["size"],
                 order_data["price"],
+                dydx_p_client_obj["side"],
             )
 
-            dydx_order_details = self.dydx_order_obj.create_order(order_data)
+            dydx_order_details = self.dydx_order_obj.create_order(
+                order_data, asset_dydx_instance["side"]
+            )
 
             dydx_order_details = vars(dydx_order_details)
             result["message"] = dydx_order_details["data"]["order"]
@@ -84,12 +89,15 @@ class Order(GenericViewSet):
     """
 
     def dydx_order(self, request):
-
         result = {"message": None, "error": None}
+        self.serializer_class = DydxAllOrdersRequestSerializer
+        serializer = self.serializer_class(data=request.data)
+        serializer.is_valid(raise_exception=True)
+        validate_data = serializer.data
         dydx_admin_obj = DydxAdmin()
         error_handler = ErrorHandler()
         try:
-            orders = dydx_admin_obj.get_account()
+            orders = dydx_admin_obj.get_account(validate_data["type"])
             orders = vars(orders)
             orders_data = orders["data"]["account"]["openPositions"]
             if not orders_data:
