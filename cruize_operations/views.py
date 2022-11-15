@@ -55,13 +55,12 @@ class CruizeOperations(GenericViewSet):
         serializer.is_valid(raise_exception=True)
         deposit_data = serializer.data
         firebase_db_obj = FirebaseDataManager()
-
         try:
             cruize_data_manager_obj = CruizeDataManager()
             asset_data = {
-                "asset_name": deposit_data.get("assset_name"),
+                "asset_name": deposit_data.get("asset_name"),
                 "type": deposit_data.get("type"),
-                "ammount": deposit_data.get("amount"),
+                "amount": deposit_data.get("amount"),
             }
             cruize_data_manager_obj.save_asset_tvl(asset_data=asset_data)
             firebase_db_obj.store_sub_collections(

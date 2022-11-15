@@ -319,7 +319,9 @@ class DydxOrderManager:
                     symbol=order_details["binance_asset_pair"],
                     status=is_position_open,
                 )
-                print(f"DydxOrderManager:: {order_details['asset_pair']} - Short position is open")
+                print(
+                    f"DydxOrderManager:: {order_details['asset_pair']} - Short position is open"
+                )
             else:
                 print(
                     f"DydxOrderManager:: { order_details['asset_pair']} {asset_trigger_price} is less than market price {asset_market_price}"
@@ -369,14 +371,18 @@ class DydxOrderManager:
                     status=is_position_open,
                 )
 
-                print(f"class::DydxOrderManager {order_details['asset_pair']} - Short position is closed")
+                print(
+                    f"class::DydxOrderManager {order_details['asset_pair']} - Short position is closed"
+                )
             else:
                 print(
                     f"DydxOrderManager:: {order_details['asset_pair']} trigger price {asset_trigger_price} is greater than market price {asset_market_price}"
                 )
         else:
             if asset_trigger_price < asset_market_price:
-                print(f"DydxOrderManager:: {order_details['asset_pair']} short position is closed")
+                print(
+                    f"DydxOrderManager:: {order_details['asset_pair']} short position is closed"
+                )
             else:
                 print(
                     f"DydxOrderManager::{order_details['asset_pair']} trigger price {asset_trigger_price} is less than market price {asset_market_price}"
