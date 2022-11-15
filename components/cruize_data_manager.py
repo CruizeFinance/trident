@@ -10,21 +10,27 @@ class CruizeDataManager(object):
         asset_tvl_data = firebase_db_manager_obj.fetch_data(
             collection_name="assets_volume", document_name=asset_data["asset_name"]
         )
+        tvl_data = {"name": None, "amount": None}
         if asset_tvl_data is not None:
             asset_tvl_amount = float(asset_tvl_data["amount"])
             asset_data["amount"] = float(asset_data["amount"])
             if asset_data["type"] == "protect":
                 asset_tvl_amount += asset_data["amount"]
+
             else:
                 asset_tvl_amount -= asset_data["amount"]
-            tvl_data = {"name": None, "amount": None}
             tvl_data["name"] = asset_data["asset_name"]
             tvl_data["amount"] = asset_tvl_amount
-            firebase_db_manager_obj.store_data(
-                collection_name="assets_volume",
-                document=asset_data["asset_name"],
-                data=tvl_data,
-            )
+
+        else:
+            tvl_data["name"] = asset_data["asset_name"]
+            tvl_data["amount"] = asset_data["amount"]
+
+        firebase_db_manager_obj.store_data(
+            collection_name="assets_volume",
+            document=asset_data["asset_name"],
+            data=tvl_data,
+        )
 
     def fetch_user_transactions(self, user_data):
         firebase_db_obj = FirebaseDataManager()
@@ -32,9 +38,8 @@ class CruizeDataManager(object):
             cruize_constants.CRUIZE_USER, user_data["wallet_address"], "transactions"
         )
         if not firebase_data:
-            raise ValidationError(
-                f"No data found for wallet address: {user_data['wallet_address']}"
-            )
+            return f"No data found for wallet address: {user_data['wallet_address']}"
+
         data = []
         if data is not None:
             for tnx_data in firebase_data:
