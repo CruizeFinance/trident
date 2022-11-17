@@ -75,7 +75,6 @@ class DydxOrderManager:
         ema_data = self.firebase_data_manager_obj.fetch_data(
             collection_name="ema_data", document_name=symbol
         )
-
         ema = ema_data.get("ema")
         # K must change ,K being variable will cover price movement
         # within 30s under normal market conditions
@@ -390,5 +389,9 @@ class DydxOrderManager:
 
 
 if __name__ == "__main__":
-    a = DydxOrderManager(None)
-    a.market_volatility("ETHBUSD")
+    a = DydxOrderManager(asset_dydx_instance["ETH-USD"])
+    a = a.calculate_open_close_price(
+        asset_pair="ETH-USD", eth_order_size=10, symbol="ETHBUSD"
+    )
+    print(a)
+    # print(a.market_volatility(symbol="ETHBUSD"))
