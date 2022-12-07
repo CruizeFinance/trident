@@ -4,23 +4,45 @@ import time
 from services.firebase_cloud_client import FirebaseClient
 from settings_config import firebase_client
 
+"""class :: FirebaseDataManager is used to manage the firebase db oprations such as storing,fetching and updating the 
+data. """
+
 
 class FirebaseDataManager(object):
     def __init__(self):
         self.firebase_client = firebase_client
+
+    """method :: get_firebase_client -  is used to get the firebase client.
+       return :: firebase client.
+    """
 
     def get_firebase_client(self):
         if self.firebase_client is None:
             self.firebase_client = FirebaseClient().get_firebase_client
         return self.firebase_client
 
+    """
+    method :: update_data -  is used to update the data on firebase db 
+    return :: None.
+    """
+
     def update_data(self, order_id, collection, data):
         self.firebase_client = self.get_firebase_client()
         self.firebase_client.collection(collection).document(order_id).update(data)
 
+    """
+    method :: store_data -  is used to store the data on firebase db 
+    return :: None.
+    """
+
     def store_data(self, data, document, collection_name):
         self.firebase_client = self.get_firebase_client()
         self.firebase_client.collection(collection_name).document(document).set(data)
+
+    """
+      method :: bulk_store -  is used to store the data on firebase db  in bulk .
+      return :: None.
+      """
 
     def bulk_store(self, data, collection_name, field):
         self.firebase_client = self.get_firebase_client()
@@ -30,6 +52,11 @@ class FirebaseDataManager(object):
             batch.set(write, {field: str(value)})
         batch.commit()
 
+    """
+        method :: store_sub_collections  -  is used to store sub_collections the data on firebase db  .
+        return :: None.
+    """
+
     def store_sub_collections(
         self, data, collection, document_name, sub_collection, sub_document
     ):
@@ -38,6 +65,11 @@ class FirebaseDataManager(object):
         self.firebase_client.collection(collection).document(document_name).collection(
             sub_collection
         ).document(sub_document).set(data)
+
+    """
+        method :: fetch_sub_collections  - is used to fetch sub_collections from the firebase db  .
+        return :: data of sub collection.
+    """
 
     def fetch_sub_collections(self, collection, document_name, sub_collection):
         self.firebase_client = self.get_firebase_client()
@@ -49,6 +81,11 @@ class FirebaseDataManager(object):
         )
         return firebase_data
 
+    """
+         method :: fetch_data  - is used to fetch data from the firebase db  .
+         return ::  collection data.
+     """
+
     def fetch_data(self, collection_name, document_name):
         self.firebase_client = self.get_firebase_client()
         firebase_data = (
@@ -59,6 +96,11 @@ class FirebaseDataManager(object):
         if firebase_data is not None:
             firebase_data = vars(firebase_data)
         return firebase_data.get("_data", None)
+
+    """
+            method :: fetch_collections  - is used to fetch collections  from the firebase db  .
+            return ::  collection .
+        """
 
     def fetch_collections(self, collection_name):
         self.firebase_client = self.get_firebase_client()

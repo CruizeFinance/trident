@@ -1,5 +1,6 @@
 #!/bin/bash
 
+# this file used while deploying the app on sever  to install required dependency to run the app .
 sudo apt-get install python3-pip python3-dev nginx
 sudo apt-get install -y python-psycopg2 libncurses5-dev libffi libffi-devel libxml2-devel libxslt-devel libxslt1-dev
 sudo apt-get install -y python-lxml python-devel gcc patch python-setuptools

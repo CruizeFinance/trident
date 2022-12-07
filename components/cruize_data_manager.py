@@ -3,8 +3,19 @@ from rest_framework.exceptions import ValidationError
 from components import FirebaseDataManager
 from utilities import cruize_constants
 
+"""
+class :: CruizeDataManager - is used to manage the db data operation for backend. such as storing data on db, getting data form db etc.
+"""
+
 
 class CruizeDataManager(object):
+
+    """
+    method :: save_asset_tvl - is used to store total TLV of an asset.
+    params :: asset_data -  contain the details of asset TLV.
+    return :: None
+    """
+
     def save_asset_tvl(self, asset_data):
         firebase_db_manager_obj = FirebaseDataManager()
         asset_tvl_data = firebase_db_manager_obj.fetch_data(
@@ -31,6 +42,12 @@ class CruizeDataManager(object):
             document=asset_data["asset_name"],
             data=tvl_data,
         )
+
+    """
+        method :: fetch_user_transactions - is used to fetch the user's transaction from DB .
+        params :: user_data -  contain the details of user's such as user's wallet address.
+        return :: user's transaction.
+    """
 
     def fetch_user_transactions(self, user_data):
         firebase_db_obj = FirebaseDataManager()

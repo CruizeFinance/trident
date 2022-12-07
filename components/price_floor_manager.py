@@ -2,9 +2,18 @@ from components import FirebaseDataManager
 from services.market_data.coingecko import CoinGecko
 
 firebase_data_manager_obj = FirebaseDataManager()
+"""class ::  PriceFloorManager is used to manage the price floor data such  a setting up price floor , retrieving price floor.
+etc. 
+"""
 
 
 class PriceFloorManager:
+    """
+    method :: set_price_floor - is used to set the price floor of an given asset.
+    params :: asset_name - name of the asset such as bitcoin etc.
+    params :: number_of_days -  for how much time you want to calculate the price floor.
+    """
+
     def set_price_floor(self, asset_name, number_of_days=30):
 
         coin_gecko = CoinGecko()
@@ -18,7 +27,7 @@ class PriceFloorManager:
             prices.sort(reverse=True)
             asset_peak_price = prices[0]
             current_price_floor = asset_peak_price * 0.60
-            # TODO: if  perivous_price_floor < current_price_floor : update the price floor, else don't update
+            # TODO: if  pervious_price_floor < current_price_floor : update the price floor, else don't update
             # get price floor
             firebase_data_manager_obj.store_data(
                 data={
@@ -32,12 +41,23 @@ class PriceFloorManager:
         except Exception as e:
             raise Exception(e)
 
+    """
+          method :: get_asset_price_floor - is used to get the price floor of an given asset.
+          params :: asset_name - name of the asset such as bitcoin etc.
+          return :: price floor of given asset.
+         """
+
     def get_asset_price_floor(self, asset_name):
         asset_price_floor_details = firebase_data_manager_obj.fetch_data(
             document_name=asset_name, collection_name="price_floor_data"
         )
         asset_price_floor_details = asset_price_floor_details.get("price_floor")
         return asset_price_floor_details
+
+    """
+            method :: get_assets_price_floors - is used to get the price floors of an given all asset that are supported by cruize.
+            return :: price floors of  assets.
+    """
 
     def get_assets_price_floors(self):
         asset_price_floor_details = firebase_data_manager_obj.fetch_collections(
