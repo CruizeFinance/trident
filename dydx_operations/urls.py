@@ -7,4 +7,6 @@ urlpatterns = [
     path("transfer", DydxOprations.as_view({"get": "transfer_information"})),
     path("deposit", DydxOprations.as_view({"post": "deposit"})),
     path("deposit/test", DydxOprations.as_view({"post": "deposit_test_fund"})),
+    path("position_id", DydxOprations.as_view({"get": "position_id"})),
+    path("register", DydxOprations.as_view({"post": "register_user"})),
 ]

@@ -1,7 +1,7 @@
-from .common import *
 from django.core.wsgi import get_wsgi_application
-
-SECRET_KEY = "j7qelfcc!qe*%((o3p0ju20obkx^j9+9#%%d-t15gqnz^*$om#"
+from .common import *
+from settings_config import project_secret_key
+SECRET_KEY = project_secret_key['data']
 DEBUG = True
 ALLOWED_HOSTS = ["127.0.0.1", "52.72.210.207", "3.210.156.188"]
 

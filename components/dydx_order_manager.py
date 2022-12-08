@@ -1,6 +1,5 @@
 import time
 from datetime import datetime, timedelta
-
 import pandas
 from dateutil.relativedelta import relativedelta
 from dydx3 import constants
@@ -13,7 +12,6 @@ from services.contracts.chainlink import ChainlinkPriceFeed
 from settings_config import asset_dydx_instance
 from utilities import cruize_constants
 from utilities.enums import AssetCodes
-
 
 # class: DydxOrderManager - is responsible for managing order on dydx.
 

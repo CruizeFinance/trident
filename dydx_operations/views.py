@@ -9,7 +9,7 @@ from dydx_operations import (
     FastWithdrawalSerializer,
     TransferSerializer,
     DepositSerializer,
-    DepositTestSerializer,
+    DepositTestSerializer,RegisterUserSerializers,PositionidSerializers
 )
 
 from services import DydxWithdrawal, DydxAdmin
@@ -139,4 +139,47 @@ class DydxOprations(GenericViewSet):
             result["error"] = e["errors"][0]["msg"]
             return Response(result, status.HTTP_500_INTERNAL_SERVER_ERROR)
 
-    # TODO :  write an api for withdrawing fund from dydx.
+# TODO :  write an api for withdrawing fund from dydx.
+    def position_id(self, request):
+            # query params  will contain the asset pair name ex ETH-USD BTC-USD .
+            request_body = request.query_params
+            serializer_class = PositionidSerializers
+            serializer = serializer_class(data=request_body)
+            serializer.is_valid(raise_exception=True)
+            data = serializer.validated_data
+            self.initialize()
+
+            result = {"message": None, "error": None}
+            try:
+                position_id = self.dydx_admin_obj.get_position_id(
+                    asset_dydx_instance[data["asset_pair"]]
+                )
+                result["message"] = {"position_id": position_id}
+                return Response(result, status.HTTP_200_OK)
+            except DydxApiError or ValueError as e:
+
+                return Response(result, status.HTTP_500_INTERNAL_SERVER_ERROR)
+
+    def register_user(self, request):
+                # query params  will contain the asset pair name ex ETH-USD BTC-USD .
+                self.initialize()
+                request_body = request.query_params
+                serializer_class = RegisterUserSerializers
+                serializer = serializer_class(data=request_body)
+                serializer.is_valid(raise_exception=True)
+                data = serializer.validated_data
+                result = {"message": None, "error": None}
+                try:
+                    user = self.dydx_admin_obj.register_user(
+                        asset_dydx_instance[data["asset_pair"]]
+                    )
+                    if user is None:
+                        raise Exception("Fail to register")
+                    result["message"] = user["data"]["signature"]
+                    return Response(result, status.HTTP_200_OK)
+                except DydxApiError or ValueError as e:
+                    result["error"] = self.error_handler.dydx_error_decoder(e)
+                    return Response(result, status.HTTP_400_BAD_REQUEST)
+                except Exception as e:
+                    result["error"] = str(e)
+                    return Response(result, status.HTTP_500_INTERNAL_SERVER_ERROR)

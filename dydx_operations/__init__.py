@@ -3,5 +3,5 @@ from .serializer.dydx_oprations_serializer import (
     FastWithdrawalSerializer,
     TransferSerializer,
     DepositSerializer,
-    DepositTestSerializer,
+    DepositTestSerializer,PositionidSerializers,RegisterUserSerializers
 )
