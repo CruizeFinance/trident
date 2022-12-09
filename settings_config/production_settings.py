@@ -1,10 +1,9 @@
 import sentry_sdk
 from sentry_sdk.integrations.django import DjangoIntegration
-
-from .common import *
+from . import sentry_dns, project_secret_key
 from django.core.wsgi import get_wsgi_application
-
-SECRET_KEY = "j7qelfcc!qe*%((o3p0ju20obkx^j9+9#%%d-t15gqnz^*$om#"
+from .common import *
+SECRET_KEY = project_secret_key['data']
 DEBUG = False
 CORS_ALLOWED_ORIGINS = [
     "http://localhost:3000",
@@ -31,7 +30,7 @@ application = get_wsgi_application()
 # SENTRY SETTINGS
 
 sentry_sdk.init(
-    dsn="https://7aa93f500f6d418092217e58f8a9557c@o4504123615084544.ingest.sentry.io/4504123647721472",
+    dsn=sentry_dns['dns'],
     integrations=[
         DjangoIntegration(),
     ],

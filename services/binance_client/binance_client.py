@@ -1,11 +1,9 @@
 import time
 from binance.client import Client as Client_binance
-from settings_config import dydx_instances
-
-
+from settings_config import dydx_credentials
 class BinanceClient(object):
     def __init__(self):
-        dydx_instances_details = dydx_instances["BTC-USD"]["binance_credentials"]
+        dydx_instances_details = dydx_credentials["BTC-USD"]["binance_credentials"]
         self.binance_api_key = dydx_instances_details["binance_api_key"]
         self.binance_api_secret = dydx_instances_details["binance_api_secret"]
         self.client = Client_binance(

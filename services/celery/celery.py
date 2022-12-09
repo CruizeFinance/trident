@@ -1,10 +1,7 @@
 import time
-
-from dydx3 import constants
 from components import FirebaseDataManager, PriceFloorManager
 from components.dydx_order_manager import DydxOrderManager
 from services import DydxWithdrawal
-from services.avve_asset_apy import AaveApy
 from settings_config import asset_dydx_instance
 from settings_config.celery_config import app
 from utilities import cruize_constants
@@ -135,12 +132,6 @@ def set_price_floor():
     price_floor_manager_obj.set_price_floor("bitcoin")
 
 
-@app.task(name="store_asset_apy")
-def store_asset_apys():
-    print("store_asset_apys :: Setting apy")
-    asset_apy_obj = AaveApy()
-    asset_apys = asset_apy_obj.fetch_asset_apys()
-    asset_apy_obj.store_asset_apys(asset_apys)
 
 
 if __name__ == "__main__":

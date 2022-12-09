@@ -32,3 +32,10 @@ class DepositSerializer(serializers.Serializer):
 
 class DepositTestSerializer(serializers.Serializer):
     asset = serializers.CharField(required=True)
+
+class PositionidSerializers(serializers.Serializer):
+    asset_pair = serializers.CharField(required=True)
+
+
+class RegisterUserSerializers(serializers.Serializer):
+    asset_pair = serializers.CharField(required=True)

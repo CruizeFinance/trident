@@ -15,9 +15,5 @@ class OrderRequestSerializer(serializers.Serializer):
         return data
 
 
-class CancelOrderRequestSerializer(serializers.Serializer):
-    order_id = serializers.CharField(required=True)
-
-
-class FirestoreOrdersRequestSerializer(serializers.Serializer):
-    order_id = serializers.CharField(required=False)
+class DydxAllOrdersRequestSerializer(serializers.Serializer):
+    type = serializers.CharField(required=True)

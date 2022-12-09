@@ -1,5 +1,4 @@
 from rest_framework import status
-from rest_framework.exceptions import ValidationError
 from rest_framework.response import Response
 from rest_framework.viewsets import GenericViewSet
 from components import PriceFloorManager, FirebaseDataManager, CruizeDataManager
@@ -11,9 +10,8 @@ from cruize_operations import (
     SetPriceFloorSerializer,
 )
 from cruize_operations.serilaizer import TvlSerializer
-from services.avve_asset_apy import AaveApy
 from services.contracts.cruize.cruize_contract import Cruize
-from utilities import cruize_constants
+
 
 price_floor_manager = PriceFloorManager()
 
@@ -115,16 +113,6 @@ class CruizeOperations(GenericViewSet):
             result["result"] = price_floor_manager.set_price_floor(
                 asset_data["asset_name"], asset_data["days"]
             )
-            return Response(result, status.HTTP_200_OK)
-        except Exception as e:
-            result["error"] = e
-            return Response(result, status.HTTP_500_INTERNAL_SERVER_ERROR)
-
-    def fetch_asset_apy(self, request):
-        result = {"result": None, "error": None}
-        try:
-            aave_apy_obj = AaveApy()
-            result["result"] = aave_apy_obj.fetch_asset_apys()
             return Response(result, status.HTTP_200_OK)
         except Exception as e:
             result["error"] = e

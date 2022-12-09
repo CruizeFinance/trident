@@ -3,7 +3,9 @@ import os
 from celery import Celery
 from celery.schedules import crontab
 from django.conf import settings
-
+from services.vault_security.vault_security import VaultSecurity
+vault_security_obj = VaultSecurity()
+celery_url = vault_security_obj.fetch('celeryurl')
 os.environ.setdefault("DJANGO_SETTINGS_MODULE", "settings_config.production_settings")
 app = Celery("trident", include=["services.celery.celery"])
 app.conf.enable_utc = True
@@ -22,7 +24,7 @@ app.conf.update(
     # broker_transport_options={
     #     "predefined_queues": {
     #         "celerybroker": {
-    #             "url": "https://sqs.us-east-1.amazonaws.com/052637204057/celerybroker",
+    #             "url": celery_url['celeryurl']
     #         },
     #     },
     # },

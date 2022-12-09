@@ -1,6 +1,6 @@
 import firebase_admin
 from firebase_admin import credentials, firestore
-import os
+from services.vault_security.vault_security import VaultSecurity
 
 """
  class FirebaseClient is responsible for initializing firebase_admin client.
@@ -13,10 +13,14 @@ import os
 class FirebaseClient(object):
     def __init__(self):
         self.client = None
+        self.firebase_credentials = None
+        self.vault_security_obj=VaultSecurity()
 
     def create_firebase_client_instance(self):
+        if self.firebase_credentials is None:
+            self.firebase_credentials = self.vault_security_obj.fetch('firebase_credentials')
         cred = credentials.Certificate(
-            os.path.abspath(os.path.dirname(__file__)) + "/firebase_config.json"
+            self.firebase_credentials
         )
         firebase_admin.initialize_app(cred)
         self.client = firestore.client()

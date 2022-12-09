@@ -19,14 +19,6 @@ class DydxOrder:
         placed_order_details = dydx_p_client.private.create_order(**order_params)
         return placed_order_details
 
-    """ function is responsible for deleting the order on dydx.
-        @param orderId orderId to be deleted.
-        @return deleted order information.
-    """
-
-    def cancel_order(self, id, dydx_client):
-        deleted_order = dydx_client.private.cancel_order(order_id=id)
-        return deleted_order
 
     """ function get_market_orders is responsible for getting all the market order according to the order_params.
         @param Order_params are the parameters that pass to dydx3  API.

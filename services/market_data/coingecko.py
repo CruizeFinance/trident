@@ -2,7 +2,6 @@ import requests
 from datetime import datetime
 from services.contracts.chainlink import ChainlinkPriceFeed
 from utilities import cruize_constants
-
 # class -  coinGecko:  is responsible for returning market data.
 from utilities.datetime_utilities import convert_epoch_to_utcdatetime
 
@@ -13,7 +12,7 @@ class CoinGecko:
     :method   - market_chart_day: will return daily market price data for each one hour.
     :params   - asset:asset for which market price data will fetch.
     :params   - vs_currency:such as ETH-USD.
-    :params   - days: for how much days data is need.
+    :params   - days:  number of days of data needed
     :return   - asset market price.
     """
 

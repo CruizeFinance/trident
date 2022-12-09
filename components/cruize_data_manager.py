@@ -1,9 +1,4 @@
-from rest_framework.exceptions import ValidationError
-
 from components import FirebaseDataManager
-from utilities import cruize_constants
-
-
 class CruizeDataManager(object):
     def save_asset_tvl(self, asset_data):
         firebase_db_manager_obj = FirebaseDataManager()
@@ -35,7 +30,7 @@ class CruizeDataManager(object):
     def fetch_user_transactions(self, user_data):
         firebase_db_obj = FirebaseDataManager()
         firebase_data = firebase_db_obj.fetch_sub_collections(
-            cruize_constants.CRUIZE_USER, user_data["wallet_address"], "transactions"
+            "cruize_users", user_data["wallet_address"], "transactions"
         )
         if not firebase_data:
             return f"No data found for wallet address: {user_data['wallet_address']}"
@@ -49,4 +44,5 @@ class CruizeDataManager(object):
 
 if __name__ == "__main__":
     d = CruizeDataManager()
-    d.save_asset_tvl({"asset_name": "WBTC", "amount": "0.1", "type": "protect"})
+    d =  d.fetch_user_transactions({"wallet_address":"0x9A3310233aaFe8930d63145CC821FF286c7829e1"})
+    print(d)
